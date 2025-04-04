@@ -6,7 +6,7 @@ ENIAD-ASSISTANT est un chatbot intelligent basé sur l'intelligence artificielle
 
 - ✅ Répondre aux questions sur les études et les services scolaires.
 - ✅ Interagir avec les utilisateurs via texte ou voix.
-- ✅ Prendre en charge trois langues : arabe, français et anglais.
+- ✅ Prendre en charge trois langues : français et anglais.
 - ✅ Utiliser une base de données vectorielle pour une recherche rapide et précise.
 
 ## 🔧 Technologies utilisées
@@ -25,8 +25,6 @@ ENIAD-ASSISTANT est un chatbot intelligent basé sur l'intelligence artificielle
 3. **Phase 3** : Développement de l’interface utilisateur et intégration avec le modèle.
 4. **Phase 4** : Tests et optimisation des performances.
 5. **Phase 5** : Livraison finale et documentation.
-
-📅 **Date limite du projet** : 1er juillet 2025
 
 ## 🎯 Critères de qualité
 
