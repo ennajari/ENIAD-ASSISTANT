@@ -35,3 +35,34 @@ ENIAD-ASSISTANT est un chatbot intelligent basé sur l'intelligence artificielle
 - ✅ **Interface utilisateur** : Intuitive et facile à utiliser
 
 Ce projet sera très utile pour les étudiants, les enseignants et l'administration, car il facilitera l'accès aux informations et améliorera l'expérience utilisateur. 🚀
+
+
+Structure simplifiée pour le projet ENIAD-ASSISTANT (PFA)
+
+eniad-assistant/
+│
+├── data/                        # Toutes les données
+│   ├── questions_fr.json        # Questions-réponses en français
+│   └── questions_en.json        # Questions-réponses en anglais
+│
+├── notebooks/                   # Notebooks Jupyter pour le développement
+│   ├── 01_exploration.ipynb     # Explorer et comprendre les données
+│   ├── 02_modele.ipynb          # Développer le modèle de chatbot
+│   └── 03_evaluation.ipynb      # Tester et évaluer le chatbot
+│
+├── src/                         # Code source du projet
+│   ├── app.py                   # Application principale
+│   ├── chatbot.py               # Logique du chatbot
+│   ├── database.py              # Gestion de la base de données
+│   └── utils.py                 # Fonctions utilitaires
+│
+├── frontend/                    # Code de l'interface utilisateur
+│   ├── index.html               # Page principale
+│   ├── style.css                # Styles
+│   └── script.js                # JavaScript pour l'interface
+│
+├── tests/                       # Tests simples
+│   └── test_chatbot.py          # Tests de base du chatbot
+│
+├── requirements.txt             # Liste des dépendances
+└── README.md                    # Instructions et documentation
