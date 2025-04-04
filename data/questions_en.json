@@ -1,202 +1,202 @@
 [
     {
-        "question": "Quels sont les horaires d'ouverture de la bibliothèque de l'ENIAD Berkane ?",
-        "réponse": "La bibliothèque est ouverte de 8h à 20h du lundi au vendredi, et de 9h à 17h le samedi."
+        "question": "What are the opening hours of the ENIAD Berkane library?",
+        "answer": "The library is open from 8 AM to 8 PM Monday to Friday, and from 9 AM to 5 PM on Saturday."
     },
     {
-        "question": "Comment s'inscrire à un cours d'intelligence artificielle ?",
-        "réponse": "L'inscription se fait en ligne via le portail étudiant ou au bureau des admissions de l'ENIAD."
+        "question": "How can I register for an artificial intelligence course?",
+        "answer": "Registration is done online via the student portal or at the ENIAD admissions office."
     },
     {
-        "question": "Où se trouve le campus de l'ENIAD Berkane ?",
-        "réponse": "Le campus est situé à Berkane, près de l'Université Mohammed 1er, dans la région de l'Oriental."
+        "question": "Where is the ENIAD Berkane campus located?",
+        "answer": "The campus is located in Berkane, near Mohammed 1st University, in the Oriental region."
     },
     {
-        "question": "Quelles sont les filières proposées à l'ENIAD ?",
-        "réponse": "L'ENIAD propose des filières en IA, Robotique, Sécurité Informatique et Génie Informatique."
+        "question": "What programs are offered at ENIAD?",
+        "answer": "ENIAD offers programs in AI, Robotics, Cybersecurity, and Computer Engineering."
     },
     {
-        "question": "Quel est le coût des frais de scolarité ?",
-        "réponse": "Les frais varient selon le programme ; contactez l'administration pour plus de détails."
+        "question": "What is the cost of tuition fees?",
+        "answer": "Fees vary depending on the program; contact the administration for more details."
     },
     {
-        "question": "Y a-t-il un internat à l'ENIAD Berkane ?",
-        "réponse": "Non, l'ENIAD ne dispose pas d'internat, mais des logements privés sont disponibles à proximité."
+        "question": "Is there a dormitory at ENIAD Berkane?",
+        "answer": "No, ENIAD does not have a dormitory, but private housing is available nearby."
     },
     {
-        "question": "Comment contacter un professeur ?",
-        "réponse": "Les coordonnées des professeurs sont disponibles sur le portail étudiant ou au secrétariat."
+        "question": "How can I contact a professor?",
+        "answer": "Professors' contact details are available on the student portal or at the secretariat."
     },
     {
-        "question": "Quand commence l'année scolaire 2025-2026 ?",
-        "réponse": "L'année scolaire débute généralement en septembre, vérifiez les dates exactes sur le site officiel."
+        "question": "When does the 2025-2026 school year start?",
+        "answer": "The school year usually starts in September; check the exact dates on the official website."
     },
     {
-        "question": "Quels sont les prérequis pour le cycle ingénieur ?",
-        "réponse": "Un diplôme de niveau bac+2 ou équivalent dans une filière technique est requis."
+        "question": "What are the prerequisites for the engineering cycle?",
+        "answer": "A bac+2 level diploma or equivalent in a technical field is required."
     },
     {
-        "question": "L'ENIAD offre-t-elle des formations en ligne ?",
-        "réponse": "Oui, certaines formations courtes sont disponibles en ligne via la plateforme e-learning."
+        "question": "Does ENIAD offer online training?",
+        "answer": "Yes, some short courses are available online via the e-learning platform."
     },
     {
-        "question": "Comment accéder au Wi-Fi du campus ?",
-        "réponse": "Utilisez votre identifiant étudiant et mot de passe fournis à l'inscription."
+        "question": "How can I access the campus Wi-Fi?",
+        "answer": "Use your student ID and password provided at registration."
     },
     {
-        "question": "Quels logiciels sont utilisés en cours d'IA ?",
-        "réponse": "Python, TensorFlow, PyTorch et d'autres outils sont couramment utilisés."
+        "question": "What software is used in AI courses?",
+        "answer": "Python, TensorFlow, PyTorch, and other tools are commonly used."
     },
     {
-        "question": "Y a-t-il des stages obligatoires ?",
-        "réponse": "Oui, un stage est requis en fin de cycle pour valider le diplôme d'ingénieur."
+        "question": "Are internships mandatory?",
+        "answer": "Yes, an internship is required at the end of the cycle to validate the engineering degree."
     },
     {
-        "question": "Où puis-je trouver le calendrier des examens ?",
-        "réponse": "Le calendrier est publié sur le portail étudiant au début de chaque semestre."
+        "question": "Where can I find the exam schedule?",
+        "answer": "The schedule is published on the student portal at the start of each semester."
     },
     {
-        "question": "L'ENIAD organise-t-elle des événements ?",
-        "réponse": "Oui, des hackathons, conférences et ateliers sont régulièrement organisés."
+        "question": "Does ENIAD organize events?",
+        "answer": "Yes, hackathons, conferences, and workshops are regularly organized."
     },
     {
-        "question": "Comment demander une bourse ?",
-        "réponse": "Soumettez une demande via le portail étudiant avant la date limite annuelle."
+        "question": "How can I apply for a scholarship?",
+        "answer": "Submit an application through the student portal before the annual deadline."
     },
     {
-        "question": "Quels sont les débouchés après un diplôme de l'ENIAD ?",
-        "réponse": "Les diplômés travaillent dans l'IA, la cybersécurité, le développement logiciel, etc."
+        "question": "What are the career opportunities after an ENIAD degree?",
+        "answer": "Graduates work in AI, cybersecurity, software development, etc."
     },
     {
-        "question": "Y a-t-il un club de robotique ?",
-        "réponse": "Oui, le club de robotique est ouvert à tous les étudiants intéressés."
+        "question": "Is there a robotics club?",
+        "answer": "Yes, the robotics club is open to all interested students."
     },
     {
-        "question": "Comment réserver une salle de travail ?",
-        "réponse": "Les réservations se font via l'application interne de l'ENIAD."
+        "question": "How can I reserve a study room?",
+        "answer": "Reservations are made through the ENIAD internal application."
     },
     {
-        "question": "Quels sont les horaires des cours ?",
-        "réponse": "Les cours ont lieu généralement de 8h30 à 17h, selon l'emploi du temps."
+        "question": "What are the class schedules?",
+        "answer": "Classes are generally held from 8:30 AM to 5 PM, depending on the timetable."
     },
     {
-        "question": "L'ENIAD a-t-elle un partenariat avec des entreprises ?",
-        "réponse": "Oui, elle collabore avec des entreprises technologiques pour des projets et stages."
+        "question": "Does ENIAD have partnerships with companies?",
+        "answer": "Yes, it collaborates with tech companies for projects and internships."
     },
     {
-        "question": "Comment assister à une journée portes ouvertes ?",
-        "réponse": "Les dates sont annoncées sur le site officiel ; l'inscription est souvent requise."
+        "question": "How can I attend an open house day?",
+        "answer": "Dates are announced on the official website; registration is often required."
     },
     {
-        "question": "Quels sont les documents pour l'inscription ?",
-        "réponse": "Carte d'identité, diplômes, relevés de notes et photos d'identité sont nécessaires."
+        "question": "What documents are needed for registration?",
+        "answer": "ID card, diplomas, transcripts, and ID photos are required."
     },
     {
-        "question": "Y a-t-il des cours en anglais ?",
-        "réponse": "Oui, certains modules avancés sont dispensés en anglais."
+        "question": "Are there courses in English?",
+        "answer": sober"Yes, some advanced modules are taught in English."
     },
     {
-        "question": "Comment signaler un problème technique ?",
-        "réponse": "Contactez le support informatique via l'adresse email support@eniad.ump.ma."
+        "question": "How can I report a technical issue?",
+        "answer": "Contact IT support via the email address support@eniad.ump.ma."
     },
     {
-        "question": "L'ENIAD propose-t-elle des certifications ?",
-        "réponse": "Oui, des certifications en IA et cybersécurité sont disponibles."
+        "question": "Does ENIAD offer certifications?",
+        "answer": "Yes, certifications in AI and cybersecurity are available."
     },
     {
-        "question": "Où manger sur le campus ?",
-        "réponse": "Une cafétéria est disponible, mais il n'y a pas de restaurant universitaire."
+        "question": "Where can I eat on campus?",
+        "answer": "A cafeteria is available, but there is no university restaurant."
     },
     {
-        "question": "Comment participer à un projet de recherche ?",
-        "réponse": "Contactez les professeurs ou le département de recherche de l'ENIAD."
+        "question": "How can I participate in a research project?",
+        "answer": "Contact professors or the ENIAD research department."
     },
     {
-        "question": "Quels sont les délais pour payer les frais ?",
-        "réponse": "Les frais doivent être payés avant le début de chaque semestre."
+        "question": "What are the deadlines for paying fees?",
+        "answer": "Fees must be paid before the start of each semester."
     },
     {
-        "question": "L'ENIAD a-t-elle une bibliothèque numérique ?",
-        "réponse": "Oui, une bibliothèque numérique est accessible avec vos identifiants étudiants."
+        "question": "Does ENIAD have a digital library?",
+        "answer": "Yes, a digital library is accessible with your student credentials."
     },
     {
-        "question": "Qu'est-ce que le Big Data à l'ENIAD Berkane ?",
-        "réponse": "Le Big Data à l'ENIAD couvre l'analyse de grandes quantités de données avec des outils comme Hadoop et Spark."
+        "question": "What is Big Data at ENIAD Berkane?",
+        "answer": "Big Data at ENIAD covers the analysis of large datasets using tools like Hadoop and Spark."
     },
     {
-        "question": "Quels outils de Big Data sont enseignés ?",
-        "réponse": "Hadoop, Apache Spark, Kafka et des bases de données NoSQL comme MongoDB sont au programme."
+        "question": "What Big Data tools are taught?",
+        "answer": "Hadoop, Apache Spark, Kafka, and NoSQL databases like MongoDB are part of the curriculum."
     },
     {
-        "question": "Comment s'inscrire au module Big Data ?",
-        "réponse": "Inscrivez-vous via le portail étudiant ou consultez le responsable du département IA."
+        "question": "How can I enroll in the Big Data module?",
+        "answer": "Enroll via the student portal or consult the AI department head."
     },
     {
-        "question": "Y a-t-il des projets Big Data à l'ENIAD ?",
-        "réponse": "Oui, les étudiants travaillent sur des projets réels avec des entreprises partenaires."
+        "question": "Are there Big Data projects at ENIAD?",
+        "answer": "Yes, students work on real projects with partner companies."
     },
     {
-        "question": "Quelles sont les bases de données utilisées en Big Data ?",
-        "réponse": "Les bases vectorielles, MongoDB, et Cassandra sont souvent utilisées."
+        "question": "What databases are used in Big Data?",
+        "answer": "Vector databases, MongoDB, and Cassandra are commonly used."
     },
     {
-        "question": "Comment accéder aux serveurs Big Data ?",
-        "réponse": "Les serveurs sont accessibles via une connexion sécurisée avec vos identifiants étudiants."
+        "question": "How can I access Big Data servers?",
+        "answer": "Servers are accessible via a secure connection with your student credentials."
     },
     {
-        "question": "Le Big Data est-il obligatoire à l'ENIAD ?",
-        "réponse": "Non, mais il est fortement recommandé pour les spécialisations en IA et informatique."
+        "question": "Is Big Data mandatory at ENIAD?",
+        "answer": "No, but it is highly recommended for AI and computer science specializations."
     },
     {
-        "question": "Quels sont les prérequis pour le cours de Big Data ?",
-        "réponse": "Des bases en programmation (Python) et en bases de données sont nécessaires."
+        "question": "What are the prerequisites for the Big Data course?",
+        "answer": "Basic programming (Python) and database knowledge are required."
     },
     {
-        "question": "Y a-t-il des certifications en Big Data ?",
-        "réponse": "Oui, l'ENIAD propose des certifications reconnues en partenariat avec des entreprises."
+        "question": "Are there Big Data certifications?",
+        "answer": "Yes, ENIAD offers recognized certifications in partnership with companies."
     },
     {
-        "question": "Comment analyser des données massives à l'ENIAD ?",
-        "réponse": "Utilisez les outils enseignés comme Spark ou participez aux ateliers pratiques."
+        "question": "How can I analyze massive data at ENIAD?",
+        "answer": "Use the taught tools like Spark or join practical workshops."
     },
     {
-        "question": "Quels sont les débouchés du Big Data ?",
-        "réponse": "Data Scientist, Ingénieur Big Data, Analyste de données, etc."
+        "question": "What are the career opportunities in Big Data?",
+        "answer": "Data Scientist, Big Data Engineer, Data Analyst, etc."
     },
     {
-        "question": "L'ENIAD a-t-elle un cluster Hadoop ?",
-        "réponse": "Oui, un cluster Hadoop est disponible pour les projets étudiants."
+        "question": "Does ENIAD have a Hadoop cluster?",
+        "answer": "Yes, a Hadoop cluster is available for student projects."
     },
     {
-        "question": "Comment participer à un hackathon Big Data ?",
-        "réponse": "Inscrivez-vous aux événements annoncés sur le portail ou par email."
+        "question": "How can I participate in a Big Data hackathon?",
+        "answer": "Register for events announced on the portal or by email."
     },
     {
-        "question": "Qu'est-ce qu'une base de données vectorielle ?",
-        "réponse": "C'est une base optimisée pour les recherches rapides, utilisée dans le Big Data et l'IA."
+        "question": "What is a vector database?",
+        "answer": "It’s a database optimized for fast searches, used in Big Data and AI."
     },
     {
-        "question": "Le Big Data est-il enseigné en anglais ?",
-        "réponse": "Oui, certains cours avancés sont en anglais pour attirer un public international."
+        "question": "Is Big Data taught in English?",
+        "answer": "Yes, some advanced courses are in English to attract an international audience."
     },
     {
-        "question": "Comment stocker des données massives à l'ENIAD ?",
-        "réponse": "Les données sont stockées sur des serveurs cloud ou locaux avec Hadoop HDFS."
+        "question": "How are massive data stored at ENIAD?",
+        "answer": "Data is stored on cloud or local servers with Hadoop HDFS."
     },
     {
-        "question": "Y a-t-il des partenariats Big Data avec des entreprises ?",
-        "réponse": "Oui, des collaborations existent avec des sociétés technologiques marocaines et internationales."
+        "question": "Are there Big Data partnerships with companies?",
+        "answer": "Yes, collaborations exist with Moroccan and international tech companies."
     },
     {
-        "question": "Quels sont les projets Big Data en cours ?",
-        "réponse": "Des projets sur l'analyse de données éducatives et industrielles sont en cours."
+        "question": "What Big Data projects are ongoing?",
+        "answer": "Projects on educational and industrial data analysis are in progress."
     },
     {
-        "question": "Comment apprendre Apache Spark à l'ENIAD ?",
-        "réponse": "Inscrivez-vous au module Big Data ou suivez les tutoriels en ligne de l'ENIAD."
+        "question": "How can I learn Apache Spark at ENIAD?",
+        "answer": "Enroll in the Big Data module or follow ENIAD’s online tutorials."
     },
     {
-        "question": "Le Big Data aide-t-il les étudiants à l'ENIAD ?",
-        "réponse": "Oui, il permet d'analyser des données pour améliorer les services et l'enseignement."
+        "question": "Does Big Data help ENIAD students?",
+        "answer": "Yes, it enables data analysis to improve services and education."
     }
 ]
