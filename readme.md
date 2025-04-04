@@ -38,7 +38,7 @@ Ce projet sera très utile pour les étudiants, les enseignants et l'administrat
 
 
 Structure simplifiée pour le projet ENIAD-ASSISTANT (PFA)
-
+<pre>
 eniad-assistant/
 │
 ├── data/                        # Toutes les données
@@ -65,4 +65,4 @@ eniad-assistant/
 │   └── test_chatbot.py          # Tests de base du chatbot
 │
 ├── requirements.txt             # Liste des dépendances
-└── README.md                    # Instructions et documentation
+└── README.md                    # Instructions et documentation </pre>
