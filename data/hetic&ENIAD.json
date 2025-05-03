@@ -1,0 +1,161 @@
+{
+    "faq": [
+      {
+        "question": "Quelles sont les prérequis pour intégrer le programme d'ingénierie à ENIAD Berkane ?",
+        "answer": "Les candidats doivent avoir un baccalauréat scientifique ou équivalent et réussir l'examen d'admission."
+      },
+      {
+        "question": "Le programme d'ingénierie est-il dispensé en français ou en anglais ?",
+        "answer": "Le programme d'ingénierie est dispensé en français avec des modules en anglais dans certaines spécialités."
+      },
+      {
+        "question": "Quels sont les frais de scolarité pour le cycle d'ingénierie à ENIAD Berkane ?",
+        "answer": "Les frais de scolarité varient chaque année et sont disponibles sur le site officiel de l'école."
+      },
+      {
+        "question": "L'école offre-t-elle des bourses d'études ?",
+        "answer": "Oui, des bourses sont disponibles pour les étudiants en fonction de leur mérite académique ou de leur situation sociale."
+      },
+      {
+        "question": "Quels sont les débouchés après avoir obtenu un diplôme d'ingénieur de ENIAD Berkane ?",
+        "answer": "Les diplômés peuvent travailler dans divers secteurs tels que l'intelligence artificielle, les réseaux et systèmes, la cybersécurité, et plus encore."
+      },
+      {
+        "question": "Quel est le programme des stages pendant le cycle d'ingénierie ?",
+        "answer": "Les stages font partie intégrante du programme, avec une première période en entreprise dès la deuxième année et un stage de fin d'études en dernière année."
+      },
+      {
+        "question": "Puis-je suivre des cours en ligne à ENIAD Berkane ?",
+        "answer": "L'école propose certains modules en ligne, en particulier pour les étudiants inscrits en alternance."
+      },
+      {
+        "question": "Quelles sont les compétences acquises pendant le programme d'ingénierie ?",
+        "answer": "Les étudiants acquièrent des compétences techniques en programmation, gestion de projet, analyse de données, IA, et plus encore."
+      },
+      {
+        "question": "Est-ce que l'école propose des opportunités d'échange international ?",
+        "answer": "Oui, des partenariats avec des universités internationales permettent aux étudiants d'effectuer des échanges académiques."
+      },
+      {
+        "question": "Comment se passe l'admission à ENIAD Berkane ?",
+        "answer": "L'admission se fait via un concours d'entrée qui inclut des épreuves écrites et orales."
+      },
+      {
+        "question": "Quels sont les profils d'étudiants recherchés par ENIAD Berkane ?",
+        "answer": "L'école recherche des étudiants passionnés par les technologies, avec une forte capacité de travail et un bon niveau en mathématiques et en sciences."
+      },
+      {
+        "question": "Quelles sont les matières enseignées dans le programme d'ingénierie ?",
+        "answer": "Les matières incluent les mathématiques, la programmation, l'algorithmique, les bases de données, le génie logiciel, et bien d'autres."
+      },
+      {
+        "question": "L'école offre-t-elle des formations en alternance ?",
+        "answer": "Oui, l'école propose des formations en alternance à partir de la troisième année du cycle ingénierie."
+      },
+      {
+        "question": "Quels sont les horaires des cours à ENIAD Berkane ?",
+        "answer": "Les cours sont généralement dispensés en journée, du lundi au vendredi, avec une organisation qui varie selon les semestres."
+      },
+      {
+        "question": "Peut-on choisir sa spécialisation à partir de la troisième année ?",
+        "answer": "Oui, à partir de la troisième année, les étudiants peuvent choisir parmi plusieurs spécialisations comme l'IA, la cybersécurité, ou le génie logiciel."
+      },
+      {
+        "question": "Est-ce que l'école organise des événements pour les étudiants ?",
+        "answer": "Oui, l'école organise régulièrement des événements comme des hackathons, des conférences et des séminaires."
+      },
+      {
+        "question": "Quels outils sont utilisés pendant le programme d'ingénierie ?",
+        "answer": "Les étudiants utilisent des outils comme Python, C++, Matlab, ainsi que des plateformes pour le cloud computing et la gestion de bases de données."
+      },
+      {
+        "question": "Y a-t-il des opportunités de travailler avec des entreprises partenaires pendant les études ?",
+        "answer": "Oui, les étudiants sont régulièrement invités à collaborer avec des entreprises partenaires dans le cadre de projets et de stages."
+      },
+      {
+        "question": "Quelles sont les options disponibles après la fin du cycle d'ingénierie ?",
+        "answer": "Les diplômés peuvent poursuivre leurs études en mastères spécialisés ou commencer à travailler dans des entreprises de technologie."
+      },
+      {
+        "question": "Quelles sont les démarches à suivre pour une admission parallèle ?",
+        "answer": "Les admissions parallèles sont ouvertes aux candidats titulaires d'un diplôme de niveau Bac+2. Il faut passer une épreuve de sélection spécifique."
+      },
+      {
+        "question": "L'école propose-t-elle des formations en cybersécurité ?",
+        "answer": "Oui, la cybersécurité fait partie des spécialisations proposées à partir de la troisième année du programme."
+      },
+      {
+        "question": "Quel est le programme d'enseignement en intelligence artificielle ?",
+        "answer": "Le programme d'IA inclut des cours sur l'apprentissage automatique, la vision par ordinateur, le traitement du langage naturel, et plus encore."
+      },
+      {
+        "question": "Comment fonctionne le processus d’évaluation des étudiants ?",
+        "answer": "Les étudiants sont évalués par des examens, des projets pratiques et des présentations orales en fin de semestre."
+      },
+      {
+        "question": "L'école offre-t-elle des cours en data science ?",
+        "answer": "Oui, la data science est un domaine clé de formation à ENIAD Berkane, avec des cours spécialisés dès la deuxième année."
+      },
+      {
+        "question": "Quels sont les types de projets sur lesquels les étudiants travaillent ?",
+        "answer": "Les étudiants travaillent sur des projets réels, souvent en collaboration avec des entreprises, dans des domaines comme le développement web, l'IA, et la cybersécurité."
+      },
+      {
+        "question": "Est-ce que l'école offre des opportunités de stage à l'international ?",
+        "answer": "Oui, ENIAD Berkane a des partenariats avec des entreprises internationales qui offrent des opportunités de stage."
+      },
+      {
+        "question": "Quels sont les objectifs du programme d'ingénierie ?",
+        "answer": "Le programme vise à préparer les étudiants à des carrières de leadership dans les technologies, en les formant aux compétences techniques et en gestion de projet."
+      },
+      {
+        "question": "Est-ce que les étudiants peuvent travailler en parallèle de leurs études ?",
+        "answer": "Les étudiants peuvent travailler pendant leurs études, notamment dans le cadre des projets en entreprise ou des stages en alternance."
+      },
+      {
+        "question": "Quelles sont les principales compétences que l'on apprend pendant le cycle d'ingénierie ?",
+        "answer": "Les compétences incluent la programmation, la gestion de projets, la résolution de problèmes complexes, et la compréhension des systèmes informatiques."
+      },
+      {
+        "question": "L'école propose-t-elle une formation en marketing digital ?",
+        "answer": "Oui, l'école propose une formation en marketing digital dans le cadre de certaines spécialisations comme le Webmarketing & UX."
+      },
+      {
+        "question": "Quels types de projets les étudiants réalisent-ils en fin de cycle ?",
+        "answer": "Les étudiants réalisent un projet de fin d'études, souvent en partenariat avec une entreprise, qui peut inclure le développement d'une application ou d'un système complexe."
+      },
+      {
+        "question": "Le cycle d'ingénierie à ENIAD Berkane permet-il d'accéder à des certifications professionnelles ?",
+        "answer": "Oui, les étudiants peuvent obtenir des certifications professionnelles en programmation, gestion de projet, ou cybersécurité pendant leur parcours."
+      },
+      {
+        "question": "Quels types de ressources sont mises à disposition des étudiants ?",
+        "answer": "Les étudiants ont accès à des laboratoires informatiques, des bibliothèques en ligne, des plateformes de cours et un encadrement personnalisé."
+      },
+      {
+        "question": "Peut-on suivre une spécialisation en développement mobile à ENIAD Berkane ?",
+        "answer": "Oui, il est possible de se spécialiser en développement mobile à partir de la troisième année."
+      },
+      {
+        "question": "Quelles sont les compétences en gestion de projet enseignées à ENIAD Berkane ?",
+        "answer": "Les étudiants sont formés à la gestion de projet en utilisant des outils comme Jira et Trello et en suivant des méthodologies comme Agile et Scrum."
+      },
+      {
+        "question": "L'école fournit-elle des équipements pour les étudiants ?",
+        "answer": "Oui, les étudiants ont accès à des ordinateurs et à des logiciels professionnels pour les aider dans leur travail."
+      },
+      {
+        "question": "Peut-on suivre des cours en ligne à temps partiel ?",
+        "answer": "Oui, certains cours sont proposés en ligne et peuvent être suivis à temps partiel, particulièrement pour les étudiants en alternance."
+      },
+      {
+        "question": "Y a-t-il une possibilité d'intégrer une école partenaire à l'étranger après une partie du programme ?",
+        "answer": "Oui, les étudiants peuvent partir en échange avec des écoles partenaires après avoir validé un certain nombre de crédits."
+      },
+      {
+        "question": "Quels sont les projets de recherche à ENIAD Berkane ?",
+        "answer": "Les étudiants peuvent participer à des projets de recherche sur des sujets innovants, tels que l'intelligence artificielle, la blockchain, et les systèmes embarqués."
+      }
+    ]
+  }
+  

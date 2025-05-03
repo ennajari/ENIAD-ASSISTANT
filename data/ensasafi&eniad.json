@@ -1,0 +1,45 @@
+{
+    "faq": [
+      {
+        "question": "Qu'est-ce que l'ENIAD Berkane ?",
+        "answer": "ENIAD est une école d'ingénieurs publique au Maroc. Elle fait partie du réseau des écoles nationales des sciences appliquées, visant à former des ingénieurs dans différents domaines scientifiques et techniques."
+      },
+      {
+        "question": "Quel est l'objectif principal de l'ENIAD ?",
+        "answer": "L'ENIAD vise à offrir une formation d'ingénieurs d'État, équilibrée entre théorie et pratique, afin de répondre aux besoins du développement industriel et économique, tant au niveau national qu'international."
+      },
+      {
+        "question": "Quels sont les domaines de formation à l'ENIAD ?",
+        "answer": "L'ENIAD propose des formations dans plusieurs filières d'ingénierie, incluant la Génie Informatique, la Génie Industriel, la Génie des Télécommunications, et d'autres domaines technologiques avancés."
+      },
+      {
+        "question": "Comment se structure la formation à l'ENIAD ?",
+        "answer": "La formation à l'ENIAD se déroule sur un cursus de cinq ans : un cycle préparatoire de deux ans suivi d'un cycle d'ingénieur de trois ans, avec une forte composante pratique et des projets en collaboration avec l'industrie."
+      },
+      {
+        "question": "Quels sont les débouchés après la formation à l'ENIAD ?",
+        "answer": "Les diplômés de l'ENIAD peuvent travailler dans divers secteurs industriels, technologiques, et économiques. Ils peuvent également poursuivre leurs études en master ou en doctorat dans des domaines spécifiques."
+      },
+      {
+        "question": "L'ENIAD propose-t-elle des formations continues ?",
+        "answer": "Oui, l'ENIAD propose des formations continues pour les professionnels souhaitant approfondir leurs connaissances dans des domaines spécifiques."
+      },
+      {
+        "question": "Quels sont les partenariats de l'ENIAD avec l'industrie ?",
+        "answer": "L'ENIAD a des partenariats avec de nombreuses entreprises et institutions pour offrir aux étudiants des opportunités de stages, de visites industrielles, et de séminaires animés par des experts du secteur."
+      },
+      {
+        "question": "L'ENIAD offre-t-elle un espace pour les étudiants ?",
+        "answer": "Oui, l'ENIAD met à disposition de ses étudiants un espace d'affichage, une bibliothèque, et un accès à des services en ligne pour faciliter leur parcours académique."
+      },
+      {
+        "question": "Où est située l'ENIAD ?",
+        "answer": "L'ENIAD est située à Berkane, dans la région de l'Oriental au Maroc."
+      },
+      {
+        "question": "Comment contacter l'ENIAD ?",
+        "answer": "Vous pouvez contacter l'ENIAD par email à l'adresse suivante : eniad@uca.ac.ma ou par téléphone au +212 656 200007."
+      }
+    ]
+  }
+  
