@@ -1,0 +1,147 @@
+{
+  "universite": "ENIAD Berkane",
+  "site_web": "www.eniad.ac.ma",
+  "dossier_candidature": {
+    "description": "La candidature à l'ENIAD Berkane se fait via notre site web.",
+    "concours": {
+      "description": "Les étudiants doivent passer un concours pour entrer dans nos programmes.",
+      "dates": [
+        "Mai",
+        "Juin",
+        "Juillet"
+      ],
+      "filiere": "La date du concours dépend de chaque filière."
+    },
+    "eligibilite": {
+      "description": "Les candidats doivent avoir de bonnes notes en contrôle continu de la 1ère et 2ème année BAC.",
+      "lien": "https://candidature.eniad.ump.ma/"
+    }
+  },
+  "formations": {
+    "poles": [
+      "Génie Informatique",
+      "Systèmes Embarqués",
+      "Intelligence Artificielle",
+      "Réseaux et Télécommunications"
+    ]
+  },
+  "bourses": {
+    "eligibilite": "Les étudiants ayant une mention Bien/Très Bien au Bac peuvent être éligibles, avec des ressources financières limitées.",
+    "candidature": "Les candidats doivent soumettre une candidature en ligne sur www.eniad.ac.ma sous l'onglet 'Candidature'."
+  },
+  "etudiants_internationaux": {
+    "description": "Les étudiants internationaux peuvent candidater via le menu 'Admissions' puis 'ÉTUDIANTS INTERNATIONAUX'.",
+    "email_contact": "contact@eniad.ac.ma",
+    "aide": "Les étudiants doivent préciser leur cas par email pour obtenir de l'aide."
+  },
+  "concours": {
+    "description": "Les concours sont organisés chaque année en trois sessions : Mai, Juin, Juillet.",
+    "suggestion": "Consulter le calendrier des concours pour les dates exactes de chaque filière."
+  },
+  "faq": [
+    {
+      "question": "Comment candidater à l'ENIAD Berkane ?",
+      "reponse": "La candidature se fait en ligne sur le site officiel de l'ENIAD Berkane."
+    },
+    {
+      "question": "Quels sont les programmes offerts en informatique ?",
+      "reponse": "L'ENIAD Berkane propose des formations en Génie Informatique, Systèmes Embarqués, Intelligence Artificielle, et Réseaux et Télécommunications."
+    },
+    {
+      "question": "Quelles sont les conditions d'admission ?",
+      "reponse": "Les candidats doivent être titulaires du Bac et réussir un concours d'entrée."
+    },
+    {
+      "question": "Comment postuler pour une bourse ?",
+      "reponse": "Les bourses sont attribuées sur la base des résultats du Bac et des ressources financières limitées."
+    },
+    {
+      "question": "Est-ce que l'ENIAD Berkane propose des formations en ligne ?",
+      "reponse": "Actuellement, les formations sont principalement en présentiel."
+    },
+    {
+      "question": "Quels sont les programmes de Master disponibles en informatique ?",
+      "reponse": "L'ENIAD Berkane propose des Masters en Génie Informatique et autres spécialités liées à l'IT."
+    },
+    {
+      "question": "Comment sont organisées les sessions de concours ?",
+      "reponse": "Il y a trois sessions de concours par an, en Mai, Juin et Juillet."
+    },
+    {
+      "question": "Quels documents sont nécessaires pour l'inscription ?",
+      "reponse": "Il faut fournir une copie du Bac, des relevés de notes, et d'autres pièces demandées sur le site de candidature."
+    },
+    {
+      "question": "L'ENIAD Berkane propose-t-elle des stages ?",
+      "reponse": "Oui, l'ENIAD Berkane organise des stages en entreprise pour ses étudiants."
+    },
+    {
+      "question": "L'ENIAD Berkane offre-t-elle des formations en alternance ?",
+      "reponse": "Oui, certaines formations en informatique sont disponibles en alternance avec des entreprises partenaires."
+    },
+    {
+      "question": "Quels sont les services offerts aux étudiants en informatique ?",
+      "reponse": "Les étudiants ont accès à des salles informatiques, une bibliothèque, et des espaces de détente."
+    },
+    {
+      "question": "Y a-t-il des clubs étudiants liés à l'informatique ?",
+      "reponse": "Oui, l'ENIAD Berkane dispose de clubs étudiants axés sur l'informatique et le développement technologique."
+    },
+    {
+      "question": "L'ENIAD Berkane est-elle accréditée ?",
+      "reponse": "Oui, l'ENIAD Berkane est accréditée par l'État et propose des diplômes reconnus."
+    },
+    {
+      "question": "Est-ce que l'ENIAD Berkane organise des événements pour les étudiants en informatique ?",
+      "reponse": "Oui, des événements comme des hackathons ou des conférences technologiques sont organisés."
+    },
+    {
+      "question": "Comment se déroule l'enseignement des programmes informatiques ?",
+      "reponse": "L'enseignement se fait en cours magistraux, travaux dirigés et pratiques, avec un fort accent sur les projets techniques."
+    },
+    {
+      "question": "Quelles sont les modalités d'examen pour les programmes informatiques ?",
+      "reponse": "Les examens incluent des partiels, des projets techniques et des soutenances."
+    },
+    {
+      "question": "Les étudiants peuvent-ils participer à des projets de recherche en informatique ?",
+      "reponse": "Oui, les étudiants peuvent participer à des projets de recherche en intelligence artificielle, réseaux, ou systèmes embarqués avec des professeurs."
+    },
+    {
+      "question": "L'ENIAD Berkane dispose-t-elle d'une bibliothèque pour les ressources informatiques ?",
+      "reponse": "Oui, une bibliothèque bien équipée avec des ressources en informatique est à la disposition des étudiants."
+    },
+    {
+      "question": "Comment l'ENIAD Berkane prépare-t-elle ses étudiants en informatique au marché du travail ?",
+      "reponse": "L'ENIAD Berkane offre des formations axées sur les besoins du marché, des stages, et des partenariats avec des entreprises technologiques."
+    },
+    {
+      "question": "Les étudiants internationaux peuvent-ils étudier l'informatique à l'ENIAD Berkane ?",
+      "reponse": "Oui, l'ENIAD Berkane accueille des étudiants internationaux dans ses programmes informatiques."
+    },
+    {
+      "question": "Quelles sont les possibilités d'emploi après un diplôme en informatique ?",
+      "reponse": "Les diplômés trouvent facilement un emploi dans des domaines comme le développement logiciel, l'IA, ou les réseaux grâce aux partenariats avec des entreprises."
+    },
+    {
+      "question": "L'ENIAD Berkane propose-t-elle des échanges internationaux pour les étudiants en informatique ?",
+      "reponse": "Oui, des programmes d'échange avec des universités étrangères sont proposés."
+    },
+    {
+      "question": "Quels sont les avantages d'étudier l'informatique à l'ENIAD Berkane ?",
+      "reponse": "L'ENIAD Berkane offre des formations de pointe en informatique, des infrastructures modernes, et des opportunités professionnelles dans le secteur technologique."
+    },
+    {
+      "question": "Quels sont les projets innovants menés par l'ENIAD Berkane en informatique ?",
+      "reponse": "L'ENIAD Berkane soutient des projets innovants en intelligence artificielle, systèmes embarqués, et réseaux."
+    },
+    {
+      "question": "Comment obtenir un stage en informatique à l'ENIAD Berkane ?",
+      "reponse": "Les étudiants peuvent postuler aux offres de stage dans le domaine informatique via la plateforme dédiée."
+    },
+    {
+      "question": "Les étudiants peuvent-ils emprunter des ressources informatiques à la bibliothèque ?",
+      "reponse": "Oui, les étudiants peuvent emprunter des livres et accéder à des ressources numériques pour leurs études en informatique."
+    }
+  ]
+}
