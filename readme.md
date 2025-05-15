@@ -64,3 +64,107 @@ eniad-assistant/
 │
 ├── requirements.txt             # Liste des dépendances
 └── README.md                    # Instructions et documentation </pre>
+
+
+
+import gradio as gr
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.svm import LinearSVC
+from sklearn.pipeline import make_pipeline
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
+import speech_recognition as sr
+from gtts import gTTS
+import os
+import tempfile
+# Données JSON (50 questions/réponses)
+qa_data = [
+    {"question": "Quels sont les horaires d'ouverture de la bibliothèque de l'ENIAD Berkane ?", "réponse": "La bibliothèque est ouverte de 8h à 20h du lundi au vendredi, et de 9h à 17h le samedi."},
+   
+]
+# Préparation des données
+questions = [item["question"] for item in qa_data]
+responses = [item["réponse"] for item in qa_data]
+labels = list(range(len(questions)))
+# Vectorisation TF-IDF
+vectorizer = TfidfVectorizer()
+X = vectorizer.fit_transform(questions)
+# Entraînement du modèle SVM
+model = LinearSVC()
+model.fit(X, labels)
+# Message d'encouragement
+encouragement = "\n\nN’hésitez pas à explorer nos programmes comme l’IA, la robotique ou le Big Data, et à participer à nos hackathons ou ateliers !"
+# Fonction Speech-to-Text
+def speech_to_text(audio):
+    if audio is None:
+        return "Veuillez enregistrer une question avec le microphone."
+    recognizer = sr.Recognizer()
+    with sr.AudioFile(audio) as source:
+        audio_data = recognizer.record(source)
+    try:
+        text = recognizer.recognize_google(audio_data, language="fr-FR")
+        return text
+    except sr.UnknownValueError:
+        return "Désolé, je n’ai pas compris ce que vous avez dit."
+    except sr.RequestError:
+        return "Erreur de connexion au service de reconnaissance vocale."
+# Fonction Text-to-Speech
+def text_to_speech(text):
+    tts = gTTS(text=text, lang="fr", slow=False)
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
+    tts.save(temp_file.name)
+    return temp_file.name
+# Fonction principale du chatbot
+def chatbot_response(text_input=None, audio_input=None):
+    # Priorité à l'audio si fourni, sinon utiliser le texte
+    if audio_input is not None:
+        user_input = speech_to_text(audio_input)
+    else:
+        user_input = text_input if text_input else ""
+    
+    if not user_input or user_input.strip() == "":
+        return "Veuillez poser une question par texte ou voix.", None
+
+    # Vectorisation de la question
+    user_vector = vectorizer.transform([user_input])
+    similarities = cosine_similarity(user_vector, X)[0]
+    best_match_idx = np.argmax(similarities)
+    confidence = similarities[best_match_idx]
+
+    # Réponse basée sur la confiance
+    if confidence > 0.3:
+        response = responses[best_match_idx]
+    else:
+        response = "Désolé, je ne suis pas sûr de la réponse. Essayez une autre question sur les cours, les clubs ou le Big Data à l’ENIAD !"
+
+    # Ajouter encouragement
+    full_response = response + encouragement
+
+    # Générer fichier audio
+    audio_file = text_to_speech(full_response)
+
+    return full_response, audio_file
+
+# Interface Gradio avec audio corrigée
+interface = gr.Interface(
+    fn=chatbot_response,
+    inputs=[
+        gr.Textbox(label="Posez votre question ici", placeholder="Tapez ou utilisez le microphone..."),
+        gr.Audio(label="Parlez ici", type="filepath")  # Suppression de 'source'
+    ],
+    outputs=[
+        gr.Textbox(label="Réponse du Chatbot"),
+        gr.Audio(label="Écoutez la réponse", type="filepath")
+    ],
+    title="ENIAD Assistant Chatbot avec Parole",
+    description="Posez-moi vos questions sur l’ENIAD Berkane par texte ou voix ! Je réponds avec du texte et de l’audio.",
+    theme="soft",
+    examples=[
+        ["Quels sont les horaires d'ouverture de la bibliothèque ?", None],
+        ["Y a-t-il des clubs étudiants ?", None],
+        ["Qu’est-ce que le Big Data à l’ENIAD ?", None]
+    ],
+    allow_flagging="never"
+)
+# Lancer l'interface
+interface.launch()
