@@ -1,0 +1,898 @@
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  Box,
+  TextField,
+  IconButton,
+  Typography,
+  Paper,
+  Container,
+  Avatar,
+  CircularProgress,
+  Tooltip,
+  ThemeProvider,
+  createTheme,
+  CssBaseline,
+  AppBar,
+  Toolbar,
+  Divider,
+  Button,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Switch,
+  FormControlLabel,
+  Drawer,
+  InputAdornment,
+  Fab,
+  Grid,
+  useMediaQuery
+} from '@mui/material';
+import {
+  Send as SendIcon,
+  Mic as MicIcon,
+  VolumeUp as VolumeUpIcon,
+  LightMode as LightModeIcon,
+  DarkMode as DarkModeIcon,
+  Delete as DeleteIcon,
+  Add as AddIcon,
+  Settings as SettingsIcon,
+  Menu as MenuIcon,
+  Close as CloseIcon,
+  Chat as ChatIcon,
+  Edit as EditIcon,
+  Save as SaveIcon,
+  Cancel as CancelIcon,
+  Person as PersonIcon,
+  School as SchoolIcon
+} from '@mui/icons-material';
+import axios from 'axios';
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+
+// Mettez à jour cette URL avec votre URL ngrok actuelle
+const API_URL = "https://25ae-35-198-214-255.ngrok-free.app/generate";
+
+const eniadQuestions = [
+  "Quelles sont les causes de la Première Guerre mondiale ?",
+  "Expliquez-moi le fonctionnement d'une base de données relationnelle",
+  "Analysez les thèmes principaux dans Les Misérables de Victor Hugo",
+];
+
+function App() {
+  const [messages, setMessages] = useState([]);
+  const [inputValue, setInputValue] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState({});
+  const [darkMode, setDarkMode] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [autoRead, setAutoRead] = useState(false);
+  const [conversationHistory, setConversationHistory] = useState([]);
+  const [currentChatId, setCurrentChatId] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isRecording, setIsRecording] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [editingMessageId, setEditingMessageId] = useState(null);
+  const [editedMessageContent, setEditedMessageContent] = useState('');
+
+  const messagesEndRef = useRef(null);
+  const chatContainerRef = useRef(null);
+  const isMobile = useMediaQuery('(max-width:600px)');
+
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+  } = useSpeechRecognition();
+
+  const theme = createTheme({
+    palette: {
+      mode: darkMode ? 'dark' : 'light',
+      primary: {
+        main: darkMode ? '#4a6fa5' : '#2c5282',
+      },
+      secondary: {
+        main: darkMode ? '#6d597a' : '#805ad5',
+      },
+      background: {
+        default: darkMode ? '#121212' : '#f5f5f5',
+        paper: darkMode ? '#1e1e1e' : '#ffffff',
+      },
+    },
+    typography: {
+      fontFamily: 'Roboto, "Helvetica Neue", Arial, sans-serif',
+    },
+    shape: {
+      borderRadius: 12,
+    },
+  });
+
+  useEffect(() => {
+    if (conversationHistory.length === 0) {
+      handleNewChat();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (transcript) {
+      setInputValue(transcript);
+    }
+  }, [transcript]);
+
+  useEffect(() => {
+    scrollToBottom();
+    if (autoRead && messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage.role === 'assistant' && !isLoading) {
+        speakText(lastMessage.content, lastMessage.id);
+      }
+    }
+  }, [messages, autoRead, isLoading]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleInputChange = (e) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleSubmit = async () => {
+    if (!inputValue.trim()) return;
+
+    const userMessage = { 
+      role: 'user', 
+      content: inputValue,
+      chatId: currentChatId,
+      timestamp: new Date().toISOString(),
+      id: Date.now().toString()
+    };
+    
+    setMessages(prev => [...prev, userMessage]);
+    setInputValue('');
+    resetTranscript();
+    setIsLoading(true);
+
+    try {
+      const response = await axios.post(API_URL, {
+        messages: [...messages, userMessage].map(({ role, content }) => ({ role, content })),
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true'
+        }
+      });
+
+      const botMessage = {
+        role: 'assistant',
+        content: response.data.reply || response.data.response || response.data,
+        id: Date.now().toString(),
+        chatId: currentChatId,
+        timestamp: new Date().toISOString()
+      };
+      
+      setMessages(prev => [...prev, botMessage]);
+      updateConversationHistory([...messages, userMessage, botMessage]);
+    } catch (error) {
+      console.error('Error:', error);
+      const errorMessage = {
+        role: 'assistant',
+        content: 'Désolé, une erreur est survenue. Veuillez réessayer.',
+        id: Date.now().toString(),
+        chatId: currentChatId,
+        timestamp: new Date().toISOString()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateConversationHistory = (updatedMessages) => {
+    if (!currentChatId) return;
+
+    setConversationHistory(prev => {
+      const existingChat = prev.find(c => c.id === currentChatId);
+      const title = existingChat?.title || updatedMessages.find(m => m.role === 'user')?.content?.substring(0, 30) || 'Nouvelle conversation';
+      
+      const updatedChat = {
+        id: currentChatId,
+        title: title.length > 30 ? title.substring(0, 30) + '...' : title,
+        messages: updatedMessages,
+        lastUpdated: new Date().toISOString()
+      };
+
+      return [
+        updatedChat,
+        ...prev.filter(c => c.id !== currentChatId)
+      ];
+    });
+  };
+
+
+  const handleEditMessage = (messageId, currentContent) => {
+    setEditingMessageId(messageId);
+    setEditedMessageContent(currentContent);
+  };
+
+  const handleSaveEdit = () => {
+    const updatedMessages = messages.map(msg => 
+      msg.id === editingMessageId ? { ...msg, content: editedMessageContent } : msg
+    );
+    setMessages(updatedMessages);
+    updateConversationHistory(updatedMessages);
+    setEditingMessageId(null);
+    setEditedMessageContent('');
+  };
+
+  const handleCancelEdit = () => {
+    setEditingMessageId(null);
+    setEditedMessageContent('');
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
+
+  const toggleRecording = () => {
+    if (listening) {
+      SpeechRecognition.stopListening();
+      setIsRecording(false);
+    } else {
+      resetTranscript();
+      SpeechRecognition.startListening({ continuous: true, language: 'fr-FR' });
+      setIsRecording(true);
+    }
+  };
+
+  const speakText = (text, id) => {
+    window.speechSynthesis.cancel();
+    if (isSpeaking[id]) {
+      setIsSpeaking(prev => ({ ...prev, [id]: false }));
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'fr-FR';
+    utterance.onend = () => {
+      setIsSpeaking(prev => ({ ...prev, [id]: false }));
+    };
+    setIsSpeaking(prev => ({ ...prev, [id]: true }));
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
+
+  const handleNewChat = () => {
+    if (messages.length > 0 && currentChatId) {
+      updateConversationHistory(messages);
+    }
+
+    const newChatId = Date.now().toString();
+    setCurrentChatId(newChatId);
+    setMessages([]);
+    setInputValue('');
+    setMobileOpen(false);
+    setEditingMessageId(null);
+    setEditedMessageContent('');
+
+    setTimeout(() => {
+      document.querySelector('.chat-input input')?.focus();
+    }, 100);
+  };
+
+  const handleLoadChat = (chatId) => {
+    const conversation = conversationHistory.find(c => c.id === chatId);
+    if (conversation) {
+      setCurrentChatId(chatId);
+      setMessages(conversation.messages);
+    }
+    setMobileOpen(false);
+    setEditingMessageId(null);
+    setEditedMessageContent('');
+  };
+
+  const handleDeleteChat = (chatId, e) => {
+    e.stopPropagation();
+    setConversationHistory(prev => prev.filter(c => c.id !== chatId));
+    if (currentChatId === chatId) {
+      handleNewChat();
+    }
+  };
+
+  const getMessageStyle = (role) => ({
+    maxWidth: 'min(90%, 800px)',
+    alignSelf: role === 'user' ? 'flex-end' : 'flex-start',
+    bgcolor: role === 'user' 
+      ? (darkMode ? 'primary.dark' : 'primary.light') 
+      : (darkMode ? 'background.paper' : 'background.paper'),
+    color: role === 'user' ? '#fff' : (darkMode ? '#fff' : 'text.primary'),
+    border: role === 'user' ? 'none' : `1px solid ${darkMode ? '#333' : '#e0e0e0'}`,
+    borderRadius: role === 'user' ? '18px 4px 18px 18px' : '4px 18px 18px 18px',
+    p: 2,
+    mb: 2,
+    boxShadow: role === 'user' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none',
+    position: 'relative',
+    '&:hover': {
+      boxShadow: role === 'user' ? '0 4px 12px rgba(0,0,0,0.15)' : '0 2px 8px rgba(0,0,0,0.05)'
+    }
+  });
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
+  const handleQuestionClick = (question) => {
+    setInputValue(question);
+    setTimeout(() => {
+      document.querySelector('.chat-input input')?.focus();
+    }, 100);
+  };
+
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Box sx={{ display: 'flex', height: '100vh', bgcolor: 'background.default' }}>
+        <Drawer
+          variant="persistent"
+          open={sidebarOpen}
+          sx={{
+            width: 300,
+            flexShrink: 0,
+            '& .MuiDrawer-paper': {
+              width: 300,
+              boxSizing: 'border-box',
+              borderRight: 'none',
+              bgcolor: darkMode ? '#1a202c' : '#ffffff',
+              display: { xs: 'none', md: 'block' },
+              boxShadow: '2px 0 10px rgba(0,0,0,0.05)'
+            },
+          }}
+        >
+          <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="h6" sx={{ fontWeight: 600, color: darkMode ? '#fff' : 'text.primary' }}>
+              ENIAD AI
+            </Typography>
+            <IconButton onClick={() => setSidebarOpen(false)} size="small">
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </Box>
+          
+          <Button
+            fullWidth
+            variant="contained"
+            color="primary"
+            startIcon={<AddIcon />}
+            onClick={handleNewChat}
+            sx={{
+              mx: 2,
+              mb: 2,
+              borderRadius: '8px',
+              textTransform: 'none',
+              fontWeight: 'medium',
+              py: 1.5
+            }}
+          >
+            Nouveau chat
+          </Button>
+          
+          <Divider sx={{ my: 1 }} />
+          
+          <List sx={{ overflow: 'auto', flex: 1 }}>
+            {conversationHistory.map((convo) => (
+              <ListItem 
+                key={convo.id}
+                disablePadding
+                secondaryAction={
+                  <IconButton 
+                    edge="end" 
+                    onClick={(e) => handleDeleteChat(convo.id, e)}
+                    sx={{ color: 'text.secondary' }}
+                    size="small"
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                }
+              >
+                <ListItemButton
+                  selected={currentChatId === convo.id}
+                  onClick={() => handleLoadChat(convo.id)}
+                  sx={{
+                    borderRadius: '8px',
+                    mx: 1,
+                    my: 0.5,
+                    '&.Mui-selected': {
+                      bgcolor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+                    },
+                    '&.Mui-selected:hover': {
+                      bgcolor: darkMode ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.06)',
+                    },
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <ChatIcon fontSize="small" color={currentChatId === convo.id ? 'primary' : 'inherit'} />
+                  </ListItemIcon>
+                  <ListItemText 
+                    primary={convo.title}
+                    primaryTypographyProps={{
+                      sx: {
+                        fontWeight: currentChatId === convo.id ? '600' : 'normal',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        fontSize: '0.9rem'
+                      }
+                    }}
+                    secondary={new Date(convo.lastUpdated).toLocaleString()}
+                    secondaryTypographyProps={{
+                      sx: { 
+                        fontSize: '0.7rem',
+                        color: darkMode ? 'text.secondary' : 'text.secondary'
+                      }
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+          
+          <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex' }}>
+              <Tooltip title={darkMode ? "Mode clair" : "Mode sombre"}>
+                <IconButton onClick={toggleDarkMode} size="small" sx={{ mr: 1 }}>
+                  {darkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Paramètres">
+                <IconButton onClick={() => setSettingsOpen(true)} size="small">
+                  <SettingsIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+              v1.0.0
+            </Typography>
+          </Box>
+        </Drawer>
+
+        <Box sx={{ 
+          flex: 1, 
+          display: 'flex', 
+          flexDirection: 'column',
+          position: 'relative'
+        }}>
+          <AppBar 
+            position="static" 
+            elevation={0}
+            sx={{ 
+              bgcolor: 'background.paper',
+              color: 'text.primary',
+              borderBottom: `1px solid ${darkMode ? '#2d3748' : '#e2e8f0'}`,
+              height: '64px',
+              justifyContent: 'center'
+            }}
+          >
+            <Toolbar sx={{ px: { xs: 1, sm: 2 } }}>
+              <IconButton
+                edge="start"
+                onClick={handleDrawerToggle}
+                sx={{ mr: 2, display: { md: 'none' } }}
+              >
+                <MenuIcon />
+              </IconButton>
+              {!sidebarOpen && (
+                <IconButton
+                  edge="start"
+                  onClick={() => setSidebarOpen(true)}
+                  sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
+                >
+                  <MenuIcon />
+                </IconButton>
+              )}
+              <Typography variant="h6" noWrap sx={{ 
+                flexGrow: 1, 
+                fontWeight: 600,
+                fontSize: { xs: '1rem', sm: '1.25rem' }
+              }}>
+                {conversationHistory.find(c => c.id === currentChatId)?.title || 'Nouvelle conversation'}
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Tooltip title="Nouveau chat">
+                  <IconButton onClick={handleNewChat} sx={{ display: { xs: 'none', sm: 'flex' } }}>
+                    <AddIcon />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </Toolbar>
+          </AppBar>
+          
+          <Box 
+            ref={chatContainerRef}
+            sx={{
+              flex: 1,
+              overflowY: 'auto',
+              p: { xs: 1, sm: 3 },
+              bgcolor: 'background.default',
+              backgroundImage: darkMode 
+                ? 'linear-gradient(rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.02))' 
+                : 'linear-gradient(rgba(0, 0, 0, 0.01), rgba(0, 0, 0, 0.01))',
+              position: 'relative'
+            }}
+          >
+            {messages.length === 0 ? (
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: '100%',
+                  textAlign: 'center',
+                  color: 'text.secondary',
+                  gap: 2,
+                  px: 2
+                }}
+              >
+                <Avatar sx={{ 
+                  width: 80, 
+                  height: 80, 
+                  mb: 2,
+                  bgcolor: 'primary.main',
+                  '& .MuiSvgIcon-root': {
+                    fontSize: '2.5rem'
+                  }
+                }}>
+                  <SchoolIcon />
+                </Avatar>
+                <Typography variant="h5" sx={{ fontWeight: 600, mb: 1 }}>
+                  Assistant Académique ENIAD
+                </Typography>
+                <Typography variant="body1" sx={{ mb: 3, maxWidth: '600px' }}>
+                  Posez votre question ou choisissez un sujet ci-dessous pour commencer une nouvelle conversation.
+                </Typography>
+                
+                <Box sx={{ width: '100%', maxWidth: 'md' }}>
+                  <Grid container spacing={2} justifyContent="center">
+                    {eniadQuestions.map((question, index) => (
+                      <Grid item xs={12} sm={6} md={4} key={index}>
+                        <Paper
+                          elevation={0}
+                          onClick={() => handleQuestionClick(question)}
+                          sx={{
+                            p: 2,
+                            borderRadius: '12px',
+                            border: `1px solid ${darkMode ? '#2d3748' : '#e2e8f0'}`,
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            height: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            '&:hover': {
+                              borderColor: darkMode ? '#4a5568' : '#cbd5e0',
+                              transform: 'translateY(-2px)',
+                              boxShadow: '0 4px 6px rgba(0,0,0,0.05)'
+                            }
+                          }}
+                        >
+                          <Typography sx={{ 
+                            fontSize: '0.95rem',
+                            lineHeight: 1.4
+                          }}>
+                            {question}
+                          </Typography>
+                        </Paper>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Box>
+              </Box>
+            ) : (
+              <Container maxWidth="md" disableGutters sx={{ pb: 2 }}>
+                {messages.map((msg, index) => (
+                  <Box key={index} sx={{ 
+                    display: 'flex', 
+                    mb: 2,
+                    px: { xs: 0.5, sm: 0 }
+                  }}>
+                    <Avatar
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        mr: 2,
+                        mt: 1,
+                        bgcolor: msg.role === 'user' 
+                          ? (darkMode ? 'primary.dark' : 'primary.main') 
+                          : (darkMode ? 'secondary.dark' : 'secondary.main'),
+                        color: '#fff'
+                      }}
+                    >
+                      {msg.role === 'user' ? (
+                        <PersonIcon fontSize="small" />
+                      ) : (
+                        <SchoolIcon fontSize="small" />
+                      )}
+                    </Avatar>
+                    
+                    <Paper elevation={0} sx={getMessageStyle(msg.role)}>
+                      {editingMessageId === msg.id ? (
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                          <TextField
+                            fullWidth
+                            multiline
+                            value={editedMessageContent}
+                            onChange={(e) => setEditedMessageContent(e.target.value)}
+                            sx={{
+                              '& .MuiOutlinedInput-root': {
+                                bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                              }
+                            }}
+                          />
+                          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                            <Button 
+                              size="small" 
+                              onClick={handleCancelEdit}
+                              variant="outlined"
+                            >
+                              <CancelIcon fontSize="small" sx={{ mr: 0.5 }} />
+                              Annuler
+                            </Button>
+                            <Button 
+                              size="small" 
+                              onClick={handleSaveEdit}
+                              variant="contained"
+                              color="primary"
+                            >
+                              <SaveIcon fontSize="small" sx={{ mr: 0.5 }} />
+                              Enregistrer
+                            </Button>
+                          </Box>
+                        </Box>
+                      ) : (
+                        <>
+                          <Typography sx={{ 
+                            whiteSpace: 'pre-wrap',
+                            lineHeight: 1.6,
+                            fontSize: '0.95rem'
+                          }}>
+                            {msg.content}
+                          </Typography>
+                          <Box sx={{ 
+                            position: 'absolute', 
+                            bottom: -16,
+                            right: -16,
+                            display: 'flex',
+                            gap: 0.5
+                          }}>
+                            {msg.role === 'user' && (
+                              <Tooltip title="Modifier">
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleEditMessage(msg.id, msg.content)}
+                                  sx={{
+                                    bgcolor: darkMode ? 'background.paper' : 'background.paper',
+                                    color: darkMode ? '#fff' : 'text.primary',
+                                    boxShadow: 1,
+                                    '&:hover': {
+                                      bgcolor: darkMode ? 'background.default' : 'background.default'
+                                    }
+                                  }}
+                                >
+                                  <EditIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            )}
+                            {msg.role === 'assistant' && (
+                              <IconButton
+                                size="small"
+                                onClick={() => speakText(msg.content, msg.id)}
+                                sx={{
+                                  bgcolor: darkMode ? 'primary.dark' : 'primary.main',
+                                  color: '#fff',
+                                  boxShadow: 1,
+                                  '&:hover': {
+                                    bgcolor: darkMode ? 'primary.main' : 'primary.dark'
+                                  }
+                                }}
+                              >
+                                <VolumeUpIcon fontSize="small" />
+                              </IconButton>
+                            )}
+                          </Box>
+                        </>
+                      )}
+                    </Paper>
+                  </Box>
+                ))}
+                
+                {isLoading && (
+                  <Box sx={{ display: 'flex', mb: 2 }}>
+                    <Avatar
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        mr: 2,
+                        mt: 1,
+                        bgcolor: darkMode ? 'secondary.dark' : 'secondary.main',
+                        color: '#fff'
+                      }}
+                    >
+                      <SchoolIcon fontSize="small" />
+                    </Avatar>
+                    <Paper 
+                      elevation={0} 
+                      sx={{ 
+                        bgcolor: darkMode ? 'background.paper' : 'background.paper',
+                        color: darkMode ? '#fff' : 'text.primary',
+                        borderRadius: '4px 18px 18px 18px',
+                        p: 2,
+                        mb: 2,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        border: `1px solid ${darkMode ? '#2d3748' : '#e2e8f0'}`
+                      }}
+                    >
+                      <CircularProgress size={20} color="inherit" />
+                      <Typography>Réflexion en cours...</Typography>
+                    </Paper>
+                  </Box>
+                )}
+                <div ref={messagesEndRef} />
+              </Container>
+            )}
+          </Box>
+          
+          <Box 
+            sx={{ 
+              p: 2, 
+              borderTop: `1px solid ${darkMode ? '#2d3748' : '#e2e8f0'}`,
+              bgcolor: 'background.paper',
+              position: 'sticky',
+              bottom: 0
+            }}
+          >
+            <Container maxWidth="md" disableGutters>
+              <TextField
+                fullWidth
+                variant="outlined"
+                placeholder="Écrivez votre message..."
+                value={inputValue}
+                onChange={handleInputChange}
+                onKeyPress={handleKeyPress}
+                disabled={isLoading}
+                multiline
+                maxRows={4}
+                className="chat-input"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '24px',
+                    paddingRight: '8px',
+                    bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                    border: `1px solid ${darkMode ? '#2d3748' : '#e2e8f0'}`,
+                    '&:hover': {
+                      borderColor: darkMode ? '#4a5568' : '#cbd5e0'
+                    },
+                    '&.Mui-focused': {
+                      borderColor: darkMode ? '#4a6fa5' : '#2c5282',
+                      boxShadow: `0 0 0 2px ${darkMode ? 'rgba(74, 111, 165, 0.2)' : 'rgba(44, 82, 130, 0.2)'}`
+                    }
+                  }
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Tooltip title={isRecording ? "Arrêter l'enregistrement" : "Enregistrer un message audio"}>
+                        <IconButton
+                          onClick={toggleRecording}
+                          disabled={!browserSupportsSpeechRecognition}
+                          sx={{
+                            mr: 1,
+                            color: isRecording ? 'error.main' : 'inherit'
+                          }}
+                        >
+                          <MicIcon />
+                        </IconButton>
+                      </Tooltip>
+                      
+                      <Fab
+                        color="primary"
+                        size="small"
+                        onClick={handleSubmit}
+                        disabled={!inputValue.trim() || isLoading}
+                        sx={{
+                          boxShadow: 'none',
+                          '&:disabled': {
+                            bgcolor: darkMode ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)'
+                          }
+                        }}
+                      >
+                        {isLoading ? (
+                          <CircularProgress size={24} color="inherit" />
+                        ) : (
+                          <SendIcon />
+                        )}
+                      </Fab>
+                    </InputAdornment>
+                  )
+                }}
+              />
+              <Typography variant="caption" sx={{ 
+                display: 'block', 
+                textAlign: 'center', 
+                mt: 1,
+                color: 'text.secondary'
+              }}>
+                ENIAD AI peut faire des erreurs. Vérifiez les informations importantes.
+              </Typography>
+            </Container>
+          </Box>
+        </Box>
+      </Box>
+
+      <Dialog 
+        open={settingsOpen} 
+        onClose={() => setSettingsOpen(false)} 
+        fullWidth 
+        maxWidth="sm"
+        PaperProps={{
+          sx: {
+            bgcolor: darkMode ? '#1e1e1e' : '#ffffff'
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          bgcolor: darkMode ? 'primary.dark' : 'primary.main',
+          color: '#fff',
+          fontWeight: 600
+        }}>
+          Paramètres
+        </DialogTitle>
+        <DialogContent dividers sx={{ py: 2 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <FormControlLabel
+              control={<Switch checked={darkMode} onChange={toggleDarkMode} />}
+              label="Mode sombre"
+              sx={{ 
+                justifyContent: 'space-between',
+                mx: 0,
+                py: 1,
+                borderBottom: `1px solid ${darkMode ? '#2d3748' : '#e2e8f0'}`
+              }}
+            />
+            <FormControlLabel
+              control={<Switch checked={autoRead} onChange={() => setAutoRead(!autoRead)} />}
+              label="Lecture automatique des réponses"
+              sx={{ 
+                justifyContent: 'space-between',
+                mx: 0,
+                py: 1,
+                borderBottom: `1px solid ${darkMode ? '#2d3748' : '#e2e8f0'}`
+              }}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ bgcolor: darkMode ? 'background.default' : 'background.paper' }}>
+          <Button 
+            onClick={() => setSettingsOpen(false)}
+            variant="contained"
+            color="primary"
+          >
+            Fermer
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </ThemeProvider>
+  );
+}
+
+export default App;
