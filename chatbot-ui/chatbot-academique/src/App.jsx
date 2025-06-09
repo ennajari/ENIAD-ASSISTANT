@@ -53,10 +53,12 @@ import {
 } from '@mui/icons-material';
 import axios from 'axios';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 // 1. Move constants that don't depend on component state here
 const drawerWidth = 300;
-const API_URL = "https://25ae-35-198-214-255.ngrok-free.app/generate";
+const API_URL = "https://27bb-35-199-163-41.ngrok-free.app/generate";
 const LANGUAGES = [
   { code: 'fr', label: 'Français', flag: '🇫🇷' },
   { code: 'ar', label: 'العربية', flag: '🇲🇦' },
@@ -748,6 +750,24 @@ function App() {
     position: 'relative',
     '&:hover': {
       boxShadow: role === 'user' ? '0 4px 12px rgba(0,0,0,0.15)' : '0 2px 8px rgba(0,0,0,0.05)'
+    },
+    '& pre': {
+      margin: '0.5em 0',
+      whiteSpace: 'pre-wrap',
+    },
+    '& code': {
+      fontFamily: 'monospace',
+      fontSize: '0.9em',
+    },
+    '& ul, & ol': {
+      marginTop: '0.5em',
+      marginBottom: '0.5em',
+    },
+    '& p:first-of-type': {
+      marginTop: 0,
+    },
+    '& p:last-of-type': {
+      marginBottom: 0,
     }
   });
 
@@ -1245,13 +1265,74 @@ function App() {
                             </Box>
                           ) : (
                             <>
-                              <Typography sx={{
-                                whiteSpace: 'pre-wrap',
-                                lineHeight: 1.6,
-                                fontSize: '0.95rem'
+                              <Box sx={{
+                                '& p': { margin: '0.5em 0' },
+                                '& code': {
+                                  backgroundColor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                                  padding: '0.2em 0.4em',
+                                  borderRadius: '3px',
+                                  fontSize: '85%',
+                                  fontFamily: 'monospace',
+                                },
+                                '& pre': {
+                                  backgroundColor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                                  padding: '1em',
+                                  borderRadius: '4px',
+                                  overflow: 'auto',
+                                  '& code': {
+                                    backgroundColor: 'transparent',
+                                    padding: 0,
+                                  }
+                                },
+                                '& ul, & ol': { marginLeft: '1.5em' },
+                                '& blockquote': {
+                                  borderLeft: '3px solid',
+                                  borderColor: 'primary.main',
+                                  marginLeft: 0,
+                                  paddingLeft: '1em',
+                                  fontStyle: 'italic',
+                                },
+                                '& table': {
+                                  borderCollapse: 'collapse',
+                                  width: '100%',
+                                  '& th, & td': {
+                                    border: '1px solid',
+                                    borderColor: 'divider',
+                                    padding: '0.5em',
+                                  }
+                                },
+                                '& a': {
+                                  color: msg.role === 'user' ? 'inherit' : 'primary.main',
+                                  textDecoration: 'underline',
+                                }
                               }}>
-                                {msg.content}
-                              </Typography>
+                                <ReactMarkdown
+                                  remarkPlugins={[remarkGfm]}
+                                  components={{
+                                    code({node, inline, className, children, ...props}) {
+                                      return (
+                                        <code
+                                          style={{
+                                            backgroundColor: darkMode 
+                                              ? 'rgba(255, 255, 255, 0.1)' 
+                                              : 'rgba(0, 0, 0, 0.1)',
+                                            padding: inline ? '0.2em 0.4em' : '1em',
+                                            borderRadius: '3px',
+                                            display: inline ? 'inline' : 'block',
+                                            overflowX: 'auto',
+                                            color: msg.role === 'user' ? '#fff' : 'inherit'
+                                          }}
+                                          {...props}
+                                        >
+                                          {children}
+                                        </code>
+                                      );
+                                    }
+                                  }}
+                                >
+                                  {msg.content}
+                                </ReactMarkdown>
+                              </Box>
                               <Box sx={{
                                 position: 'absolute',
                                 bottom: -16,
