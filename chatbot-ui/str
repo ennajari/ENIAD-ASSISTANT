@@ -16,7 +16,7 @@ chatbot-academique/
 ├── vite.config.js
 le voici le code des fichiers de l'application:
 │   ├── App.jsx
-import React, { useState, useEffect, useRef } from 'react';
+/import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   TextField,
