@@ -1,60 +1,67 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useMediaQuery } from '@mui/material';
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import { useAuth } from './contexts/AuthContext';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import CssBaseline from '@mui/material/CssBaseline';
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import Login from './components/Login';
 import {
   Box,
-  TextField,
-  IconButton,
   Typography,
-  Paper,
-  Container,
-  Avatar,
-  CircularProgress,
-  Tooltip,
-  ThemeProvider,
-  createTheme,
-  CssBaseline,
+  Button,
   AppBar,
   Toolbar,
-  Divider,
-  Button,
+  IconButton,
+  Drawer,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Divider,
+  Avatar,
+  Paper,
+  TextField,
+  InputAdornment,
+  Tooltip,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   Switch,
   FormControlLabel,
-  Drawer,
-  InputAdornment,
-  Fab,
-  Grid
+  Grid,
+  Container,
+  CircularProgress,
+  Fab
 } from '@mui/material';
+
+// MUI Icons
 import {
-  Send as SendIcon,
-  Mic as MicIcon,
-  VolumeUp as VolumeUpIcon,
-  LightMode as LightModeIcon,
-  DarkMode as DarkModeIcon,
-  Delete as DeleteIcon,
-  Add as AddIcon,
-  Settings as SettingsIcon,
   Menu as MenuIcon,
-  Close as CloseIcon,
+  Add as AddIcon,
   Chat as ChatIcon,
   Edit as EditIcon,
+  Delete as DeleteIcon,
+  Close as CloseIcon,
   Save as SaveIcon,
   Cancel as CancelIcon,
-  Person as PersonIcon,
-  School as SchoolIcon
+  Settings as SettingsIcon,
+  DarkMode as DarkModeIcon,
+  LightMode as LightModeIcon,
+  Mic as MicIcon,
+  Send as SendIcon,
+  VolumeUp as VolumeUpIcon,
+  School as SchoolIcon,
+  Person as PersonIcon
 } from '@mui/icons-material';
-import axios from 'axios';
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+
+// Additional imports
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import axios from 'axios';
+import { auth } from './firebase';
 
 // 1. Move constants that don't depend on component state here
 const drawerWidth = 300;
@@ -94,7 +101,9 @@ const translations = {
     ],
     usingSystemPreference: "Utilise les préférences système",
     editTitle: "Modifier le titre de la conversation",
-    contextTitle: "Contexte: "
+    contextTitle: "Contexte: ",
+    login: "Se connecter",
+    logout: "Se déconnecter",
   },
   en: {
     newChat: "New Chat",
@@ -124,7 +133,9 @@ const translations = {
     ],
     usingSystemPreference: "Using system preference",
     editTitle: "Edit conversation title",
-    contextTitle: "Context: "
+    contextTitle: "Context: ",
+    login: "Login",
+    logout: "Logout",
   },
   ar: {
     newChat: "محادثة جديدة",
@@ -154,7 +165,9 @@ const translations = {
     ],
     usingSystemPreference: "يستخدم تفضيلات النظام",
     editTitle: "تعديل عنوان المحادثة",
-    contextTitle: "السياق: "
+    contextTitle: "السياق: ",
+    login: "تسجيل الدخول",
+    logout: "تسجيل الخروج",
   }
 };
 
@@ -225,6 +238,27 @@ const useSpeechSynthesis = () => {
 };
 
 function App() {
+  const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
+
+  if (authLoading) {
+    return (
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh'
+      }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  // Remove this block to make login optional
+  // if (!user) {
+  //   return <Login />;
+  // }
+
   // Add this with your other state declarations at the top of the App component
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [darkMode, setDarkMode] = useState(() => {
@@ -377,11 +411,11 @@ function App() {
     try {
       const savedHistory = localStorage.getItem('conversationHistory');
       const savedCurrentChatId = localStorage.getItem('currentChatId');
-      
+
       if (savedHistory) {
         const parsedHistory = JSON.parse(savedHistory);
         setConversationHistory(parsedHistory);
-        
+
         if (savedCurrentChatId) {
           setCurrentChatId(savedCurrentChatId);
           const currentChat = parsedHistory.find(chat => chat.id === savedCurrentChatId);
@@ -428,13 +462,13 @@ function App() {
     try {
       if (currentChatId) {
         localStorage.setItem('currentChatId', currentChatId);
-        
-        const updatedHistory = conversationHistory.map(chat => 
-          chat.id === currentChatId 
+
+        const updatedHistory = conversationHistory.map(chat =>
+          chat.id === currentChatId
             ? { ...chat, messages: messages }
             : chat
         );
-        
+
         localStorage.setItem('conversationHistory', JSON.stringify(updatedHistory));
         setConversationHistory(updatedHistory);
       }
@@ -664,7 +698,7 @@ function App() {
 
       setCurrentChatId(newChatId);
       localStorage.setItem('currentChatId', newChatId);
-      
+
       setConversationHistory(prev => [newChat, ...prev]);
       setMessages([]);
       setInputValue('');
@@ -700,7 +734,7 @@ function App() {
         localStorage.setItem('currentChatId', chatId);
         setMessages(conversation.messages);
       }
-      
+
       setMobileOpen(false);
       setEditingMessageId(null);
       setEditedMessageContent('');
@@ -814,8 +848,8 @@ function App() {
   // Add this new function to handle the rename submission
   const handleRenameSubmit = () => {
     if (newChatTitle.trim()) {
-      const updatedHistory = conversationHistory.map(chat => 
-        chat.id === renameChatId 
+      const updatedHistory = conversationHistory.map(chat =>
+        chat.id === renameChatId
           ? { ...chat, title: newChatTitle.trim() }
           : chat
       );
@@ -830,717 +864,735 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box sx={{
-        display: 'flex',
-        direction: currentLanguage === 'ar' ? 'rtl' : 'ltr',
-        '& .MuiDrawer-root': {
-          flexDirection: currentLanguage === 'ar' ? 'row-reverse' : 'row'
-        }
-      }}>
-        {/* Drawer */}
-        <Drawer
-          variant={drawerVariant}
-          open={drawerOpen}
-          onClose={() => isMobile && setMobileOpen(false)}
-          anchor={currentLanguage === 'ar' ? 'right' : 'left'}
-          sx={{
-            width: {
-              xs: 0,
-              md: drawerOpenDesktop ? drawerWidth : 0
-            },
-            flexShrink: 0,
-            '& .MuiDrawer-paper': {
-              transform: (theme) => {
-                if (!drawerOpen) {
-                  return theme.direction === 'rtl' 
-                    ? 'translateX(100%)' 
-                    : 'translateX(-100%)';
-                }
-                return 'translateX(0)';
-              },
-              visibility: drawerOpen ? 'visible' : 'hidden',
-            },
-          }}
-        >
-          <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="h6" sx={{ fontWeight: 600, color: darkMode ? '#fff' : 'text.primary' }}>
-              ENIAD AI
-            </Typography>
-            {/* 1. Updated close icon logic */}
-            <IconButton onClick={() => isMobile ? setMobileOpen(false) : setSidebarOpen(false)} size="small">
-              <CloseIcon fontSize="small" />
-            </IconButton>
-          </Box>
-          {/* 5. Nouveau chat button always visible, fullWidth, styled */}
-          <Button
-            fullWidth
-            variant="contained"
-            color="primary"
-            startIcon={currentLanguage === 'ar' ? null : <AddIcon />}
-            endIcon={currentLanguage === 'ar' ? <AddIcon /> : null}
-            onClick={handleNewChat}
-            sx={{
-              textTransform: 'none',
-              py: 1.5,
-              borderRadius: 1,
-              mb: 2,
-              flexDirection: currentLanguage === 'ar' ? 'row-reverse' : 'row',
-              '& .MuiButton-startIcon': {
-                marginRight: currentLanguage === 'ar' ? 0 : 1,
-                marginLeft: currentLanguage === 'ar' ? 1 : 0,
-              },
-              '& .MuiButton-endIcon': {
-                marginLeft: currentLanguage === 'ar' ? 0 : 1,
-                marginRight: currentLanguage === 'ar' ? 1 : 0,
+      <Routes>
+        <Route
+          path="/login"
+          element={<Login />}
+        />
+        <Route
+          path="/"
+          element={
+            <Box sx={{
+              display: 'flex',
+              direction: currentLanguage === 'ar' ? 'rtl' : 'ltr',
+              minHeight: '100vh',
+              bgcolor: 'background.default',
+              '& .MuiDrawer-root': {
+                flexDirection: currentLanguage === 'ar' ? 'row-reverse' : 'row'
               }
-            }}
-          >
-            {t('newChat')}
-          </Button>
-          <Divider sx={{ my: 1 }} />
-          <List sx={{ overflow: 'auto', flex: 1 }}>
-            {conversationHistory.map((convo) => (
-              <ListItem
-                key={convo.id}
-                disablePadding
-                secondaryAction={
-                  <Box sx={{ 
-                    display: 'flex',
-                    flexDirection: currentLanguage === 'ar' ? 'row-reverse' : 'row' 
-                  }}>
-                    <IconButton
-                      edge="end"
-                      onClick={(e) => handleEditTitle(convo.id, convo.title)}
-                      sx={{ 
-                        color: 'text.secondary',
-                        mr: currentLanguage === 'ar' ? 0 : 1,
-                        ml: currentLanguage === 'ar' ? 1 : 0
-                      }}
-                      size="small"
-                    >
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton
-                      edge="end"
-                      onClick={(e) => handleDeleteChat(convo.id, e)}
-                      sx={{ color: 'text.secondary' }}
-                      size="small"
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </Box>
-                }
-              >
-                <ListItemButton
-                  selected={currentChatId === convo.id}
-                  onClick={() => handleLoadChat(convo.id)}
-                  sx={{
-                    borderRadius: '8px',
-                    mx: 1,
-                    my: 0.5,
-                    pr: currentLanguage === 'ar' ? 2 : 8,
-                    pl: currentLanguage === 'ar' ? 8 : 2,
-                    '&.Mui-selected': {
-                      bgcolor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
-                    },
-                    '&.Mui-selected:hover': {
-                      bgcolor: darkMode ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.06)',
-                    },
-                  }}
-                >
-                  <ListItemIcon sx={{ 
-                    minWidth: 36,
-                    mr: currentLanguage === 'ar' ? 0 : 1,
-                    ml: currentLanguage === 'ar' ? 1 : 0
-                  }}>
-                    <ChatIcon fontSize="small" color={currentChatId === convo.id ? 'primary' : 'inherit'} />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={convo.title}
-                    primaryTypographyProps={{
-                      sx: {
-                        fontWeight: currentChatId === convo.id ? '600' : 'normal',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                        fontSize: '0.9rem',
-                        textAlign: currentLanguage === 'ar' ? 'right' : 'left'
-                      }
-                    }}
-                    secondary={new Date(convo.lastUpdated).toLocaleString()}
-                    secondaryTypographyProps={{
-                      sx: {
-                        fontSize: '0.7rem',
-                        color: darkMode ? 'text.secondary' : 'text.secondary',
-                        textAlign: currentLanguage === 'ar' ? 'right' : 'left'
-                      }
-                    }}
-                  />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-          <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Box sx={{ display: 'flex' }}>
-              <Tooltip title={darkMode === prefersDarkMode 
-  ? t('usingSystemPreference') 
-  : darkMode ? t('lightMode') : t('darkMode')}>
-  <IconButton 
-    onClick={toggleDarkMode} 
-    size="small" 
-    sx={{ 
-      mr: 1,
-      opacity: darkMode === prefersDarkMode ? 0.7 : 1 
-    }}
-  >
-    {darkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
-  </IconButton>
-</Tooltip>
-              <Tooltip title={t('settings')}>
-                <IconButton onClick={() => setSettingsOpen(true)} size="small">
-                  <SettingsIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            </Box>
-            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-              {translations[currentLanguage].version}
-            </Typography>
-          </Box>
-        </Drawer>
-
-        {/* Main Content */}
-        <Box
-          component="main"
-          sx={{
-            flexGrow: 1,
-            height: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-            width: {
-              xs: '100%',
-              md: drawerOpenDesktop ? `calc(100% - ${drawerWidth}px)` : '100%'
-            },
-            transition: theme => theme.transitions.create(['width', 'margin'], {
-              easing: theme.transitions.easing.sharp,
-              duration: theme.transitions.duration.enteringScreen,
-            }),
-          }}
-        >
-          <AppBar
-            position="fixed"
-            elevation={0}
-            sx={{
-              width: {
-                xs: '100%',
-                md: drawerOpenDesktop ? `calc(100% - ${drawerWidth}px)` : '100%'
-              },
-              [currentLanguage === 'ar' ? 'mr' : 'ml']: {
-                xs: 0,
-                md: drawerOpenDesktop ? `${drawerWidth}px` : 0
-              },
-              transition: theme => theme.transitions.create(['width', 'margin'], {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.enteringScreen,
-              }),
-              bgcolor: 'background.paper',
-              color: 'text.primary',
-              borderBottom: `1px solid ${darkMode ? '#2d3748' : '#e2e8f0'}`,
-              zIndex: (theme) => theme.zIndex.drawer + 1
-            }}
-          >
-            <Toolbar>
-              <IconButton
-                edge={currentLanguage === 'ar' ? 'end' : 'start'}
-                onClick={handleDrawerToggle}
+            }}>
+              {/* Drawer */}
+              <Drawer
+                variant={drawerVariant}
+                open={drawerOpen}
+                onClose={() => isMobile && setMobileOpen(false)}
+                anchor={currentLanguage === 'ar' ? 'right' : 'left'}
                 sx={{
-                  mr: currentLanguage === 'ar' ? 0 : 2,
-                  ml: currentLanguage === 'ar' ? 2 : 0
+                  width: {
+                    xs: 0,
+                    md: drawerOpenDesktop ? drawerWidth : 0
+                  },
+                  flexShrink: 0,
+                  '& .MuiDrawer-paper': {
+                    transform: (theme) => {
+                      if (!drawerOpen) {
+                        return theme.direction === 'rtl'
+                          ? 'translateX(100%)'
+                          : 'translateX(-100%)';
+                      }
+                      return 'translateX(0)';
+                    },
+                    visibility: drawerOpen ? 'visible' : 'hidden',
+                  },
                 }}
               >
-                <MenuIcon />
-              </IconButton>
-              <Typography
-                variant="h6"
-                noWrap
+                <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography variant="h6" sx={{ fontWeight: 600, color: darkMode ? '#fff' : 'text.primary' }}>
+                    ENIAD AI
+                  </Typography>
+                  {/* 1. Updated close icon logic */}
+                  <IconButton onClick={() => isMobile ? setMobileOpen(false) : setSidebarOpen(false)} size="small">
+                    <CloseIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+                {/* 5. Nouveau chat button always visible, fullWidth, styled */}
+                <Button
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  startIcon={currentLanguage === 'ar' ? null : <AddIcon />}
+                  endIcon={currentLanguage === 'ar' ? <AddIcon /> : null}
+                  onClick={handleNewChat}
+                  sx={{
+                    textTransform: 'none',
+                    py: 1.5,
+                    borderRadius: 1,
+                    mb: 2,
+                    flexDirection: currentLanguage === 'ar' ? 'row-reverse' : 'row',
+                    '& .MuiButton-startIcon': {
+                      marginRight: currentLanguage === 'ar' ? 0 : 1,
+                      marginLeft: currentLanguage === 'ar' ? 1 : 0,
+                    },
+                    '& .MuiButton-endIcon': {
+                      marginLeft: currentLanguage === 'ar' ? 0 : 1,
+                      marginRight: currentLanguage === 'ar' ? 1 : 0,
+                    }
+                  }}
+                >
+                  {t('newChat')}
+                </Button>
+                <Divider sx={{ my: 1 }} />
+                <List sx={{ overflow: 'auto', flex: 1 }}>
+                  {conversationHistory.map((convo) => (
+                    <ListItem
+                      key={convo.id}
+                      disablePadding
+                      secondaryAction={
+                        <Box sx={{
+                          display: 'flex',
+                          flexDirection: currentLanguage === 'ar' ? 'row-reverse' : 'row'
+                        }}>
+                          <IconButton
+                            edge="end"
+                            onClick={(e) => handleEditTitle(convo.id, convo.title)}
+                            sx={{
+                              color: 'text.secondary',
+                              mr: currentLanguage === 'ar' ? 0 : 1,
+                              ml: currentLanguage === 'ar' ? 1 : 0
+                            }}
+                            size="small"
+                          >
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            edge="end"
+                            onClick={(e) => handleDeleteChat(convo.id, e)}
+                            sx={{ color: 'text.secondary' }}
+                            size="small"
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      }
+                    >
+                      <ListItemButton
+                        selected={currentChatId === convo.id}
+                        onClick={() => handleLoadChat(convo.id)}
+                        sx={{
+                          borderRadius: '8px',
+                          mx: 1,
+                          my: 0.5,
+                          pr: currentLanguage === 'ar' ? 2 : 8,
+                          pl: currentLanguage === 'ar' ? 8 : 2,
+                          '&.Mui-selected': {
+                            bgcolor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+                          },
+                          '&.Mui-selected:hover': {
+                            bgcolor: darkMode ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.06)',
+                          },
+                        }}
+                      >
+                        <ListItemIcon sx={{
+                          minWidth: 36,
+                          mr: currentLanguage === 'ar' ? 0 : 1,
+                          ml: currentLanguage === 'ar' ? 1 : 0
+                        }}>
+                          <ChatIcon fontSize="small" color={currentChatId === convo.id ? 'primary' : 'inherit'} />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={convo.title}
+                          primaryTypographyProps={{
+                            sx: {
+                              fontWeight: currentChatId === convo.id ? '600' : 'normal',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                              fontSize: '0.9rem',
+                              textAlign: currentLanguage === 'ar' ? 'right' : 'left'
+                            }
+                          }}
+                          secondary={new Date(convo.lastUpdated).toLocaleString()}
+                          secondaryTypographyProps={{
+                            sx: {
+                              fontSize: '0.7rem',
+                              color: darkMode ? 'text.secondary' : 'text.secondary',
+                              textAlign: currentLanguage === 'ar' ? 'right' : 'left'
+                            }
+                          }}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+                </List>
+                <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Box sx={{ display: 'flex' }}>
+                    <Tooltip title={darkMode === prefersDarkMode
+                      ? t('usingSystemPreference')
+                      : darkMode ? t('lightMode') : t('darkMode')}>
+                      <IconButton
+                        onClick={toggleDarkMode}
+                        size="small"
+                        sx={{
+                          mr: 1,
+                          opacity: darkMode === prefersDarkMode ? 0.7 : 1
+                        }}
+                      >
+                        {darkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('settings')}>
+                      <IconButton onClick={() => setSettingsOpen(true)} size="small">
+                        <SettingsIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                    {translations[currentLanguage].version}
+                  </Typography>
+                </Box>
+              </Drawer>
+
+              {/* Main Content */}
+              <Box
+                component="main"
                 sx={{
                   flexGrow: 1,
-                  fontWeight: 600,
-                  fontSize: { xs: '1rem', sm: '1.25rem' },
-                  textAlign: currentLanguage === 'ar' ? 'right' : 'left'
+                  height: '100vh',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  width: {
+                    xs: '100%',
+                    md: drawerOpenDesktop ? `calc(100% - ${drawerWidth}px)` : '100%'
+                  },
+                  transition: theme => theme.transitions.create(['width', 'margin'], {
+                    easing: theme.transitions.easing.sharp,
+                    duration: theme.transitions.duration.enteringScreen,
+                  }),
                 }}
               >
-                {conversationHistory.find(c => c.id === currentChatId)?.title || t('newConversation')}
-              </Typography>
-
-              <Tooltip title="Change Language / Changer la langue / تغيير اللغة">
-                <IconButton
-                  size="small"
-                  onClick={() => setSettingsOpen(true)}
+                <AppBar
+                  position="fixed"
+                  elevation={0}
                   sx={{
-                    ml: currentLanguage === 'ar' ? 0 : 1,
-                    mr: currentLanguage === 'ar' ? 1 : 0
+                    width: {
+                      xs: '100%',
+                      md: drawerOpenDesktop ? `calc(100% - ${drawerWidth}px)` : '100%'
+                    },
+                    [currentLanguage === 'ar' ? 'mr' : 'ml']: {
+                      xs: 0,
+                      md: drawerOpenDesktop ? `${drawerWidth}px` : 0
+                    },
+                    transition: theme => theme.transitions.create(['width', 'margin'], {
+                      easing: theme.transitions.easing.sharp,
+                      duration: theme.transitions.duration.enteringScreen,
+                    }),
+                    bgcolor: 'background.paper',
+                    color: 'text.primary',
+                    borderBottom: `1px solid ${darkMode ? '#2d3748' : '#e2e8f0'}`,
+                    zIndex: (theme) => theme.zIndex.drawer + 1
                   }}
                 >
-                  <Typography sx={{
-                    fontSize: '1.2rem',
-                    width: 24,
-                    height: 24,
+                  <Toolbar>
+                    <IconButton
+                      edge={currentLanguage === 'ar' ? 'end' : 'start'}
+                      onClick={handleDrawerToggle}
+                      sx={{
+                        mr: currentLanguage === 'ar' ? 0 : 2,
+                        ml: currentLanguage === 'ar' ? 2 : 0
+                      }}
+                    >
+                      <MenuIcon />
+                    </IconButton>
+                    <Typography
+                      variant="h6"
+                      noWrap
+                      sx={{
+                        flexGrow: 1,
+                        fontWeight: 600,
+                        fontSize: { xs: '1rem', sm: '1.25rem' },
+                        textAlign: currentLanguage === 'ar' ? 'right' : 'left'
+                      }}
+                    >
+                      {conversationHistory.find(c => c.id === currentChatId)?.title || t('newConversation')}
+                    </Typography>
+
+                    <Button
+                      color="primary"
+                      variant={user ? "outlined" : "contained"}
+                      onClick={() => user ? auth.signOut() : navigate('/login')}
+                      sx={{
+                        ml: 1,
+                        mr: currentLanguage === 'ar' ? 2 : 0
+                      }}
+                    >
+                      {user ? t('logout') : t('login')}
+                    </Button>
+
+                    <Tooltip title="Change Language / Changer la langue / تغيير اللغة">
+                      <IconButton
+                        size="small"
+                        onClick={() => setSettingsOpen(true)}
+                        sx={{
+                          ml: currentLanguage === 'ar' ? 0 : 1,
+                          mr: currentLanguage === 'ar' ? 1 : 0
+                        }}
+                      >
+                        <Typography sx={{
+                          fontSize: '1.2rem',
+                          width: 24,
+                          height: 24,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          {LANGUAGES.find(l => l.code === currentLanguage)?.flag}
+                        </Typography>
+                      </IconButton>
+                    </Tooltip>
+                  </Toolbar>
+                </AppBar>
+
+                <Toolbar /> {/* This creates space below the fixed AppBar */}
+
+                <Box
+                  ref={chatContainerRef}
+                  sx={{
+                    flexGrow: 1,
                     display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    {LANGUAGES.find(l => l.code === currentLanguage)?.flag}
-                  </Typography>
-                </IconButton>
-              </Tooltip>
-            </Toolbar>
-          </AppBar>
-
-          <Toolbar /> {/* This creates space below the fixed AppBar */}
-
-          <Box
-            ref={chatContainerRef}
-            sx={{
-              flexGrow: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              height: `calc(100vh - 64px)`, // 64px is AppBar height
-              pt: `64px`, // Add padding top to account for AppBar
-              overflow: 'hidden', // Prevent double scrollbars
-            }}
-          >
-            {/* Chat content container */}
-            <Box
-              sx={{
-                flex: 1,
-                overflowY: 'auto',
-                bgcolor: 'background.default',
-                display: 'flex',
-                flexDirection: 'column'
-              }}
-            >
-              <Container
-                maxWidth="md"
-                disableGutters
-                sx={{
-                  px: { xs: 1, sm: 3 },
-                  py: { xs: 1, sm: 3 },
-                  flex: 1,
-                  display: 'flex',
-                  flexDirection: 'column'
-                }}
-              >
-                {messages.length === 0 ? (
+                    flexDirection: 'column',
+                    height: `calc(100vh - 64px)`, // 64px is AppBar height
+                    pt: `64px`, // Add padding top to account for AppBar
+                    overflow: 'hidden', // Prevent double scrollbars
+                  }}
+                >
+                  {/* Chat content container */}
                   <Box
                     sx={{
+                      flex: 1,
+                      overflowY: 'auto',
+                      bgcolor: 'background.default',
                       display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      height: '100%',
-                      textAlign: 'center',
-                      color: 'text.secondary',
-                      gap: 2,
-                      px: 2
+                      flexDirection: 'column'
                     }}
                   >
-                    <Avatar sx={{
-                      width: 80,
-                      height: 80,
-                      mb: 2,
-                      bgcolor: 'primary.main',
-                      '& .MuiSvgIcon-root': {
-                        fontSize: '2.5rem'
-                      }
-                    }}>
-                      <SchoolIcon />
-                    </Avatar>
-                    <Typography variant="h5" sx={{ fontWeight: 600, mb: 1 }}>
-                      {t('assistant')}
-                    </Typography>
-                    <Typography variant="body1" sx={{ mb: 3, maxWidth: '600px' }}>
-                      {t('startPrompt')}
-                    </Typography>
-
-                    <Box sx={{ width: '100%', maxWidth: 'md' }}>
-                      <Grid container spacing={2} justifyContent="center">
-                        {translations[currentLanguage].suggestions.map((question, index) => (
-                          <Grid item xs={12} sm={6} md={4} key={index}>
-                            <Paper
-                              elevation={0}
-                              onClick={() => handleQuestionClick(question)}
-                              sx={{
-                                p: 2,
-                                borderRadius: '12px',
-                                border: `1px solid ${darkMode ? '#2d3748' : '#e2e8f0'}`,
-                                cursor: 'pointer',
-                                transition: 'all 0.2s',
-                                height: '100%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                '&:hover': {
-                                  borderColor: darkMode ? '#4a5568' : '#cbd5e0',
-                                  transform: 'translateY(-2px)',
-                                  boxShadow: '0 4px 6px rgba(0,0,0,0.05)'
-                                }
-                              }}
-                            >
-                              <Typography sx={{
-                                fontSize: '0.95rem',
-                                lineHeight: 1.4,
-                                textAlign: currentLanguage === 'ar' ? 'right' : 'left'
-                              }}>
-                                {question}
-                              </Typography>
-                            </Paper>
-                          </Grid>
-                        ))}
-                      </Grid>
-                    </Box>
-                  </Box>
-                ) : (
-                  <Box sx={{ width: '100%' }}>
-                    {messages.map((msg, index) => (
-                      <Box key={index} sx={{
+                    <Container
+                      maxWidth="md"
+                      disableGutters
+                      sx={{
+                        px: { xs: 1, sm: 3 },
+                        py: { xs: 1, sm: 3 },
+                        flex: 1,
                         display: 'flex',
-                        mb: 2,
-                        justifyContent: msg.role === 'user'
-                          ? currentLanguage === 'ar' ? 'flex-start' : 'flex-end'
-                          : currentLanguage === 'ar' ? 'flex-end' : 'flex-start',
-                        px: { xs: 0.5, sm: 0 }
-                      }}>
-                        {msg.role !== 'user' && (
-                          <Avatar
-                            sx={{
-                              width: 32,
-                              height: 32,
-                              mr: 2,
-                              mt: 1,
-                              bgcolor: darkMode ? 'secondary.dark' : 'secondary.main',
-                              color: '#fff'
-                            }}
-                          >
-                            <SchoolIcon fontSize="small" />
-                          </Avatar>
-                        )}
-                        <Paper
-                          elevation={0}
+                        flexDirection: 'column'
+                      }}
+                    >
+                      {messages.length === 0 ? (
+                        <Box
                           sx={{
-                            ...getMessageStyle(msg.role),
-                            maxWidth: '85%'
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            height: '100%',
+                            textAlign: 'center',
+                            color: 'text.secondary',
+                            gap: 2,
+                            px: 2
                           }}
                         >
-                          {editingMessageId === msg.id ? (
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                              <TextField
-                                fullWidth
-                                multiline
-                                value={editedMessageContent}
-                                onChange={(e) => setEditedMessageContent(e.target.value)}
-                                sx={{
-                                  '& .MuiOutlinedInput-root': {
-                                    bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
-                                  }
-                                }}
-                              />
-                              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                                <Button
-                                  size="small"
-                                  onClick={handleCancelEdit}
-                                  variant="outlined"
-                                >
-                                  <CancelIcon fontSize="small" sx={{ mr: 0.5 }} />
-                                  {t('cancel')}
-                                </Button>
-                                <Button
-                                  size="small"
-                                  onClick={handleSaveEdit}
-                                  variant="contained"
-                                  color="primary"
-                                >
-                                  <SaveIcon fontSize="small" sx={{ mr: 0.5 }} />
-                                  {t('save')}
-                                </Button>
-                              </Box>
-                            </Box>
-                          ) : (
-                            <>
-                              <Box sx={{
-                                '& p': { margin: '0.5em 0' },
-                                '& code': {
-                                  backgroundColor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
-                                  padding: '0.2em 0.4em',
-                                  borderRadius: '3px',
-                                  fontSize: '85%',
-                                  fontFamily: 'monospace',
-                                },
-                                '& pre': {
-                                  backgroundColor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
-                                  padding: '1em',
-                                  borderRadius: '4px',
-                                  overflow: 'auto',
-                                  '& code': {
-                                    backgroundColor: 'transparent',
-                                    padding: 0,
-                                  }
-                                },
-                                '& ul, & ol': { marginLeft: '1.5em' },
-                                '& blockquote': {
-                                  borderLeft: '3px solid',
-                                  borderColor: 'primary.main',
-                                  marginLeft: 0,
-                                  paddingLeft: '1em',
-                                  fontStyle: 'italic',
-                                },
-                                '& table': {
-                                  borderCollapse: 'collapse',
-                                  width: '100%',
-                                  '& th, & td': {
-                                    border: '1px solid',
-                                    borderColor: 'divider',
-                                    padding: '0.5em',
-                                  }
-                                },
-                                '& a': {
-                                  color: msg.role === 'user' ? 'inherit' : 'primary.main',
-                                  textDecoration: 'underline',
-                                }
-                              }}>
-                                <ReactMarkdown
-                                  remarkPlugins={[remarkGfm]}
-                                  components={{
-                                    code({node, inline, className, children, ...props}) {
-                                      return (
-                                        <code
-                                          style={{
-                                            backgroundColor: darkMode 
-                                              ? 'rgba(255, 255, 255, 0.1)' 
-                                              : 'rgba(0, 0, 0, 0.1)',
-                                            padding: inline ? '0.2em 0.4em' : '1em',
-                                            borderRadius: '3px',
-                                            display: inline ? 'inline' : 'block',
-                                            overflowX: 'auto',
-                                            color: msg.role === 'user' ? '#fff' : 'inherit'
-                                          }}
-                                          {...props}
-                                        >
-                                          {children}
-                                        </code>
-                                      );
-                                    }
-                                  }}
-                                >
-                                  {msg.content}
-                                </ReactMarkdown>
-                              </Box>
-                              <Box sx={{
-                                position: 'absolute',
-                                bottom: -16,
-                                right: -16,
-                                display: 'flex',
-                                gap: 0.5
-                              }}>
-                                {msg.role === 'user' && (
-                                  <Tooltip title={t('edit')}>
-                                    <IconButton
-                                      size="small"
-                                      onClick={() => handleEditMessage(msg.id, msg.content)}
-                                      sx={{
-                                        bgcolor: darkMode ? 'background.paper' : 'background.paper',
-                                        color: darkMode ? '#fff' : 'text.primary',
-                                        boxShadow: 1,
-                                        '&:hover': {
-                                          bgcolor: darkMode ? 'background.default' : 'background.default'
-                                        }
-                                      }}
-                                    >
-                                      <EditIcon fontSize="small" />
-                                    </IconButton>
-                                  </Tooltip>
-                                )}
-                                {msg.role === 'assistant' && (
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => speakText(msg.content, msg.id)}
-                                    disabled={!supported}
+                          <Avatar sx={{
+                            width: 80,
+                            height: 80,
+                            mb: 2,
+                            bgcolor: 'primary.main',
+                            '& .MuiSvgIcon-root': {
+                              fontSize: '2.5rem'
+                            }
+                          }}>
+                            <SchoolIcon />
+                          </Avatar>
+                          <Typography variant="h5" sx={{ fontWeight: 600, mb: 1 }}>
+                            {t('assistant')}
+                          </Typography>
+                          <Typography variant="body1" sx={{ mb: 3, maxWidth: '600px' }}>
+                            {t('startPrompt')}
+                          </Typography>
+
+                          <Box sx={{ width: '100%', maxWidth: 'md' }}>
+                            <Grid container spacing={2} justifyContent="center">
+                              {translations[currentLanguage].suggestions.map((question, index) => (
+                                <Grid item xs={12} sm={6} md={4} key={index}>
+                                  <Paper
+                                    elevation={0}
+                                    onClick={() => handleQuestionClick(question)}
                                     sx={{
-                                      bgcolor: darkMode ? 'primary.dark' : 'primary.main',
-                                      color: '#fff',
-                                      boxShadow: 1,
+                                      p: 2,
+                                      borderRadius: '12px',
+                                      border: `1px solid ${darkMode ? '#2d3748' : '#e2e8f0'}`,
+                                      cursor: 'pointer',
+                                      transition: 'all 0.2s',
+                                      height: '100%',
+                                      display: 'flex',
+                                      alignItems: 'center',
                                       '&:hover': {
-                                        bgcolor: darkMode ? 'primary.main' : 'primary.dark'
-                                      },
-                                      '&.Mui-disabled': {
-                                        bgcolor: 'rgba(0, 0, 0, 0.12)',
-                                        color: 'rgba(0, 0, 0, 0.26)'
+                                        borderColor: darkMode ? '#4a5568' : '#cbd5e0',
+                                        transform: 'translateY(-2px)',
+                                        boxShadow: '0 4px 6px rgba(0,0,0,0.05)'
                                       }
                                     }}
                                   >
-                                    <VolumeUpIcon fontSize="small" />
-                                  </IconButton>
-                                )}
-                              </Box>
-                            </>
-                          )}
-                        </Paper>
-                        {msg.role === 'user' && (
-                          <Avatar
-                            sx={{
-                              width: 32,
-                              height: 32,
-                              ml: 2,
-                              mt: 1,
-                              bgcolor: darkMode ? 'primary.dark' : 'primary.main',
-                              color: '#fff'
-                            }}
-                          >
-                            <PersonIcon fontSize="small" />
-                          </Avatar>
-                        )}
-                      </Box>
-                    ))}
-
-                    {isLoading && (
-                      <Box sx={{ display: 'flex', mb: 2 }}>
-                        <Avatar
-                          sx={{
-                            width: 32,
-                            height: 32,
-                            mr: 2,
-                            mt: 1,
-                            bgcolor: darkMode ? 'secondary.dark' : 'secondary.main',
-                            color: '#fff'
-                          }}
-                        >
-                          <SchoolIcon fontSize="small" />
-                        </Avatar>
-                        <Paper
-                          elevation={0}
-                          sx={{
-                            bgcolor: darkMode ? 'background.paper' : 'background.paper',
-                            p: 2,
-                            borderRadius: '8px'
-                          }}
-                        >
-                          <Typography>{t('thinking')}</Typography>
-                        </Paper>
-                      </Box>
-                    )}
-                    <div ref={messagesEndRef} />
-                  </Box>
-                )}
-              </Container>
-            </Box>
-
-            {/* Input container - Update the styling */}
-            <Box
-              sx={{
-                borderTop: `1px solid ${darkMode ? '#2d3748' : '#e2e8f0'}`,
-                bgcolor: 'background.paper',
-                position: 'sticky',
-                bottom: 0,
-                width: '100%',
-                zIndex: 1
-              }}
-            >
-              <Container
-                maxWidth="md"
-                disableGutters
-                sx={{
-                  px: { xs: 1, sm: 3 },
-                  py: { xs: 1, sm: 2 }
-                }}
-              >
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  placeholder={t('writeMessage')}
-                  value={inputValue}
-                  onChange={handleInputChange}
-                  onKeyPress={handleKeyPress}
-                  disabled={isLoading}
-                  multiline
-                  maxRows={4}
-                  className="chat-input"
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: '24px',
-                      paddingRight: '8px',
-                      bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
-                      border: `1px solid ${darkMode ? '#2d3748' : '#e2e8f0'}`,
-                      '&:hover': {
-                        borderColor: darkMode ? '#4a5568' : '#cbd5e0'
-                      },
-                      '&.Mui-focused': {
-                        borderColor: darkMode ? '#4a6fa5' : '#2c5282',
-                        boxShadow: `0 0 0 2px ${darkMode ? 'rgba(74, 111, 165, 0.2)' : 'rgba(44, 82, 130, 0.2)'}`
-                      }
-                    },
-                    '& .MuiInputAdornment-root': {
-                      [currentLanguage === 'ar' ? 'marginLeft' : 'marginRight']: 0
-                    }
-                  }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <Box sx={{
-                          display: 'flex',
-                          flexDirection: currentLanguage === 'ar' ? 'row-reverse' : 'row',
-                          gap: 1
-                        }}>
-                          <Tooltip title={isRecording ? t('stopRecording') : t('startRecording')}>
-                            <IconButton
-                              onClick={toggleRecording}
-                              disabled={!browserSupportsSpeechRecognition}
-                              sx={{
-                                color: isRecording ? 'error.main' : 'inherit'
-                              }}
-                            >
-                              <MicIcon />
-                            </IconButton>
-                          </Tooltip>
-
-                          <Fab
-                            color="primary"
-                            size="small"
-                            onClick={handleSubmit}
-                            disabled={!inputValue.trim() || isLoading}
-                            sx={{
-                              boxShadow: 'none',
-                              '&:disabled': {
-                                bgcolor: darkMode ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)'
-                              }
-                            }}
-                          >
-                            {isLoading ? (
-                              <CircularProgress size={24} color="inherit" />
-                            ) : (
-                              <SendIcon />
-                            )}
-                          </Fab>
+                                    <Typography sx={{
+                                      fontSize: '0.95rem',
+                                      lineHeight: 1.4,
+                                      textAlign: currentLanguage === 'ar' ? 'right' : 'left'
+                                    }}>
+                                      {question}
+                                    </Typography>
+                                  </Paper>
+                                </Grid>
+                              ))}
+                            </Grid>
+                          </Box>
                         </Box>
-                      </InputAdornment>
-                    ),
-                    sx: {
-                      '& .MuiInputAdornment-root': {
-                        [currentLanguage === 'ar' ? 'marginLeft' : 'marginRight']: 0
-                      }
-                    }
-                  }}
-                />
-                <Typography variant="caption" sx={{
-                  display: 'block',
-                  textAlign: 'center',
-                  mt: 1,
-                  color: 'text.secondary'
-                }}>
-                  {t('disclaimer')}
-                </Typography>
-              </Container>
+                      ) : (
+                        <Box sx={{ width: '100%' }}>
+                          {messages.map((msg, index) => (
+                            <Box key={index} sx={{
+                              display: 'flex',
+                              mb: 2,
+                              justifyContent: msg.role === 'user'
+                                ? currentLanguage === 'ar' ? 'flex-start' : 'flex-end'
+                                : currentLanguage === 'ar' ? 'flex-end' : 'flex-start',
+                              px: { xs: 0.5, sm: 0 }
+                            }}>
+                              {msg.role !== 'user' && (
+                                <Avatar
+                                  sx={{
+                                    width: 32,
+                                    height: 32,
+                                    mr: 2,
+                                    mt: 1,
+                                    bgcolor: darkMode ? 'secondary.dark' : 'secondary.main',
+                                    color: '#fff'
+                                  }}
+                                >
+                                  <SchoolIcon fontSize="small" />
+                                </Avatar>
+                              )}
+                              <Paper
+                                elevation={0}
+                                sx={{
+                                  ...getMessageStyle(msg.role),
+                                  maxWidth: '85%'
+                                }}
+                              >
+                                {editingMessageId === msg.id ? (
+                                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                    <TextField
+                                      fullWidth
+                                      multiline
+                                      value={editedMessageContent}
+                                      onChange={(e) => setEditedMessageContent(e.target.value)}
+                                      sx={{
+                                        '& .MuiOutlinedInput-root': {
+                                          bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                                        }
+                                      }}
+                                    />
+                                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                                      <Button
+                                        size="small"
+                                        onClick={handleCancelEdit}
+                                        variant="outlined"
+                                      >
+                                        <CancelIcon fontSize="small" sx={{ mr: 0.5 }} />
+                                        {t('cancel')}
+                                      </Button>
+                                      <Button
+                                        size="small"
+                                        onClick={handleSaveEdit}
+                                        variant="contained"
+                                        color="primary"
+                                      >
+                                        <SaveIcon fontSize="small" sx={{ mr: 0.5 }} />
+                                        {t('save')}
+                                      </Button>
+                                    </Box>
+                                  </Box>
+                                ) : (
+                                  <>
+                                    <Box sx={{
+                                      '& p': { margin: '0.5em 0' },
+                                      '& code': {
+                                        backgroundColor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                                        padding: '0.2em 0.4em',
+                                        borderRadius: '3px',
+                                        fontSize: '85%',
+                                        fontFamily: 'monospace',
+                                      },
+                                      '& pre': {
+                                        backgroundColor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                                        padding: '1em',
+                                        borderRadius: '4px',
+                                        overflow: 'auto',
+                                        '& code': {
+                                          backgroundColor: 'transparent',
+                                          padding: 0,
+                                        }
+                                      },
+                                      '& ul, & ol': { marginLeft: '1.5em' },
+                                      '& blockquote': {
+                                        borderLeft: '3px solid',
+                                        borderColor: 'primary.main',
+                                        marginLeft: 0,
+                                        paddingLeft: '1em',
+                                        fontStyle: 'italic',
+                                      },
+                                      '& table': {
+                                        borderCollapse: 'collapse',
+                                        width: '100%',
+                                        '& th, & td': {
+                                          border: '1px solid',
+                                          borderColor: 'divider',
+                                          padding: '0.5em',
+                                        }
+                                      },
+                                      '& a': {
+                                        color: msg.role === 'user' ? 'inherit' : 'primary.main',
+                                        textDecoration: 'underline',
+                                      }
+                                    }}>
+                                      <ReactMarkdown
+                                        remarkPlugins={[remarkGfm]}
+                                        components={{
+                                          code({ node, inline, className, children, ...props }) {
+                                            return (
+                                              <code
+                                                style={{
+                                                  backgroundColor: darkMode
+                                                    ? 'rgba(255, 255, 255, 0.1)'
+                                                    : 'rgba(0, 0, 0, 0.1)',
+                                                  padding: inline ? '0.2em 0.4em' : '1em',
+                                                  borderRadius: '3px',
+                                                  display: inline ? 'inline' : 'block',
+                                                  overflowX: 'auto',
+                                                  color: msg.role === 'user' ? '#fff' : 'inherit'
+                                                }}
+                                                {...props}
+                                              >
+                                                {children}
+                                              </code>
+                                            );
+                                          }
+                                        }}
+                                      >
+                                        {msg.content}
+                                      </ReactMarkdown>
+                                    </Box>
+                                    <Box sx={{
+                                      position: 'absolute',
+                                      bottom: -16,
+                                      right: -16,
+                                      display: 'flex',
+                                      gap: 0.5
+                                    }}>
+                                      {msg.role === 'user' && (
+                                        <Tooltip title={t('edit')}>
+                                          <IconButton
+                                            size="small"
+                                            onClick={() => handleEditMessage(msg.id, msg.content)}
+                                            sx={{
+                                              bgcolor: darkMode ? 'background.paper' : 'background.paper',
+                                              color: darkMode ? '#fff' : 'text.primary',
+                                              boxShadow: 1,
+                                              '&:hover': {
+                                                bgcolor: darkMode ? 'background.default' : 'background.default'
+                                              }
+                                            }}
+                                          >
+                                            <EditIcon fontSize="small" />
+                                          </IconButton>
+                                        </Tooltip>
+                                      )}
+                                      {msg.role === 'assistant' && (
+                                        <IconButton
+                                          size="small"
+                                          onClick={() => speakText(msg.content, msg.id)}
+                                          disabled={!supported}
+                                          sx={{
+                                            bgcolor: darkMode ? 'primary.dark' : 'primary.main',
+                                            color: '#fff',
+                                            boxShadow: 1,
+                                            '&:hover': {
+                                              bgcolor: darkMode ? 'primary.main' : 'primary.dark'
+                                            },
+                                            '&.Mui-disabled': {
+                                              bgcolor: 'rgba(0, 0, 0, 0.12)',
+                                              color: 'rgba(0, 0, 0, 0.26)'
+                                            }
+                                          }}
+                                        >
+                                          <VolumeUpIcon fontSize="small" />
+                                        </IconButton>
+                                      )}
+                                    </Box>
+                                  </>
+                                )}
+                              </Paper>
+                              {msg.role === 'user' && (
+                                <Avatar
+                                  sx={{
+                                    width: 32,
+                                    height: 32,
+                                    ml: 2,
+                                    mt: 1,
+                                    bgcolor: darkMode ? 'primary.dark' : 'primary.main',
+                                    color: '#fff'
+                                  }}
+                                >
+                                  <PersonIcon fontSize="small" />
+                                </Avatar>
+                              )}
+                            </Box>
+                          ))}
+
+                          {isLoading && (
+                            <Box sx={{ display: 'flex', mb: 2 }}>
+                              <Avatar
+                                sx={{
+                                  width: 32,
+                                  height: 32,
+                                  mr: 2,
+                                  mt: 1,
+                                  bgcolor: darkMode ? 'secondary.dark' : 'secondary.main',
+                                  color: '#fff'
+                                }}
+                              >
+                                <SchoolIcon fontSize="small" />
+                              </Avatar>
+                              <Paper
+                                elevation={0}
+                                sx={{
+                                  bgcolor: darkMode ? 'background.paper' : 'background.paper',
+                                  p: 2,
+                                  borderRadius: '8px'
+                                }}
+                              >
+                                <Typography>{t('thinking')}</Typography>
+                              </Paper>
+                            </Box>
+                          )}
+                          <div ref={messagesEndRef} />
+                        </Box>
+                      )}
+                    </Container>
+                  </Box>
+
+                  {/* Input container - Update the styling */}
+                  <Box
+                    sx={{
+                      borderTop: `1px solid ${darkMode ? '#2d3748' : '#e2e8f0'}`,
+                      bgcolor: 'background.paper',
+                      position: 'sticky',
+                      bottom: 0,
+                      width: '100%',
+                      zIndex: 1
+                    }}
+                  >
+                    <Container
+                      maxWidth="md"
+                      disableGutters
+                      sx={{
+                        px: { xs: 1, sm: 3 },
+                        py: { xs: 1, sm: 2 }
+                      }}
+                    >
+                      <TextField
+                        fullWidth
+                        variant="outlined"
+                        placeholder={t('writeMessage')}
+                        value={inputValue}
+                        onChange={handleInputChange}
+                        onKeyPress={handleKeyPress}
+                        disabled={isLoading}
+                        multiline
+                        maxRows={4}
+                        className="chat-input"
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: '24px',
+                            paddingRight: '8px',
+                            bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                            border: `1px solid ${darkMode ? '#2d3748' : '#e2e8f0'}`,
+                            '&:hover': {
+                              borderColor: darkMode ? '#4a5568' : '#cbd5e0'
+                            },
+                            '&.Mui-focused': {
+                              borderColor: darkMode ? '#4a6fa5' : '#2c5282',
+                              boxShadow: `0 0 0 2px ${darkMode ? 'rgba(74, 111, 165, 0.2)' : 'rgba(44, 82, 130, 0.2)'}`
+                            }
+                          },
+                          '& .MuiInputAdornment-root': {
+                            [currentLanguage === 'ar' ? 'marginLeft' : 'marginRight']: 0
+                          }
+                        }}
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <Box sx={{
+                                display: 'flex',
+                                flexDirection: currentLanguage === 'ar' ? 'row-reverse' : 'row',
+                                gap: 1
+                              }}>
+                                <Tooltip title={isRecording ? t('stopRecording') : t('startRecording')}>
+                                  <IconButton
+                                    onClick={toggleRecording}
+                                    disabled={!browserSupportsSpeechRecognition}
+                                    sx={{
+                                      color: isRecording ? 'error.main' : 'inherit'
+                                    }}
+                                  >
+                                    <MicIcon />
+                                  </IconButton>
+                                </Tooltip>
+                                <Fab
+                                  color="primary"
+                                  size="small"
+                                  onClick={handleSubmit}
+                                  disabled={!inputValue.trim() || isLoading}
+                                  sx={{
+                                    boxShadow: 'none',
+                                    '&:disabled': {
+                                      bgcolor: darkMode ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)'
+                                    }
+                                  }}
+                                >
+                                  {isLoading ? (
+                                    <CircularProgress size={24} color="inherit" />
+                                  ) : (
+                                    <SendIcon />
+                                  )}
+                                </Fab>
+                              </Box>
+                            </InputAdornment>
+                          )
+                        }}
+                      />
+                      <Typography variant="caption" sx={{
+                        display: 'block',
+                        textAlign: 'center',
+                        mt: 1,
+                        color: 'text.secondary'
+                      }}>
+                        {t('disclaimer')}
+                      </Typography>
+                    </Container>
+                  </Box>
+                </Box>
+              </Box >
             </Box>
-          </Box>
-        </Box >
-      </Box >
+          } />
+      </Routes>
 
       <Dialog
         open={settingsOpen}
@@ -1572,7 +1624,7 @@ function App() {
                 py: 1
               }}
             />
-            
+
             {/* Auto Read Toggle */}
             <FormControlLabel
               control={
@@ -1628,54 +1680,54 @@ function App() {
       </Dialog>
 
       {/* Rename Dialog */}
-<Dialog
-  open={renameDialogOpen}
-  onClose={() => setRenameDialogOpen(false)}
-  fullWidth
-  maxWidth="xs"
-  PaperProps={{
-    sx: {
-      bgcolor: darkMode ? '#1e1e1e' : '#ffffff'
-    }
-  }}
->
-  <DialogTitle sx={{
-    bgcolor: darkMode ? 'primary.dark' : 'primary.main',
-    color: '#fff',
-    fontWeight: 600
-  }}>
-    {t('editTitle')}
-  </DialogTitle>
-  <DialogContent sx={{ py: 2, mt: 1 }}>
-    <TextField
-      fullWidth
-      value={newChatTitle}
-      onChange={(e) => setNewChatTitle(e.target.value)}
-      placeholder={t('newConversation')}
-      autoFocus
-      InputProps={{
-        sx: {
-          bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
-        }
-      }}
-    />
-  </DialogContent>
-  <DialogActions sx={{ px: 3, pb: 2 }}>
-    <Button 
-      onClick={() => setRenameDialogOpen(false)}
-      variant="outlined"
-    >
-      {t('cancel')}
-    </Button>
-    <Button 
-      onClick={handleRenameSubmit}
-      variant="contained"
-      disabled={!newChatTitle.trim()}
-    >
-      {t('save')}
-    </Button>
-  </DialogActions>
-</Dialog>
+      <Dialog
+        open={renameDialogOpen}
+        onClose={() => setRenameDialogOpen(false)}
+        fullWidth
+        maxWidth="xs"
+        PaperProps={{
+          sx: {
+            bgcolor: darkMode ? '#1e1e1e' : '#ffffff'
+          }
+        }}
+      >
+        <DialogTitle sx={{
+          bgcolor: darkMode ? 'primary.dark' : 'primary.main',
+          color: '#fff',
+          fontWeight: 600
+        }}>
+          {t('editTitle')}
+        </DialogTitle>
+        <DialogContent sx={{ py: 2, mt: 1 }}>
+          <TextField
+            fullWidth
+            value={newChatTitle}
+            onChange={(e) => setNewChatTitle(e.target.value)}
+            placeholder={t('newConversation')}
+            autoFocus
+            InputProps={{
+              sx: {
+                bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+              }
+            }}
+          />
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button
+            onClick={() => setRenameDialogOpen(false)}
+            variant="outlined"
+          >
+            {t('cancel')}
+          </Button>
+          <Button
+            onClick={handleRenameSubmit}
+            variant="contained"
+            disabled={!newChatTitle.trim()}
+          >
+            {t('save')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </ThemeProvider >
   );
 }
