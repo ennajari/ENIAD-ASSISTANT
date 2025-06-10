@@ -4,18 +4,7 @@ chatbot-academique/
 ├── public/
 │   └── vite.svg             
 ├── src/
-│   ├── App.jsx               
-│   ├── index.css             
-│   └── main.jsx              
-├── index.html               
-├── package.json      
-├── postcss.config.cjs    
-├── postcss.config.js
-├── tailwind.config.cjs
-├── tailwind.config.js
-├── vite.config.js
-le voici le code des fichiers de l'application:
-│   ├── App.jsx
+│   ├── App.jsx  
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
@@ -72,7 +61,8 @@ import {
 import axios from 'axios';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
-const API_URL = "https://6241-34-83-186-174.ngrok-free.app/generate";
+// Mettez à jour cette URL avec votre URL ngrok actuelle
+const API_URL = "https://25ae-35-198-214-255.ngrok-free.app/generate";
 
 const eniadQuestions = [
   "Quelles sont les causes de la Première Guerre mondiale ?",
@@ -187,7 +177,7 @@ function App() {
 
       const botMessage = {
         role: 'assistant',
-        content: response.data.response || response.data,
+        content: response.data.reply || response.data.response || response.data,
         id: Date.now().toString(),
         chatId: currentChatId,
         timestamp: new Date().toISOString()
@@ -230,6 +220,7 @@ function App() {
       ];
     });
   };
+
 
   const handleEditMessage = (messageId, currentContent) => {
     setEditingMessageId(messageId);
@@ -911,13 +902,204 @@ function App() {
   );
 }
 
-export default App;
+export default App;             
 │   ├── index.css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: none;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Animation for typing indicator */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.typing-indicator {
+  animation: blink 1.5s infinite;
+}             
 │   └── main.jsx 
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.jsx'
+import './index.css'
+import { registerSW } from 'virtual:pwa-register'
 
-├── index.html  
+// Register service worker for PWA
+if ('serviceWorker' in navigator) {
+  registerSW()
+}
 
-├── package.json
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)             
+├── index.html     
+    <!-- index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Chatbot Académique</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+      
+├── package.json      
+{
+  "name": "chatbot-academique",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^7.1.0",
+    "@mui/material": "^7.1.0",
+    "axios": "^1.9.0",
+    "file-saver": "^2.0.5",
+    "gh-pages": "^6.1.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-speech-recognition": "^4.0.1",
+    "uuid": "^9.0.1",
+    "virtual:pwa-register": "latest"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.25.0",
+    "@tailwindcss/postcss": "^4.1.7",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@vitejs/plugin-react": "^4.4.1",
+    "@vitejs/plugin-react-swc": "^3.9.0",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.25.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^16.0.0",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.3.0",
+    "vite": "^6.3.5",
+    "vite-plugin-pwa": "^0.17.4"
+  }
+}
+├── postcss.config.cjs   
+ module.exports = {
+  plugins: {
+    '@tailwindcss/postcss': {},
+    autoprefixer: {},
+  },
+}
+├── postcss.config.js
+export default {
+  plugins: {
+    '@tailwindcss/postcss': {},
+    autoprefixer: {},
+  },
+}
+├── tailwind.config.cjs
+// tailwind.config.js
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+├── tailwind.config.js
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
 
-├── postcss.config.cjs    
+
+├── vite.config.js
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
+
+export default defineConfig({
+  plugins: [
+    react(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
+      manifest: {
+        name: 'ENIAD Assistant',
+        short_name: 'ENIAD',
+        description: 'Assistant académique ENIAD',
+        theme_color: '#2c5282',
+        icons: [
+          {
+            src: 'pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: 'pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png'
+          }
+        ]
+      }
+    })
+  ],
+  server: {
+    proxy: {
+      '/generate': {
+        target: 'https://25ae-35-198-214-255.ngrok-free.app',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/generate/, '')
+      }
+    }
+  }
+})
+   
