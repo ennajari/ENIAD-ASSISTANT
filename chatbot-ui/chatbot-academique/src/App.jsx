@@ -6,6 +6,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import CssBaseline from '@mui/material/CssBaseline';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import Login from './components/Login';
+import { useLanguage } from './contexts/LanguageContext';
 import {
   Box,
   Typography,
@@ -34,8 +35,11 @@ import {
   Grid,
   Container,
   CircularProgress,
-  Fab
+  Fab,
+  Menu,
+  MenuItem
 } from '@mui/material';
+import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 
 // MUI Icons
 import {
@@ -54,7 +58,8 @@ import {
   Send as SendIcon,
   VolumeUp as VolumeUpIcon,
   School as SchoolIcon,
-  Person as PersonIcon
+  Person as PersonIcon,
+  MoreHoriz as MoreHorizIcon
 } from '@mui/icons-material';
 
 // Additional imports
@@ -85,7 +90,7 @@ const translations = {
     thinking: "Réflexion en cours...",
     newConversation: "Nouvelle conversation",
     edit: "Modifier",
-    cancel: "Annuler",
+    delete: "Supprimer", // <-- changed from "Annuler"
     save: "Enregistrer",
     startRecording: "Enregistrer un message audio",
     stopRecording: "Arrêter l'enregistrement",
@@ -117,7 +122,7 @@ const translations = {
     thinking: "Thinking...",
     newConversation: "New Conversation",
     edit: "Edit",
-    cancel: "Cancel",
+    delete: "Delete", // <-- changed from "Cancel"
     save: "Save",
     startRecording: "Record audio message",
     stopRecording: "Stop recording",
@@ -149,7 +154,7 @@ const translations = {
     thinking: "جاري التفكير...",
     newConversation: "محادثة جديدة",
     edit: "تعديل",
-    cancel: "إلغاء",
+    delete: "حذف", // <-- changed from "إلغاء"
     save: "حفظ",
     startRecording: "تسجيل رسالة صوتية",
     stopRecording: "إيقاف التسجيل",
@@ -240,6 +245,7 @@ const useSpeechSynthesis = () => {
 function App() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const { language: currentLanguage, changeLanguage } = useLanguage();
 
   if (authLoading) {
     return (
@@ -283,15 +289,18 @@ function App() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [editingMessageId, setEditingMessageId] = useState(null);
   const [editedMessageContent, setEditedMessageContent] = useState('');
-  const [currentLanguage, setCurrentLanguage] = useState(() => {
-    const saved = localStorage.getItem('language');
-    return saved || 'fr';
-  });
+  // const [currentLanguageState, setCurrentLanguage] = useState(() => {
+  //   const saved = localStorage.getItem('language');
+  //   return saved || 'fr';
+  // });
 
   // Add these state declarations in the App component
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [renameChatId, setRenameChatId] = useState(null);
   const [newChatTitle, setNewChatTitle] = useState('');
+
+  const [chatMenuAnchorEl, setChatMenuAnchorEl] = useState(null);
+  const [chatMenuChatId, setChatMenuChatId] = useState(null);
 
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
@@ -362,47 +371,30 @@ function App() {
             boxShadow: theme.direction === 'rtl'
               ? '-2px 0 10px rgba(0,0,0,0.05)'
               : '2px 0 10px rgba(0,0,0,0.05)',
-            transform: 'none', // Reset any default transforms
-            transition: theme.transitions.create(['transform'], {
-              duration: theme.transitions.duration.standard,
-              easing: theme.transitions.easing.sharp,
-            }),
+            animation: `${drawerOpen
+              ? (theme.direction === 'rtl' ? 'slideInRTL' : 'slideInLTR')
+              : (theme.direction === 'rtl' ? 'slideOutRTL' : 'slideOutLTR')
+              } 200ms ${theme.transitions.easing.sharp}`,
           }),
         },
       },
     },
-    // Add custom keyframes
+    // Corrected keyframes:
     '@keyframes slideInRTL': {
-      '0%': {
-        transform: 'translateX(-100%)',
-      },
-      '100%': {
-        transform: 'translateX(0)',
-      },
+      '0%': { transform: 'translateX(100%)' },
+      '100%': { transform: 'translateX(0)' },
     },
     '@keyframes slideOutRTL': {
-      '0%': {
-        transform: 'translateX(0)',
-      },
-      '100%': {
-        transform: 'translateX(100%)',
-      },
+      '0%': { transform: 'translateX(0)' },
+      '100%': { transform: 'translateX(100%)' },
     },
     '@keyframes slideInLTR': {
-      '0%': {
-        transform: 'translateX(-100%)',
-      },
-      '100%': {
-        transform: 'translateX(0)',
-      },
+      '0%': { transform: 'translateX(-100%)' },
+      '100%': { transform: 'translateX(0)' },
     },
     '@keyframes slideOutLTR': {
-      '0%': {
-        transform: 'translateX(0)',
-      },
-      '100%': {
-        transform: 'translateX(-100%)',
-      },
+      '0%': { transform: 'translateX(0)' },
+      '100%': { transform: 'translateX(-100%)' },
     },
   });
 
@@ -861,6 +853,15 @@ function App() {
     setNewChatTitle('');
   };
 
+  const handleChatMenuOpen = (event, chatId) => {
+    setChatMenuAnchorEl(event.currentTarget);
+    setChatMenuChatId(chatId);
+  };
+  const handleChatMenuClose = () => {
+    setChatMenuAnchorEl(null);
+    setChatMenuChatId(null);
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -872,21 +873,25 @@ function App() {
         <Route
           path="/"
           element={
-            <Box sx={{
-              display: 'flex',
-              direction: currentLanguage === 'ar' ? 'rtl' : 'ltr',
-              minHeight: '100vh',
-              bgcolor: 'background.default',
-              '& .MuiDrawer-root': {
-                flexDirection: currentLanguage === 'ar' ? 'row-reverse' : 'row'
-              }
-            }}>
-              {/* Drawer */}
+            <Box
+              sx={{
+                display: 'flex',
+                direction: currentLanguage === 'ar' ? 'rtl' : 'ltr',
+                minHeight: '100vh',
+                bgcolor: 'background.default',
+                position: 'relative',
+                overflow: 'hidden',
+                '& .MuiDrawer-root': {
+                  flexDirection: currentLanguage === 'ar' ? 'row-reverse' : 'row'
+                }
+              }}
+            >
               <Drawer
                 variant={drawerVariant}
                 open={drawerOpen}
                 onClose={() => isMobile && setMobileOpen(false)}
                 anchor={currentLanguage === 'ar' ? 'right' : 'left'}
+                SlideProps={{ direction: currentLanguage === 'ar' ? 'left' : 'right' }} // <-- FIXED
                 sx={{
                   width: {
                     xs: 0,
@@ -894,15 +899,23 @@ function App() {
                   },
                   flexShrink: 0,
                   '& .MuiDrawer-paper': {
-                    transform: (theme) => {
-                      if (!drawerOpen) {
-                        return theme.direction === 'rtl'
-                          ? 'translateX(100%)'
-                          : 'translateX(-100%)';
-                      }
-                      return 'translateX(0)';
-                    },
+                    // KEEP all your custom styles, transitions, keyframes, etc!
+                    transition: theme => theme.transitions.create('transform', {
+                      duration: 200,
+                      easing: theme.transitions.easing.sharp
+                    }),
+                    transform: theme => !drawerOpen
+                      ? theme.direction === 'rtl'
+                        ? 'translateX(-100%)'
+                        : 'translateX(100%)'
+                      : 'translateX(0)',
                     visibility: drawerOpen ? 'visible' : 'hidden',
+                    backgroundColor: theme => theme.palette.background.paper,
+                    boxShadow: theme =>
+                      theme.direction === 'rtl'
+                        ? '-2px 0 10px rgba(0,0,0,0.05)'
+                        : '2px 0 10px rgba(0,0,0,0.05)',
+                    // ...any other custom styles you have
                   },
                 }}
               >
@@ -944,37 +957,7 @@ function App() {
                 <Divider sx={{ my: 1 }} />
                 <List sx={{ overflow: 'auto', flex: 1 }}>
                   {conversationHistory.map((convo) => (
-                    <ListItem
-                      key={convo.id}
-                      disablePadding
-                      secondaryAction={
-                        <Box sx={{
-                          display: 'flex',
-                          flexDirection: currentLanguage === 'ar' ? 'row-reverse' : 'row'
-                        }}>
-                          <IconButton
-                            edge="end"
-                            onClick={(e) => handleEditTitle(convo.id, convo.title)}
-                            sx={{
-                              color: 'text.secondary',
-                              mr: currentLanguage === 'ar' ? 0 : 1,
-                              ml: currentLanguage === 'ar' ? 1 : 0
-                            }}
-                            size="small"
-                          >
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                          <IconButton
-                            edge="end"
-                            onClick={(e) => handleDeleteChat(convo.id, e)}
-                            sx={{ color: 'text.secondary' }}
-                            size="small"
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Box>
-                      }
-                    >
+                    <ListItem key={convo.id} disablePadding>
                       <ListItemButton
                         selected={currentChatId === convo.id}
                         onClick={() => handleLoadChat(convo.id)}
@@ -984,6 +967,9 @@ function App() {
                           my: 0.5,
                           pr: currentLanguage === 'ar' ? 2 : 8,
                           pl: currentLanguage === 'ar' ? 8 : 2,
+                          flexDirection: 'row', // Always row, we control order below
+                          alignItems: 'center',
+                          position: 'relative',
                           '&.Mui-selected': {
                             bgcolor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
                           },
@@ -992,34 +978,94 @@ function App() {
                           },
                         }}
                       >
-                        <ListItemIcon sx={{
-                          minWidth: 36,
-                          mr: currentLanguage === 'ar' ? 0 : 1,
-                          ml: currentLanguage === 'ar' ? 1 : 0
-                        }}>
-                          <ChatIcon fontSize="small" color={currentChatId === convo.id ? 'primary' : 'inherit'} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={convo.title}
-                          primaryTypographyProps={{
-                            sx: {
-                              fontWeight: currentChatId === convo.id ? '600' : 'normal',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap',
-                              fontSize: '0.9rem',
-                              textAlign: currentLanguage === 'ar' ? 'right' : 'left'
-                            }
-                          }}
-                          secondary={new Date(convo.lastUpdated).toLocaleString()}
-                          secondaryTypographyProps={{
-                            sx: {
-                              fontSize: '0.7rem',
-                              color: darkMode ? 'text.secondary' : 'text.secondary',
-                              textAlign: currentLanguage === 'ar' ? 'right' : 'left'
-                            }
-                          }}
-                        />
+                        {/* AR: [Menu][Bubble][Text] | EN/FR: [Bubble][Text][Menu] */}
+                        {currentLanguage === 'ar' ? (
+                          <>
+                            <ListItemSecondaryAction
+                              sx={{
+                                left: 0,
+                                right: 'auto',
+                              }}
+                            >
+                              <IconButton
+                                size="small"
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  handleChatMenuOpen(e, convo.id);
+                                }}
+                              >
+                                <MoreHorizIcon />
+                              </IconButton>
+                            </ListItemSecondaryAction>
+                            <ListItemIcon sx={{ minWidth: 36, mr: 1 }}>
+                              <ChatIcon fontSize="small" color={currentChatId === convo.id ? 'primary' : 'inherit'} />
+                            </ListItemIcon>
+                            <ListItemText
+                              primary={convo.title}
+                              primaryTypographyProps={{
+                                sx: {
+                                  fontWeight: currentChatId === convo.id ? '600' : 'normal',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  whiteSpace: 'nowrap',
+                                  fontSize: '0.9rem',
+                                  textAlign: 'right'
+                                }
+                              }}
+                              secondary={new Date(convo.lastUpdated).toLocaleString()}
+                              secondaryTypographyProps={{
+                                sx: {
+                                  fontSize: '0.7rem',
+                                  color: darkMode ? 'text.secondary' : 'text.secondary',
+                                  textAlign: 'right'
+                                }
+                              }}
+                            />
+                          </>
+                        ) : (
+                          <>
+                            <ListItemIcon sx={{ minWidth: 36, mr: 1 }}>
+                              <ChatIcon fontSize="small" color={currentChatId === convo.id ? 'primary' : 'inherit'} />
+                            </ListItemIcon>
+                            <ListItemText
+                              primary={convo.title}
+                              primaryTypographyProps={{
+                                sx: {
+                                  fontWeight: currentChatId === convo.id ? '600' : 'normal',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  whiteSpace: 'nowrap',
+                                  fontSize: '0.9rem',
+                                  textAlign: 'left'
+                                }
+                              }}
+                              secondary={new Date(convo.lastUpdated).toLocaleString()}
+                              secondaryTypographyProps={{
+                                sx: {
+                                  fontSize: '0.7rem',
+                                  color: darkMode ? 'text.secondary' : 'text.secondary',
+                                  textAlign: 'left'
+                                }
+                              }}
+                            />
+                            <ListItemSecondaryAction
+                              sx={{
+                                right: 0,
+                                left: 'auto',
+                              }}
+                            >
+                              <IconButton
+                                size="small"
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  handleChatMenuOpen(e, convo.id);
+                                }}
+                              >
+                                <MoreHorizIcon />
+                              </IconButton>
+                            </ListItemSecondaryAction>
+                          </>
+                        )}
                       </ListItemButton>
                     </ListItem>
                   ))}
@@ -1160,11 +1206,133 @@ function App() {
                     flexGrow: 1,
                     display: 'flex',
                     flexDirection: 'column',
-                    height: `calc(100vh - 64px)`, // 64px is AppBar height
-                    pt: `64px`, // Add padding top to account for AppBar
-                    overflow: 'hidden', // Prevent double scrollbars
+                    height: `calc(100vh - 64px)`,
+                    pt: `64px`,
+                    overflow: 'hidden',
+                    position: 'relative',
                   }}
                 >
+                  {/* KEEP this set of animated icons so they scroll with chat */}
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%) rotate(0deg)',
+                      opacity: darkMode ? 0.22 : 0.32,
+                      color: darkMode ? 'primary.main' : '#388e3c', // More visible green in light mode
+                      fontSize: { xs: 120, md: 180 },
+                      animation: 'floatNodeCenter 3.5s ease-in-out infinite',
+                      zIndex: 0,
+                      pointerEvents: 'none',
+                      filter: darkMode ? 'none' : 'drop-shadow(0 2px 8px #b5e7b0)',
+                    }}
+                  >
+                    <SchoolIcon fontSize="inherit" />
+                  </Box>
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      top: '10%',
+                      left: '7%',
+                      transform: 'translate(-50%, -50%) rotate(0deg)',
+                      opacity: darkMode ? 0.18 : 0.32,
+                      color: darkMode ? '#42a5f5' : '#1976d2', // Strong blue in light mode
+                      fontSize: { xs: 60, md: 100 },
+                      animation: 'floatNodeTL 4s ease-in-out infinite',
+                      zIndex: 0,
+                      pointerEvents: 'none',
+                      filter: darkMode ? 'none' : 'drop-shadow(0 2px 8px #90caf9)',
+                    }}
+                  >
+                    <ChatIcon fontSize="inherit" />
+                  </Box>
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      top: '15%',
+                      right: '8%',
+                      transform: 'translate(50%, -50%) rotate(0deg)',
+                      opacity: darkMode ? 0.19 : 0.33,
+                      color: darkMode ? '#388e3c' : '#388e3c', // Strong green in light mode
+                      fontSize: { xs: 70, md: 120 },
+                      animation: 'floatNodeTR 4s ease-in-out infinite',
+                      zIndex: 0,
+                      pointerEvents: 'none',
+                      filter: darkMode ? 'none' : 'drop-shadow(0 2px 8px #b5e7b0)',
+                    }}
+                  >
+                    <PersonIcon fontSize="inherit" />
+                  </Box>
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      bottom: '10%',
+                      left: '12%',
+                      transform: 'translate(-50%, 50%) rotate(0deg)',
+                      opacity: darkMode ? 0.16 : 0.28,
+                      color: darkMode ? '#ff9800' : '#f57c00', // Strong orange in light mode
+                      fontSize: { xs: 55, md: 90 },
+                      animation: 'floatNodeBL 4s ease-in-out infinite',
+                      zIndex: 0,
+                      pointerEvents: 'none',
+                      filter: darkMode ? 'none' : 'drop-shadow(0 2px 8px #ffd180)',
+                    }}
+                  >
+                    <EditIcon fontSize="inherit" />
+                  </Box>
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      bottom: '13%',
+                      right: '10%',
+                      transform: 'translate(50%, 50%) rotate(0deg)',
+                      opacity: darkMode ? 0.17 : 0.29,
+                      color: darkMode ? '#1976d2' : '#1976d2', // Strong blue in light mode
+                      fontSize: { xs: 60, md: 100 },
+                      animation: 'floatNodeBR 4s ease-in-out infinite',
+                      zIndex: 0,
+                      pointerEvents: 'none',
+                      filter: darkMode ? 'none' : 'drop-shadow(0 2px 8px #90caf9)',
+                    }}
+                  >
+                    <SettingsIcon fontSize="inherit" />
+                  </Box>
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      top: '60%',
+                      left: '5%',
+                      transform: 'translate(-50%, -50%) rotate(0deg)',
+                      opacity: darkMode ? 0.15 : 0.25,
+                      color: darkMode ? '#43a047' : '#388e3c', // Strong green in light mode
+                      fontSize: { xs: 45, md: 70 },
+                      animation: 'floatNodeML 4s ease-in-out infinite',
+                      zIndex: 0,
+                      pointerEvents: 'none',
+                      filter: darkMode ? 'none' : 'drop-shadow(0 2px 8px #b5e7b0)',
+                    }}
+                  >
+                    <VolumeUpIcon fontSize="inherit" />
+                  </Box>
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      top: '70%',
+                      right: '6%',
+                      transform: 'translate(50%, -50%) rotate(0deg)',
+                      opacity: darkMode ? 0.15 : 0.25,
+                      color: darkMode ? '#fbc02d' : '#fbc02d', // Strong yellow in light mode
+                      fontSize: { xs: 50, md: 80 },
+                      animation: 'floatNodeMR 4s ease-in-out infinite',
+                      zIndex: 0,
+                      pointerEvents: 'none',
+                      filter: darkMode ? 'none' : 'drop-shadow(0 2px 8px #fff59d)',
+                    }}
+                  >
+                    <MicIcon fontSize="inherit" />
+                  </Box>
+
                   {/* Chat content container */}
                   <Box
                     sx={{
@@ -1652,10 +1820,7 @@ function App() {
                   <Button
                     key={lang.code}
                     variant={currentLanguage === lang.code ? 'contained' : 'outlined'}
-                    onClick={() => {
-                      setCurrentLanguage(lang.code);
-                      localStorage.setItem('language', lang.code);
-                    }}
+                    onClick={() => changeLanguage(lang.code)}
                     sx={{
                       minWidth: 'auto',
                       px: 2,
@@ -1677,7 +1842,7 @@ function App() {
             {t('close')}
           </Button>
         </DialogActions>
-      </Dialog>
+           </Dialog>
 
       {/* Rename Dialog */}
       <Dialog
@@ -1728,6 +1893,90 @@ function App() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Menu
+        anchorEl={chatMenuAnchorEl}
+        open={Boolean(chatMenuAnchorEl)}
+        onClose={handleChatMenuClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: currentLanguage === 'ar' ? 'left' : 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: currentLanguage === 'ar' ? 'left' : 'right' }}
+      >
+        <MenuItem
+          onClick={() => {
+            const chat = conversationHistory.find(c => c.id === chatMenuChatId);
+            handleEditTitle(chatMenuChatId, chat?.title || '');
+            handleChatMenuClose();
+          }}
+          sx={{ direction: currentLanguage === 'ar' ? 'rtl' : 'ltr' }}
+        >
+          <EditIcon fontSize="small" sx={{ mr: currentLanguage === 'ar' ? 0 : 1, ml: currentLanguage === 'ar' ? 1 : 0 }} />
+          {t('edit')}
+        </MenuItem>
+        <MenuItem
+          onClick={(e) => {
+            handleDeleteChat(chatMenuChatId, e);
+            handleChatMenuClose();
+          }}
+          sx={{ direction: currentLanguage === 'ar' ? 'rtl' : 'ltr' }}
+        >
+          <DeleteIcon fontSize="small" sx={{ mr: currentLanguage === 'ar' ? 0 : 1, ml: currentLanguage === 'ar' ? 1 : 0 }} />
+          {t('delete')}
+        </MenuItem>
+      </Menu>
+
+      <style>
+        {`
+          @keyframes floatCenter {
+            0%   { transform: translate(-50%, -50%) rotate(0deg);}
+            25%  { transform: translate(-50%, calc(-50% - 50px)) rotate(7deg);}
+            50%  { transform: translate(-50%, calc(-50% + 50px)) rotate(-7deg);}
+            75%  { transform: translate(-50%, calc(-50% - 50px)) rotate(7deg);}
+            100% { transform: translate(-50%, -50%) rotate(0deg);}
+          }
+          @keyframes floatNodeTL {
+            0%   { transform: translate(-50%, -50%) rotate(0deg);}
+            25%  { transform: translate(-50%, calc(-50% - 40px)) rotate(-7deg);}
+            50%  { transform: translate(-50%, calc(-50% + 40px)) rotate(7deg);}
+            75%  { transform: translate(-50%, calc(-50% - 40px)) rotate(-7deg);}
+            100% { transform: translate(-50%, -50%) rotate(0deg);}
+          }
+          @keyframes floatNodeTR {
+            0%   { transform: translate(50%, -50%) rotate(0deg);}
+            25%  { transform: translate(50%, calc(-50% - 40px)) rotate(7deg);}
+            50%  { transform: translate(50%, calc(-50% + 40px)) rotate(-7deg);}
+            75%  { transform: translate(50%, calc(-50% - 40px)) rotate(7deg);}
+            100% { transform: translate(50%, -50%) rotate(0deg);}
+          }
+          @keyframes floatNodeBL {
+            0%   { transform: translate(-50%, 50%) rotate(0deg);}
+            25%  { transform: translate(-50%, calc(50% + 40px)) rotate(7deg);}
+            50%  { transform: translate(-50%, calc(50% - 40px)) rotate(-7deg);}
+            75%  { transform: translate(-50%, calc(50% + 40px)) rotate(7deg);}
+            100% { transform: translate(-50%, 50%) rotate(0deg);}
+          }
+          @keyframes floatNodeBR {
+            0%   { transform: translate(50%, 50%) rotate(0deg);}
+            25%  { transform: translate(50%, calc(50% + 40px)) rotate(-7deg);}
+            50%  { transform: translate(50%, calc(50% - 40px)) rotate(7deg);}
+            75%  { transform: translate(50%, calc(50% + 40px)) rotate(-7deg);}
+            100% { transform: translate(50%, 50%) rotate(0deg);}
+          }
+          @keyframes floatNodeML {
+            0%   { transform: translate(-50%, -50%) rotate(0deg);}
+            25%  { transform: translate(calc(-50% - 30px), -50%) rotate(5deg);}
+            50%  { transform: translate(calc(-50% + 30px), -50%) rotate(-5deg);}
+            75%  { transform: translate(calc(-50% - 30px), -50%) rotate(5deg);}
+            100% { transform: translate(-50%, -50%) rotate(0deg);}
+          }
+          @keyframes floatNodeMR {
+            0%   { transform: translate(50%, -50%) rotate(0deg);}
+            25%  { transform: translate(calc(50% + 30px), -50%) rotate(-5deg);}
+            50%  { transform: translate(calc(50% - 30px), -50%) rotate(5deg);}
+            75%  { transform: translate(calc(50% + 30px), -50%) rotate(-5deg);}
+            100% { transform: translate(50%, -50%) rotate(0deg);}
+          }
+        `}
+      </style>
     </ThemeProvider >
   );
 }
