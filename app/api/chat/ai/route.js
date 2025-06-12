@@ -8,7 +8,7 @@ import OpenAI from "openai";
 
 // Initialize OpenAI client with Llama3 model configuration
 const openai = new OpenAI({
-    baseURL: 'https://ahmedoukachaam--llama3-openai-compatible-serve.modal.run/v1',
+    baseURL: 'https://gorafrenk--llama3-openai-compatible-serve.modal.run/v1',
     apiKey: "super-secret-key"
 });
 
