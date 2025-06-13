@@ -1,316 +1,49 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import CssBaseline from '@mui/material/CssBaseline';
+import { ThemeProvider } from '@mui/material/styles';
+import { Box, CircularProgress, CssBaseline, Toolbar, useMediaQuery } from '@mui/material';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import Login from './components/Login';
 import { useLanguage } from './contexts/LanguageContext';
-import {
-  Box,
-  Typography,
-  Button,
-  AppBar,
-  Toolbar,
-  IconButton,
-  Drawer,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Divider,
-  Avatar,
-  Paper,
-  TextField,
-  InputAdornment,
-  Tooltip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Switch,
-  FormControlLabel,
-  Grid,
-  Container,
-  CircularProgress,
-  Fab,
-  Menu,
-  MenuItem
-} from '@mui/material';
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
-
-// MUI Icons
-import {
-  Menu as MenuIcon,
-  Add as AddIcon,
-  Chat as ChatIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  Close as CloseIcon,
-  Save as SaveIcon,
-  Cancel as CancelIcon,
-  Settings as SettingsIcon,
-  DarkMode as DarkModeIcon,
-  LightMode as LightModeIcon,
-  Mic as MicIcon,
-  Send as SendIcon,
-  VolumeUp as VolumeUpIcon,
-  School as SchoolIcon,
-  Person as PersonIcon,
-  MoreHoriz as MoreHorizIcon
-} from '@mui/icons-material';
-
-// Additional imports
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import axios from 'axios';
+import { createAppTheme } from './theme/theme';
+import { useChatState } from './hooks/useChatState';
+import { useSpeechSynthesis } from './hooks/useSpeechSynthesis';
+import { useThemeMode } from './hooks/useThemeMode';
+import ChatSidebar from './components/ChatSidebar';
+import ChatHeader from './components/ChatHeader';
+import ChatContent from './components/ChatContent';
+import ChatInput from './components/ChatInput';
+import SettingsDialog from './components/SettingsDialog';
+import RenameDialog from './components/RenameDialog';
+import ChatMenu from './components/ChatMenu';
+import ErrorBoundary from './components/ErrorBoundary';
+import { DRAWER_WIDTH } from './constants/config';
+import { createChatHandlers } from './utils/chatHandlers';
+import { useTranslation } from './utils/translations';
 import { auth } from './firebase';
-
-// 1. Move constants that don't depend on component state here
-const drawerWidth = 300;
-const API_URL = "https://27bb-35-199-163-41.ngrok-free.app/generate";
-const LANGUAGES = [
-  { code: 'fr', label: 'Français', flag: '🇫🇷' },
-  { code: 'ar', label: 'العربية', flag: '🇲🇦' },
-  { code: 'en', label: 'English', flag: '🇬🇧' }
-];
-
-const translations = {
-  fr: {
-    newChat: "Nouveau chat",
-    settings: "Paramètres",
-    darkMode: "Mode sombre",
-    lightMode: "Mode clair",
-    autoRead: "Lecture automatique des réponses",
-    languageSection: "Langue",
-    close: "Fermer",
-    writeMessage: "Écrivez votre message...",
-    thinking: "Réflexion en cours...",
-    newConversation: "Nouvelle conversation",
-    edit: "Modifier",
-    delete: "Supprimer", // <-- changed from "Annuler"
-    save: "Enregistrer",
-    startRecording: "Enregistrer un message audio",
-    stopRecording: "Arrêter l'enregistrement",
-    assistant: "Assistant Académique ENIAD",
-    startPrompt: "Posez votre question ou choisissez un sujet ci-dessous pour commencer une nouvelle conversation.",
-    errorMessage: "Désolé, une erreur est survenue. Veuillez réessayer.",
-    disclaimer: "ENIAD AI peut faire des erreurs. Vérifiez les informations importantes.",
-    version: "v1.0.0",
-    suggestions: [
-      "Quels sont les programmes de formation disponibles à l'ENIAD ?",
-      "Comment puis-je m'inscrire à l'ENIAD ?",
-      "Quelles sont les conditions d'admission à l'ENIAD ?",
-    ],
-    usingSystemPreference: "Utilise les préférences système",
-    editTitle: "Modifier le titre de la conversation",
-    contextTitle: "Contexte: ",
-    login: "Se connecter",
-    logout: "Se déconnecter",
-  },
-  en: {
-    newChat: "New Chat",
-    settings: "Settings",
-    darkMode: "Dark Mode",
-    lightMode: "Light Mode",
-    autoRead: "Auto-read responses",
-    languageSection: "Language",
-    close: "Close",
-    writeMessage: "Write your message...",
-    thinking: "Thinking...",
-    newConversation: "New Conversation",
-    edit: "Edit",
-    delete: "Delete", // <-- changed from "Cancel"
-    save: "Save",
-    startRecording: "Record audio message",
-    stopRecording: "Stop recording",
-    assistant: "ENIAD Academic Assistant",
-    startPrompt: "Ask your question or choose a topic below to start a new conversation.",
-    errorMessage: "Sorry, an error occurred. Please try again.",
-    disclaimer: "ENIAD AI may make mistakes. Please verify important information.",
-    version: "v1.0.0",
-    suggestions: [
-      "What training programs are available at ENIAD?",
-      "How can I enroll at ENIAD?",
-      "What are the admission requirements for ENIAD?",
-    ],
-    usingSystemPreference: "Using system preference",
-    editTitle: "Edit conversation title",
-    contextTitle: "Context: ",
-    login: "Login",
-    logout: "Logout",
-  },
-  ar: {
-    newChat: "محادثة جديدة",
-    settings: "الإعدادات",
-    darkMode: "الوضع الداكن",
-    lightMode: "الوضع الفاتح",
-    autoRead: "قراءة تلقائية للردود",
-    languageSection: "اللغة",
-    close: "إغلاق",
-    writeMessage: "اكتب رسالتك...",
-    thinking: "جاري التفكير...",
-    newConversation: "محادثة جديدة",
-    edit: "تعديل",
-    delete: "حذف", // <-- changed from "إلغاء"
-    save: "حفظ",
-    startRecording: "تسجيل رسالة صوتية",
-    stopRecording: "إيقاف التسجيل",
-    assistant: "المساعد الأكاديمي ENIAD",
-    startPrompt: "اطرح سؤالك أو اختر موضوعًا أدناه لبدء محادثة جديدة.",
-    errorMessage: "عذراً، حدث خطأ. يرجى المحاولة مرة أخرى.",
-    disclaimer: "قد يرتكب ENIAD AI أخطاء. يرجى التحقق من المعلومات المهمة.",
-    version: "الإصدار 1.0.0",
-    suggestions: [
-      "ما هي البرامج التدريبية المتاحة في ENIAD؟",
-      "كيف يمكنني التسجيل في ENIAD؟",
-      "ما هي شروط القبول في ENIAD؟",
-    ],
-    usingSystemPreference: "يستخدم تفضيلات النظام",
-    editTitle: "تعديل عنوان المحادثة",
-    contextTitle: "السياق: ",
-    login: "تسجيل الدخول",
-    logout: "تسجيل الخروج",
-  }
-};
-
-// Instead of react-speech-kit, let's use the native Web Speech API
-const useSpeechSynthesis = () => {
-  const [voices, setVoices] = useState([]);
-  const [speaking, setSpeaking] = useState(false);
-  const supported = 'speechSynthesis' in window;
-
-  useEffect(() => {
-    if (!supported) return;
-
-    const loadVoices = () => {
-      const availableVoices = window.speechSynthesis.getVoices();
-      setVoices(availableVoices);
-    };
-
-    loadVoices();
-    window.speechSynthesis.onvoiceschanged = loadVoices;
-
-    return () => {
-      window.speechSynthesis.cancel();
-    };
-  }, [supported]);
-
-  const speak = ({ text, lang, onEnd, onError }) => {
-    if (!supported) return;
-
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-
-    // Set language and rate
-    utterance.lang = lang;
-    utterance.rate = 0.9; // Slower rate for better pronunciation
-    utterance.pitch = 1;
-
-    // Try to find a voice for the language
-    const availableVoices = window.speechSynthesis.getVoices();
-    const voiceForLang = availableVoices.find(voice =>
-      voice.lang.toLowerCase().startsWith(lang.toLowerCase().split('-')[0])
-    );
-
-    if (voiceForLang) {
-      utterance.voice = voiceForLang;
-    }
-
-    utterance.onend = () => {
-      setSpeaking(false);
-      onEnd?.();
-    };
-
-    utterance.onerror = (event) => {
-      console.error('Speech synthesis error:', event);
-      setSpeaking(false);
-      onError?.(event);
-    };
-
-    setSpeaking(true);
-    window.speechSynthesis.speak(utterance);
-  };
-
-  return {
-    speak,
-    speaking,
-    supported,
-    voices
-  };
-};
 
 function App() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { language: currentLanguage, changeLanguage } = useLanguage();
 
-  if (authLoading) {
-    return (
-      <Box sx={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh'
-      }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
+  // Custom hooks
+  const { darkMode, toggleDarkMode, prefersDarkMode } = useThemeMode();
+  const chatState = useChatState();
+  const { speak, speaking, supported } = useSpeechSynthesis();
+  const { t } = useTranslation(currentLanguage);
 
-  // Remove this block to make login optional
-  // if (!user) {
-  //   return <Login />;
-  // }
+  // Research mode state
+  const [isResearchMode, setIsResearchMode] = useState(false);
 
-  // Add this with your other state declarations at the top of the App component
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const [darkMode, setDarkMode] = useState(() => {
-    const savedMode = localStorage.getItem('darkMode');
-    return savedMode !== null ? JSON.parse(savedMode) : prefersDarkMode;
-  });
+  // Sidebar state
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const currentSidebarWidth = sidebarCollapsed ? 72 : DRAWER_WIDTH;
 
-  // 1. First declare all state and refs
-  const [messages, setMessages] = useState([]);
-  const [inputValue, setInputValue] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState({});
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [autoRead, setAutoRead] = useState(() => {
-    const saved = localStorage.getItem('autoRead');
-    return saved ? JSON.parse(saved) : false;
-  });
-  const [conversationHistory, setConversationHistory] = useState([]);
-  const [currentChatId, setCurrentChatId] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [isRecording, setIsRecording] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [editingMessageId, setEditingMessageId] = useState(null);
-  const [editedMessageContent, setEditedMessageContent] = useState('');
-  // const [currentLanguageState, setCurrentLanguage] = useState(() => {
-  //   const saved = localStorage.getItem('language');
-  //   return saved || 'fr';
-  // });
 
-  // Add these state declarations in the App component
-  const [renameDialogOpen, setRenameDialogOpen] = useState(false);
-  const [renameChatId, setRenameChatId] = useState(null);
-  const [newChatTitle, setNewChatTitle] = useState('');
 
-  const [chatMenuAnchorEl, setChatMenuAnchorEl] = useState(null);
-  const [chatMenuChatId, setChatMenuChatId] = useState(null);
-
-  const messagesEndRef = useRef(null);
-  const chatContainerRef = useRef(null);
-
-  // 2. Then declare hooks that depend on component state
-  const isMobile = useMediaQuery('(max-width:600px)');
-  const drawerOpenDesktop = sidebarOpen && !isMobile;
-  const drawerVariant = isMobile ? 'temporary' : 'persistent';
-  const drawerOpen = isMobile ? mobileOpen : sidebarOpen;
-
+  // Speech recognition
   const {
     transcript,
     listening,
@@ -318,316 +51,99 @@ function App() {
     browserSupportsSpeechRecognition,
   } = useSpeechRecognition();
 
-  const { speak, speaking, supported, voices } = useSpeechSynthesis();
+  // Refs
+  const messagesEndRef = useRef(null);
 
-  const theme = createTheme({
-    palette: {
-      mode: darkMode ? 'dark' : 'light',
-      primary: {
-        main: darkMode ? '#4caf50' : '#2e7d32', // Green shades
-        dark: darkMode ? '#388e3c' : '#1b5e20',
-        light: darkMode ? '#81c784' : '#66bb6a',
-      },
-      secondary: {
-        main: darkMode ? '#ff9800' : '#f57c00', // Orange shades
-        dark: darkMode ? '#f57c00' : '#e65100',
-        light: darkMode ? '#ffb74d' : '#ffa726',
-      },
-      background: {
-        default: darkMode ? '#0a0d0a' : '#f5f8f5',
-        paper: darkMode ? '#1a1d1a' : '#ffffff',
-      },
-      text: {
-        primary: darkMode ? '#ffffff' : '#1c2119',
-        secondary: darkMode ? '#a5a5a5' : '#666666',
-      },
-      divider: darkMode ? '#2d3748' : '#e2e8f0',
-    },
-    direction: currentLanguage === 'ar' ? 'rtl' : 'ltr',
-    typography: {
-      fontFamily: currentLanguage === 'ar'
-        ? 'Arial, "Helvetica Neue", Helvetica, sans-serif'
-        : 'Roboto, "Helvetica Neue", Arial, sans-serif',
-    },
-    shape: {
-      borderRadius: 12,
-    },
-    components: {
-      MuiButton: {
-        styleOverrides: {
-          root: {
-            textTransform: 'none',
-          },
-        },
-      },
-      MuiDrawer: {
-        styleOverrides: {
-          paper: ({ theme }) => ({
-            width: drawerWidth,
-            boxSizing: 'border-box',
-            borderRight: 'none',
-            borderLeft: 'none',
-            backgroundColor: theme.palette.mode === 'dark' ? '#1a202c' : '#ffffff',
-            boxShadow: theme.direction === 'rtl'
-              ? '-2px 0 10px rgba(0,0,0,0.05)'
-              : '2px 0 10px rgba(0,0,0,0.05)',
-            animation: `${drawerOpen
-              ? (theme.direction === 'rtl' ? 'slideInRTL' : 'slideInLTR')
-              : (theme.direction === 'rtl' ? 'slideOutRTL' : 'slideOutLTR')
-              } 200ms ${theme.transitions.easing.sharp}`,
-          }),
-        },
-      },
-    },
-    // Corrected keyframes:
-    '@keyframes slideInRTL': {
-      '0%': { transform: 'translateX(100%)' },
-      '100%': { transform: 'translateX(0)' },
-    },
-    '@keyframes slideOutRTL': {
-      '0%': { transform: 'translateX(0)' },
-      '100%': { transform: 'translateX(100%)' },
-    },
-    '@keyframes slideInLTR': {
-      '0%': { transform: 'translateX(-100%)' },
-      '100%': { transform: 'translateX(0)' },
-    },
-    '@keyframes slideOutLTR': {
-      '0%': { transform: 'translateX(0)' },
-      '100%': { transform: 'translateX(-100%)' },
-    },
-  });
+  // Responsive
+  const isMobile = useMediaQuery('(max-width:600px)');
+  const drawerOpenDesktop = chatState.sidebarOpen && !isMobile;
+  const drawerVariant = isMobile ? 'temporary' : 'persistent';
+  const drawerOpen = isMobile ? chatState.mobileOpen : chatState.sidebarOpen;
 
+  // Create theme
+  const theme = createAppTheme(darkMode, currentLanguage, drawerOpen);
+
+  // Chat handlers
+  const chatHandlers = createChatHandlers(chatState, currentLanguage, t, messagesEndRef);
+
+  // Load saved conversations on mount
   useEffect(() => {
-    // 1. Update the useEffect for loading saved conversations
     try {
       const savedHistory = localStorage.getItem('conversationHistory');
       const savedCurrentChatId = localStorage.getItem('currentChatId');
 
       if (savedHistory) {
         const parsedHistory = JSON.parse(savedHistory);
-        setConversationHistory(parsedHistory);
+        chatState.setConversationHistory(parsedHistory);
 
         if (savedCurrentChatId) {
-          setCurrentChatId(savedCurrentChatId);
+          chatState.setCurrentChatId(savedCurrentChatId);
           const currentChat = parsedHistory.find(chat => chat.id === savedCurrentChatId);
           if (currentChat) {
-            setMessages(currentChat.messages);
+            chatState.setMessages(currentChat.messages);
           }
         } else {
-          handleNewChat();
+          chatHandlers.handleNewChat();
         }
       } else {
-        handleNewChat();
+        chatHandlers.handleNewChat();
       }
     } catch (error) {
       console.error('Error loading saved conversations:', error);
-      handleNewChat();
+      chatHandlers.handleNewChat();
     }
   }, []);
 
+  // Handle transcript changes
   useEffect(() => {
     if (transcript) {
-      setInputValue(transcript);
+      chatState.setInputValue(transcript);
     }
   }, [transcript]);
 
+  // Auto-scroll and auto-read
   useEffect(() => {
-    scrollToBottom();
-    if (autoRead && messages.length > 0 && supported) {
-      const lastMessage = messages[messages.length - 1];
-      if (lastMessage.role === 'assistant' && !isLoading && !speaking) {
+    chatHandlers.scrollToBottom();
+    if (chatState.autoRead && chatState.messages.length > 0 && supported) {
+      const lastMessage = chatState.messages[chatState.messages.length - 1];
+      if (lastMessage.role === 'assistant' && !chatState.isLoading && !speaking) {
         speakText(lastMessage.content, lastMessage.id);
       }
     }
-  }, [messages, autoRead, isLoading, speaking, supported]);
+  }, [chatState.messages, chatState.autoRead, chatState.isLoading, speaking, supported]);
 
-  // Add this near your other useEffect hooks
+  // Load voices
   useEffect(() => {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.getVoices();
     }
   }, []);
 
-  // 2. Update the useEffect for saving conversations
+  // Save conversations
   useEffect(() => {
     try {
-      if (currentChatId) {
-        localStorage.setItem('currentChatId', currentChatId);
+      if (chatState.currentChatId) {
+        localStorage.setItem('currentChatId', chatState.currentChatId);
 
-        const updatedHistory = conversationHistory.map(chat =>
-          chat.id === currentChatId
-            ? { ...chat, messages: messages }
+        const updatedHistory = chatState.conversationHistory.map(chat =>
+          chat.id === chatState.currentChatId
+            ? { ...chat, messages: chatState.messages }
             : chat
         );
 
         localStorage.setItem('conversationHistory', JSON.stringify(updatedHistory));
-        setConversationHistory(updatedHistory);
+        chatState.setConversationHistory(updatedHistory);
       }
     } catch (error) {
       console.error('Error saving conversations:', error);
     }
-  }, [messages, currentChatId]);
+  }, [chatState.messages, chatState.currentChatId]);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const handleInputChange = (e) => {
-    setInputValue(e.target.value);
-  };
-
-  const handleSubmit = async () => {
-    if (!inputValue.trim()) return;
-
-    const userMessage = {
-      role: 'user',
-      content: inputValue,
-      chatId: currentChatId,
-      timestamp: new Date().toISOString(),
-      id: Date.now().toString()
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setInputValue('');
-    resetTranscript();
-    setIsLoading(true);
-
-    try {
-      const response = await axios.post(API_URL, {
-        messages: [...messages, userMessage].map(({ role, content }) => ({ role, content })),
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': 'true'
-        }
-      });
-
-      const botMessage = {
-        role: 'assistant',
-        content: response.data.reply || response.data.response || response.data,
-        id: Date.now().toString(),
-        chatId: currentChatId,
-        timestamp: new Date().toISOString()
-      };
-
-      setMessages(prev => [...prev, botMessage]);
-
-      // Set context-based title if this is the first message
-      if (messages.length === 0) {
-        const contextTitle = userMessage.content.slice(0, 50) + (userMessage.content.length > 50 ? '...' : '');
-        const updatedHistory = conversationHistory.map(chat =>
-          chat.id === currentChatId
-            ? { ...chat, title: contextTitle, messages: [...messages, userMessage, botMessage] }
-            : chat
-        );
-        setConversationHistory(updatedHistory);
-        localStorage.setItem('conversationHistory', JSON.stringify(updatedHistory));
-      } else {
-        updateConversationHistory([...messages, userMessage, botMessage]);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      const errorMessage = {
-        role: 'assistant',
-        content: t('errorMessage'),
-        id: Date.now().toString(),
-        chatId: currentChatId,
-        timestamp: new Date().toISOString()
-      };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const updateConversationHistory = (updatedMessages) => {
-    if (!currentChatId) return;
-
-    setConversationHistory(prev => {
-      const existingChat = prev.find(c => c.id === currentChatId);
-      const title = existingChat?.title || updatedMessages.find(m => m.role === 'user')?.content?.substring(0, 30) || 'Nouvelle conversation';
-
-      const updatedChat = {
-        id: currentChatId,
-        title: title.length > 30 ? title.substring(0, 30) + '...' : title,
-        messages: updatedMessages,
-        lastUpdated: new Date().toISOString()
-      };
-
-      return [
-        updatedChat,
-        ...prev.filter(c => c.id !== currentChatId)
-      ];
-    });
-  };
-
-  const handleEditMessage = (messageId, currentContent) => {
-    setEditingMessageId(messageId);
-    setEditedMessageContent(currentContent);
-  };
-
-  const handleSaveEdit = () => {
-    const updatedMessages = messages.map(msg =>
-      msg.id === editingMessageId ? { ...msg, content: editedMessageContent } : msg
-    );
-    setMessages(updatedMessages);
-    updateConversationHistory(updatedMessages);
-    setEditingMessageId(null);
-    setEditedMessageContent('');
-  };
-
-  const handleCancelEdit = () => {
-    setEditingMessageId(null);
-    setEditedMessageContent('');
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSubmit();
-    }
-  };
-
-  const toggleRecording = () => {
-    if (listening) {
-      SpeechRecognition.stopListening();
-      setIsRecording(false);
-    } else {
-      resetTranscript();
-      SpeechRecognition.startListening({
-        continuous: true,
-        language: currentLanguage === 'ar' ? 'ar-SA' : currentLanguage === 'en' ? 'en-US' : 'fr-FR'
-      });
-      setIsRecording(true);
-    }
-  };
-
-  // Helper to find best matching voice for current language
-  const getBestVoice = (langCode) => {
-    if (!voices || voices.length === 0) return null;
-
-    // Try to find exact match first
-    const exactMatch = voices.find(voice =>
-      voice.lang.toLowerCase().startsWith(langCode.toLowerCase())
-    );
-    if (exactMatch) return exactMatch;
-
-    // Fallback to partial match
-    const langPrefix = langCode.split('-')[0];
-    const partialMatch = voices.find(voice =>
-      voice.lang.toLowerCase().startsWith(langPrefix)
-    );
-    if (partialMatch) return partialMatch;
-
-    // Default to first available voice if no match
-    return voices[0];
-  };
-
+  // Speech synthesis
   const speakText = (text, id) => {
-    if (isSpeaking[id]) {
+    if (chatState.isSpeaking[id]) {
       window.speechSynthesis.cancel();
-      setIsSpeaking(prev => ({ ...prev, [id]: false }));
+      chatState.setIsSpeaking(prev => ({ ...prev, [id]: false }));
       return;
     }
 
@@ -643,233 +159,115 @@ function App() {
       speak({
         text,
         lang,
-        onEnd: () => setIsSpeaking(prev => ({ ...prev, [id]: false })),
+        onEnd: () => chatState.setIsSpeaking(prev => ({ ...prev, [id]: false })),
         onError: (event) => {
           console.error('Speech synthesis error:', event);
-          setIsSpeaking(prev => ({ ...prev, [id]: false }));
+          chatState.setIsSpeaking(prev => ({ ...prev, [id]: false }));
         }
       });
-      setIsSpeaking(prev => ({ ...prev, [id]: true }));
+      chatState.setIsSpeaking(prev => ({ ...prev, [id]: true }));
     } catch (error) {
       console.error('Speech synthesis error:', error);
-      setIsSpeaking(prev => ({ ...prev, [id]: false }));
+      chatState.setIsSpeaking(prev => ({ ...prev, [id]: false }));
     }
   };
 
-  const toggleDarkMode = () => {
-    const newMode = !darkMode;
-    setDarkMode(newMode);
-    localStorage.setItem('darkMode', JSON.stringify(newMode));
+  // Input handlers
+  const handleInputChange = (e) => {
+    chatState.setInputValue(e.target.value);
   };
 
-  useEffect(() => {
-    setDarkMode(prefersDarkMode);
-  }, [prefersDarkMode]);
-
-  // 3. Update the handleNewChat function
-  const handleNewChat = () => {
-    try {
-      // Save current chat before creating new one
-      if (messages.length > 0 && currentChatId) {
-        const updatedHistory = conversationHistory.map(chat =>
-          chat.id === currentChatId
-            ? { ...chat, messages: messages }
-            : chat
-        );
-        localStorage.setItem('conversationHistory', JSON.stringify(updatedHistory));
-        setConversationHistory(updatedHistory);
-      }
-
-      const newChatId = Date.now().toString();
-      const newChat = {
-        id: newChatId,
-        title: t('newConversation'),
-        messages: [],
-        lastUpdated: new Date().toISOString()
-      };
-
-      setCurrentChatId(newChatId);
-      localStorage.setItem('currentChatId', newChatId);
-
-      setConversationHistory(prev => [newChat, ...prev]);
-      setMessages([]);
-      setInputValue('');
-      setMobileOpen(false);
-      setEditingMessageId(null);
-      setEditedMessageContent('');
-
-      setTimeout(() => {
-        document.querySelector('.chat-input input')?.focus();
-      }, 100);
-    } catch (error) {
-      console.error('Error creating new chat:', error);
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      chatHandlers.handleSubmit();
     }
   };
 
-  // 4. Update the handleLoadChat function
-  const handleLoadChat = (chatId) => {
-    try {
-      // Save current chat before switching
-      if (currentChatId && messages.length > 0) {
-        const updatedHistory = conversationHistory.map(chat =>
-          chat.id === currentChatId
-            ? { ...chat, messages: messages }
-            : chat
-        );
-        localStorage.setItem('conversationHistory', JSON.stringify(updatedHistory));
-        setConversationHistory(updatedHistory);
-      }
-
-      const conversation = conversationHistory.find(c => c.id === chatId);
-      if (conversation) {
-        setCurrentChatId(chatId);
-        localStorage.setItem('currentChatId', chatId);
-        setMessages(conversation.messages);
-      }
-
-      setMobileOpen(false);
-      setEditingMessageId(null);
-      setEditedMessageContent('');
-    } catch (error) {
-      console.error('Error loading chat:', error);
+  const toggleRecording = () => {
+    if (listening) {
+      SpeechRecognition.stopListening();
+      chatState.setIsRecording(false);
+    } else {
+      resetTranscript();
+      SpeechRecognition.startListening({
+        continuous: true,
+        language: currentLanguage === 'ar' ? 'ar-SA' : currentLanguage === 'en' ? 'en-US' : 'fr-FR'
+      });
+      chatState.setIsRecording(true);
     }
   };
 
-  // 5. Update the handleDeleteChat function
-  const handleDeleteChat = (chatId, e) => {
-    e.stopPropagation();
-    try {
-      const updatedHistory = conversationHistory.filter(c => c.id !== chatId);
-      localStorage.setItem('conversationHistory', JSON.stringify(updatedHistory));
-      setConversationHistory(updatedHistory);
-
-      if (currentChatId === chatId) {
-        if (updatedHistory.length > 0) {
-          const firstChat = updatedHistory[0];
-          setCurrentChatId(firstChat.id);
-          localStorage.setItem('currentChatId', firstChat.id);
-          setMessages(firstChat.messages);
-        } else {
-          setCurrentChatId(null);
-          localStorage.removeItem('currentChatId');
-          setMessages([]);
-          handleNewChat(); // Create a new chat when all are deleted
-        }
-      }
-    } catch (error) {
-      console.error('Error deleting chat:', error);
-    }
-  };
-
-  const getMessageStyle = (role) => ({
-    maxWidth: 'min(90%, 800px)',
-    alignSelf: role === 'user' ? 'flex-end' : 'flex-start',
-    bgcolor: role === 'user'
-      ? (darkMode ? 'primary.dark' : 'primary.light')
-      : (darkMode ? 'background.paper' : 'background.paper'),
-    color: role === 'user' ? '#fff' : (darkMode ? '#fff' : 'text.primary'),
-    border: role === 'user' ? 'none' : `1px solid ${darkMode ? '#333' : '#e0e0e0'}`,
-    borderRadius: role === 'user' ? '18px 4px 18px 18px' : '4px 18px 18px 18px',
-    p: 2,
-    mb: 2,
-    boxShadow: role === 'user' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none',
-    position: 'relative',
-    '&:hover': {
-      boxShadow: role === 'user' ? '0 4px 12px rgba(0,0,0,0.15)' : '0 2px 8px rgba(0,0,0,0.05)'
-    },
-    '& pre': {
-      margin: '0.5em 0',
-      whiteSpace: 'pre-wrap',
-    },
-    '& code': {
-      fontFamily: 'monospace',
-      fontSize: '0.9em',
-    },
-    '& ul, & ol': {
-      marginTop: '0.5em',
-      marginBottom: '0.5em',
-    },
-    '& p:first-of-type': {
-      marginTop: 0,
-    },
-    '& p:last-of-type': {
-      marginBottom: 0,
-    }
-  });
-
-  // 3. Responsive Drawer toggle
+  // Drawer handlers
   const handleDrawerToggle = () => {
     if (isMobile) {
-      setMobileOpen((prev) => !prev);
+      chatState.setMobileOpen((prev) => !prev);
     } else {
-      setSidebarOpen((prev) => !prev);
+      chatState.setSidebarOpen((prev) => !prev);
     }
   };
 
-  const handleQuestionClick = (question) => {
-    setInputValue(question);
-    setTimeout(() => {
-      document.querySelector('.chat-input input')?.focus();
-    }, 100);
-  };
-
-  // 4. Responsive layout for content and AppBar
-  const contentMarginLeft = { md: sidebarOpen ? drawerWidth : 0 };
-  const appBarSx = {
-    width: { md: `calc(100% - ${sidebarOpen ? drawerWidth : 0}px)` },
-    marginLeft: { md: sidebarOpen ? drawerWidth : 0 },
-    transition: 'width 225ms ease, margin 225ms ease',
-    bgcolor: 'background.paper',
-    color: 'text.primary',
-    borderBottom: `1px solid ${darkMode ? '#2d3748' : '#e2e8f0'}`,
-    height: '64px',
-    justifyContent: 'center'
-  };
-
-  const t = (key) => {
-    return translations[currentLanguage]?.[key] || translations.en[key];
-  };
-
-  // Update the handleEditTitle function
-  const handleEditTitle = (chatId, currentTitle) => {
-    setRenameChatId(chatId);
-    setNewChatTitle(currentTitle);
-    setRenameDialogOpen(true);
-  };
-
-  // Add this new function to handle the rename submission
-  const handleRenameSubmit = () => {
-    if (newChatTitle.trim()) {
-      const updatedHistory = conversationHistory.map(chat =>
-        chat.id === renameChatId
-          ? { ...chat, title: newChatTitle.trim() }
-          : chat
-      );
-      setConversationHistory(updatedHistory);
-      localStorage.setItem('conversationHistory', JSON.stringify(updatedHistory));
+  // Auth handler
+  const handleAuthAction = () => {
+    if (user) {
+      auth.signOut();
+    } else {
+      navigate('/login');
     }
-    setRenameDialogOpen(false);
-    setRenameChatId(null);
-    setNewChatTitle('');
   };
 
-  const handleChatMenuOpen = (event, chatId) => {
-    setChatMenuAnchorEl(event.currentTarget);
-    setChatMenuChatId(chatId);
+
+
+  // Research handler
+  const handleResearch = () => {
+    setIsResearchMode(prev => !prev);
+    console.log('Research mode toggled:', !isResearchMode);
+
+    // TODO: Wire up to CrewIA or LangChain
+    // This is where you'll integrate with your research AI system
+    if (!isResearchMode) {
+      console.log('🔬 Activating research mode - enhanced AI with web search capabilities');
+      // Future integration point for CrewIA/LangChain
+      // You can modify the chat behavior here for research mode
+    } else {
+      console.log('💬 Deactivating research mode - returning to standard chat');
+    }
   };
-  const handleChatMenuClose = () => {
-    setChatMenuAnchorEl(null);
-    setChatMenuChatId(null);
+
+  // Search handler
+  const handleSearch = () => {
+    console.log('Search button clicked');
+    console.log('Current input value:', chatState.inputValue);
+
+    // TODO: Implement search functionality
+    // This is where you'll integrate with your search API
+    if (chatState.inputValue.trim()) {
+      console.log('🔍 Performing search for:', chatState.inputValue.trim());
+      // Future integration point for web search API
+      // You can call your search API here and append results to the chat
+    } else {
+      console.log('No search query provided');
+    }
   };
+
+  if (authLoading) {
+    return (
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh'
+      }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Routes>
-        <Route
-          path="/login"
-          element={<Login />}
-        />
+        <Route path="/login" element={<Login />} />
         <Route
           path="/"
           element={
@@ -878,227 +276,35 @@ function App() {
                 display: 'flex',
                 direction: currentLanguage === 'ar' ? 'rtl' : 'ltr',
                 minHeight: '100vh',
-                bgcolor: 'background.default',
+                bgcolor: darkMode ? '#0a0a0a' : '#f8fafc',
                 position: 'relative',
                 overflow: 'hidden',
+                width: '100%',
                 '& .MuiDrawer-root': {
                   flexDirection: currentLanguage === 'ar' ? 'row-reverse' : 'row'
                 }
               }}
             >
-              <Drawer
-                variant={drawerVariant}
+              <ChatSidebar
                 open={drawerOpen}
-                onClose={() => isMobile && setMobileOpen(false)}
+                onClose={() => isMobile && chatState.setMobileOpen(false)}
+                variant={drawerVariant}
                 anchor={currentLanguage === 'ar' ? 'right' : 'left'}
-                SlideProps={{ direction: currentLanguage === 'ar' ? 'left' : 'right' }} // <-- FIXED
-                sx={{
-                  width: {
-                    xs: 0,
-                    md: drawerOpenDesktop ? drawerWidth : 0
-                  },
-                  flexShrink: 0,
-                  '& .MuiDrawer-paper': {
-                    // KEEP all your custom styles, transitions, keyframes, etc!
-                    transition: theme => theme.transitions.create('transform', {
-                      duration: 200,
-                      easing: theme.transitions.easing.sharp
-                    }),
-                    transform: theme => !drawerOpen
-                      ? theme.direction === 'rtl'
-                        ? 'translateX(-100%)'
-                        : 'translateX(100%)'
-                      : 'translateX(0)',
-                    visibility: drawerOpen ? 'visible' : 'hidden',
-                    backgroundColor: theme => theme.palette.background.paper,
-                    boxShadow: theme =>
-                      theme.direction === 'rtl'
-                        ? '-2px 0 10px rgba(0,0,0,0.05)'
-                        : '2px 0 10px rgba(0,0,0,0.05)',
-                    // ...any other custom styles you have
-                  },
-                }}
-              >
-                <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography variant="h6" sx={{ fontWeight: 600, color: darkMode ? '#fff' : 'text.primary' }}>
-                    ENIAD AI
-                  </Typography>
-                  {/* 1. Updated close icon logic */}
-                  <IconButton onClick={() => isMobile ? setMobileOpen(false) : setSidebarOpen(false)} size="small">
-                    <CloseIcon fontSize="small" />
-                  </IconButton>
-                </Box>
-                {/* 5. Nouveau chat button always visible, fullWidth, styled */}
-                <Button
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  startIcon={currentLanguage === 'ar' ? null : <AddIcon />}
-                  endIcon={currentLanguage === 'ar' ? <AddIcon /> : null}
-                  onClick={handleNewChat}
-                  sx={{
-                    textTransform: 'none',
-                    py: 1.5,
-                    borderRadius: 1,
-                    mb: 2,
-                    flexDirection: currentLanguage === 'ar' ? 'row-reverse' : 'row',
-                    '& .MuiButton-startIcon': {
-                      marginRight: currentLanguage === 'ar' ? 0 : 1,
-                      marginLeft: currentLanguage === 'ar' ? 1 : 0,
-                    },
-                    '& .MuiButton-endIcon': {
-                      marginLeft: currentLanguage === 'ar' ? 0 : 1,
-                      marginRight: currentLanguage === 'ar' ? 1 : 0,
-                    }
-                  }}
-                >
-                  {t('newChat')}
-                </Button>
-                <Divider sx={{ my: 1 }} />
-                <List sx={{ overflow: 'auto', flex: 1 }}>
-                  {conversationHistory.map((convo) => (
-                    <ListItem key={convo.id} disablePadding>
-                      <ListItemButton
-                        selected={currentChatId === convo.id}
-                        onClick={() => handleLoadChat(convo.id)}
-                        sx={{
-                          borderRadius: '8px',
-                          mx: 1,
-                          my: 0.5,
-                          pr: currentLanguage === 'ar' ? 2 : 8,
-                          pl: currentLanguage === 'ar' ? 8 : 2,
-                          flexDirection: 'row', // Always row, we control order below
-                          alignItems: 'center',
-                          position: 'relative',
-                          '&.Mui-selected': {
-                            bgcolor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
-                          },
-                          '&.Mui-selected:hover': {
-                            bgcolor: darkMode ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.06)',
-                          },
-                        }}
-                      >
-                        {/* AR: [Menu][Bubble][Text] | EN/FR: [Bubble][Text][Menu] */}
-                        {currentLanguage === 'ar' ? (
-                          <>
-                            <ListItemSecondaryAction
-                              sx={{
-                                left: 0,
-                                right: 'auto',
-                              }}
-                            >
-                              <IconButton
-                                size="small"
-                                onClick={e => {
-                                  e.stopPropagation();
-                                  handleChatMenuOpen(e, convo.id);
-                                }}
-                              >
-                                <MoreHorizIcon />
-                              </IconButton>
-                            </ListItemSecondaryAction>
-                            <ListItemIcon sx={{ minWidth: 36, mr: 1 }}>
-                              <ChatIcon fontSize="small" color={currentChatId === convo.id ? 'primary' : 'inherit'} />
-                            </ListItemIcon>
-                            <ListItemText
-                              primary={convo.title}
-                              primaryTypographyProps={{
-                                sx: {
-                                  fontWeight: currentChatId === convo.id ? '600' : 'normal',
-                                  overflow: 'hidden',
-                                  textOverflow: 'ellipsis',
-                                  whiteSpace: 'nowrap',
-                                  fontSize: '0.9rem',
-                                  textAlign: 'right'
-                                }
-                              }}
-                              secondary={new Date(convo.lastUpdated).toLocaleString()}
-                              secondaryTypographyProps={{
-                                sx: {
-                                  fontSize: '0.7rem',
-                                  color: darkMode ? 'text.secondary' : 'text.secondary',
-                                  textAlign: 'right'
-                                }
-                              }}
-                            />
-                          </>
-                        ) : (
-                          <>
-                            <ListItemIcon sx={{ minWidth: 36, mr: 1 }}>
-                              <ChatIcon fontSize="small" color={currentChatId === convo.id ? 'primary' : 'inherit'} />
-                            </ListItemIcon>
-                            <ListItemText
-                              primary={convo.title}
-                              primaryTypographyProps={{
-                                sx: {
-                                  fontWeight: currentChatId === convo.id ? '600' : 'normal',
-                                  overflow: 'hidden',
-                                  textOverflow: 'ellipsis',
-                                  whiteSpace: 'nowrap',
-                                  fontSize: '0.9rem',
-                                  textAlign: 'left'
-                                }
-                              }}
-                              secondary={new Date(convo.lastUpdated).toLocaleString()}
-                              secondaryTypographyProps={{
-                                sx: {
-                                  fontSize: '0.7rem',
-                                  color: darkMode ? 'text.secondary' : 'text.secondary',
-                                  textAlign: 'left'
-                                }
-                              }}
-                            />
-                            <ListItemSecondaryAction
-                              sx={{
-                                right: 0,
-                                left: 'auto',
-                              }}
-                            >
-                              <IconButton
-                                size="small"
-                                onClick={e => {
-                                  e.stopPropagation();
-                                  handleChatMenuOpen(e, convo.id);
-                                }}
-                              >
-                                <MoreHorizIcon />
-                              </IconButton>
-                            </ListItemSecondaryAction>
-                          </>
-                        )}
-                      </ListItemButton>
-                    </ListItem>
-                  ))}
-                </List>
-                <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Box sx={{ display: 'flex' }}>
-                    <Tooltip title={darkMode === prefersDarkMode
-                      ? t('usingSystemPreference')
-                      : darkMode ? t('lightMode') : t('darkMode')}>
-                      <IconButton
-                        onClick={toggleDarkMode}
-                        size="small"
-                        sx={{
-                          mr: 1,
-                          opacity: darkMode === prefersDarkMode ? 0.7 : 1
-                        }}
-                      >
-                        {darkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title={t('settings')}>
-                      <IconButton onClick={() => setSettingsOpen(true)} size="small">
-                        <SettingsIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
-                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                    {translations[currentLanguage].version}
-                  </Typography>
-                </Box>
-              </Drawer>
+                currentLanguage={currentLanguage}
+                darkMode={darkMode}
+                prefersDarkMode={prefersDarkMode}
+                conversationHistory={chatState.conversationHistory}
+                currentChatId={chatState.currentChatId}
+                onNewChat={chatHandlers.handleNewChat}
+                onLoadChat={chatHandlers.handleLoadChat}
+                onChatMenuOpen={chatHandlers.handleChatMenuOpen}
+                onToggleDarkMode={toggleDarkMode}
+                onSettingsOpen={() => chatState.setSettingsOpen(true)}
+                isMobile={isMobile}
+                onSidebarCollapse={setSidebarCollapsed}
+                sidebarCollapsed={sidebarCollapsed}
+              />
 
-              {/* Main Content */}
               <Box
                 component="main"
                 sx={{
@@ -1106,929 +312,126 @@ function App() {
                   height: '100vh',
                   display: 'flex',
                   flexDirection: 'column',
-                  width: {
-                    xs: '100%',
-                    md: drawerOpenDesktop ? `calc(100% - ${drawerWidth}px)` : '100%'
+                  width: '100%',
+                  [currentLanguage === 'ar' ? 'mr' : 'ml']: {
+                    xs: 0,
+                    md: drawerOpenDesktop ? `${currentSidebarWidth}px` : 0
                   },
-                  transition: theme => theme.transitions.create(['width', 'margin'], {
-                    easing: theme.transitions.easing.sharp,
-                    duration: theme.transitions.duration.enteringScreen,
+                  transition: theme => theme.transitions.create([
+                    currentLanguage === 'ar' ? 'margin-right' : 'margin-left'
+                  ], {
+                    easing: theme.transitions.easing.easeInOut,
+                    duration: theme.transitions.duration.standard,
                   }),
+                  position: 'relative',
+                  overflow: 'hidden',
                 }}
               >
-                <AppBar
-                  position="fixed"
-                  elevation={0}
-                  sx={{
-                    width: {
-                      xs: '100%',
-                      md: drawerOpenDesktop ? `calc(100% - ${drawerWidth}px)` : '100%'
-                    },
-                    [currentLanguage === 'ar' ? 'mr' : 'ml']: {
-                      xs: 0,
-                      md: drawerOpenDesktop ? `${drawerWidth}px` : 0
-                    },
-                    transition: theme => theme.transitions.create(['width', 'margin'], {
-                      easing: theme.transitions.easing.sharp,
-                      duration: theme.transitions.duration.enteringScreen,
-                    }),
-                    bgcolor: 'background.paper',
-                    color: 'text.primary',
-                    borderBottom: `1px solid ${darkMode ? '#2d3748' : '#e2e8f0'}`,
-                    zIndex: (theme) => theme.zIndex.drawer + 1
-                  }}
-                >
-                  <Toolbar>
-                    <IconButton
-                      edge={currentLanguage === 'ar' ? 'end' : 'start'}
-                      onClick={handleDrawerToggle}
-                      sx={{
-                        mr: currentLanguage === 'ar' ? 0 : 2,
-                        ml: currentLanguage === 'ar' ? 2 : 0
-                      }}
-                    >
-                      <MenuIcon />
-                    </IconButton>
-                    <Typography
-                      variant="h6"
-                      noWrap
-                      sx={{
-                        flexGrow: 1,
-                        fontWeight: 600,
-                        fontSize: { xs: '1rem', sm: '1.25rem' },
-                        textAlign: currentLanguage === 'ar' ? 'right' : 'left'
-                      }}
-                    >
-                      {conversationHistory.find(c => c.id === currentChatId)?.title || t('newConversation')}
-                    </Typography>
+                <ChatHeader
+                  drawerOpen={drawerOpenDesktop}
+                  darkMode={darkMode}
+                  currentLanguage={currentLanguage}
+                  conversationHistory={chatState.conversationHistory}
+                  currentChatId={chatState.currentChatId}
+                  user={user}
+                  onDrawerToggle={handleDrawerToggle}
+                  onSettingsOpen={() => chatState.setSettingsOpen(true)}
+                  onAuthAction={handleAuthAction}
+                  sidebarWidth={currentSidebarWidth}
+                />
 
-                    <Button
-                      color="primary"
-                      variant={user ? "outlined" : "contained"}
-                      onClick={() => user ? auth.signOut() : navigate('/login')}
-                      sx={{
-                        ml: 1,
-                        mr: currentLanguage === 'ar' ? 2 : 0
-                      }}
-                    >
-                      {user ? t('logout') : t('login')}
-                    </Button>
-
-                    <Tooltip title="Change Language / Changer la langue / تغيير اللغة">
-                      <IconButton
-                        size="small"
-                        onClick={() => setSettingsOpen(true)}
-                        sx={{
-                          ml: currentLanguage === 'ar' ? 0 : 1,
-                          mr: currentLanguage === 'ar' ? 1 : 0
-                        }}
-                      >
-                        <Typography sx={{
-                          fontSize: '1.2rem',
-                          width: 24,
-                          height: 24,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}>
-                          {LANGUAGES.find(l => l.code === currentLanguage)?.flag}
-                        </Typography>
-                      </IconButton>
-                    </Tooltip>
-                  </Toolbar>
-                </AppBar>
-
-                <Toolbar /> {/* This creates space below the fixed AppBar */}
+                <Toolbar />
 
                 <Box
-                  ref={chatContainerRef}
                   sx={{
                     flexGrow: 1,
                     display: 'flex',
                     flexDirection: 'column',
-                    height: `calc(100vh - 64px)`,
-                    pt: `64px`,
+                    height: 'calc(100vh - 64px)',
                     overflow: 'hidden',
                     position: 'relative',
+                    bgcolor: darkMode ? '#0a0a0a' : '#f8fafc',
+                    width: '100%',
+                    margin: 0,
+                    padding: 0,
                   }}
                 >
-                  {/* KEEP this set of animated icons so they scroll with chat */}
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%) rotate(0deg)',
-                      opacity: darkMode ? 0.22 : 0.32,
-                      color: darkMode ? 'primary.main' : '#388e3c', // More visible green in light mode
-                      fontSize: { xs: 120, md: 180 },
-                      animation: 'floatNodeCenter 3.5s ease-in-out infinite',
-                      zIndex: 0,
-                      pointerEvents: 'none',
-                      filter: darkMode ? 'none' : 'drop-shadow(0 2px 8px #b5e7b0)',
-                    }}
-                  >
-                    <SchoolIcon fontSize="inherit" />
-                  </Box>
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      top: '10%',
-                      left: '7%',
-                      transform: 'translate(-50%, -50%) rotate(0deg)',
-                      opacity: darkMode ? 0.18 : 0.32,
-                      color: darkMode ? '#42a5f5' : '#1976d2', // Strong blue in light mode
-                      fontSize: { xs: 60, md: 100 },
-                      animation: 'floatNodeTL 4s ease-in-out infinite',
-                      zIndex: 0,
-                      pointerEvents: 'none',
-                      filter: darkMode ? 'none' : 'drop-shadow(0 2px 8px #90caf9)',
-                    }}
-                  >
-                    <ChatIcon fontSize="inherit" />
-                  </Box>
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      top: '15%',
-                      right: '8%',
-                      transform: 'translate(50%, -50%) rotate(0deg)',
-                      opacity: darkMode ? 0.19 : 0.33,
-                      color: darkMode ? '#388e3c' : '#388e3c', // Strong green in light mode
-                      fontSize: { xs: 70, md: 120 },
-                      animation: 'floatNodeTR 4s ease-in-out infinite',
-                      zIndex: 0,
-                      pointerEvents: 'none',
-                      filter: darkMode ? 'none' : 'drop-shadow(0 2px 8px #b5e7b0)',
-                    }}
-                  >
-                    <PersonIcon fontSize="inherit" />
-                  </Box>
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      bottom: '10%',
-                      left: '12%',
-                      transform: 'translate(-50%, 50%) rotate(0deg)',
-                      opacity: darkMode ? 0.16 : 0.28,
-                      color: darkMode ? '#ff9800' : '#f57c00', // Strong orange in light mode
-                      fontSize: { xs: 55, md: 90 },
-                      animation: 'floatNodeBL 4s ease-in-out infinite',
-                      zIndex: 0,
-                      pointerEvents: 'none',
-                      filter: darkMode ? 'none' : 'drop-shadow(0 2px 8px #ffd180)',
-                    }}
-                  >
-                    <EditIcon fontSize="inherit" />
-                  </Box>
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      bottom: '13%',
-                      right: '10%',
-                      transform: 'translate(50%, 50%) rotate(0deg)',
-                      opacity: darkMode ? 0.17 : 0.29,
-                      color: darkMode ? '#1976d2' : '#1976d2', // Strong blue in light mode
-                      fontSize: { xs: 60, md: 100 },
-                      animation: 'floatNodeBR 4s ease-in-out infinite',
-                      zIndex: 0,
-                      pointerEvents: 'none',
-                      filter: darkMode ? 'none' : 'drop-shadow(0 2px 8px #90caf9)',
-                    }}
-                  >
-                    <SettingsIcon fontSize="inherit" />
-                  </Box>
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      top: '60%',
-                      left: '5%',
-                      transform: 'translate(-50%, -50%) rotate(0deg)',
-                      opacity: darkMode ? 0.15 : 0.25,
-                      color: darkMode ? '#43a047' : '#388e3c', // Strong green in light mode
-                      fontSize: { xs: 45, md: 70 },
-                      animation: 'floatNodeML 4s ease-in-out infinite',
-                      zIndex: 0,
-                      pointerEvents: 'none',
-                      filter: darkMode ? 'none' : 'drop-shadow(0 2px 8px #b5e7b0)',
-                    }}
-                  >
-                    <VolumeUpIcon fontSize="inherit" />
-                  </Box>
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      top: '70%',
-                      right: '6%',
-                      transform: 'translate(50%, -50%) rotate(0deg)',
-                      opacity: darkMode ? 0.15 : 0.25,
-                      color: darkMode ? '#fbc02d' : '#fbc02d', // Strong yellow in light mode
-                      fontSize: { xs: 50, md: 80 },
-                      animation: 'floatNodeMR 4s ease-in-out infinite',
-                      zIndex: 0,
-                      pointerEvents: 'none',
-                      filter: darkMode ? 'none' : 'drop-shadow(0 2px 8px #fff59d)',
-                    }}
-                  >
-                    <MicIcon fontSize="inherit" />
-                  </Box>
+                  <ChatContent
+                    messages={chatState.messages}
+                    isLoading={chatState.isLoading}
+                    currentLanguage={currentLanguage}
+                    darkMode={darkMode}
+                    editingMessageId={chatState.editingMessageId}
+                    editedMessageContent={chatState.editedMessageContent}
+                    setEditedMessageContent={chatState.setEditedMessageContent}
+                    onEditMessage={chatHandlers.handleEditMessage}
+                    onSaveEdit={chatHandlers.handleSaveEdit}
+                    onCancelEdit={chatHandlers.handleCancelEdit}
+                    onQuestionClick={chatHandlers.handleQuestionClick}
+                    onSpeakText={speakText}
+                    isSpeaking={chatState.isSpeaking}
+                    supported={supported}
+                    messagesEndRef={messagesEndRef}
+                  />
 
-                  {/* Chat content container */}
-                  <Box
-                    sx={{
-                      flex: 1,
-                      overflowY: 'auto',
-                      bgcolor: 'background.default',
-                      display: 'flex',
-                      flexDirection: 'column'
-                    }}
-                  >
-                    <Container
-                      maxWidth="md"
-                      disableGutters
-                      sx={{
-                        px: { xs: 1, sm: 3 },
-                        py: { xs: 1, sm: 3 },
-                        flex: 1,
-                        display: 'flex',
-                        flexDirection: 'column'
-                      }}
-                    >
-                      {messages.length === 0 ? (
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            height: '100%',
-                            textAlign: 'center',
-                            color: 'text.secondary',
-                            gap: 2,
-                            px: 2
-                          }}
-                        >
-                          <Avatar sx={{
-                            width: 80,
-                            height: 80,
-                            mb: 2,
-                            bgcolor: 'primary.main',
-                            '& .MuiSvgIcon-root': {
-                              fontSize: '2.5rem'
-                            }
-                          }}>
-                            <SchoolIcon />
-                          </Avatar>
-                          <Typography variant="h5" sx={{ fontWeight: 600, mb: 1 }}>
-                            {t('assistant')}
-                          </Typography>
-                          <Typography variant="body1" sx={{ mb: 3, maxWidth: '600px' }}>
-                            {t('startPrompt')}
-                          </Typography>
-
-                          <Box sx={{ width: '100%', maxWidth: 'md' }}>
-                            <Grid container spacing={2} justifyContent="center">
-                              {translations[currentLanguage].suggestions.map((question, index) => (
-                                <Grid item xs={12} sm={6} md={4} key={index}>
-                                  <Paper
-                                    elevation={0}
-                                    onClick={() => handleQuestionClick(question)}
-                                    sx={{
-                                      p: 2,
-                                      borderRadius: '12px',
-                                      border: `1px solid ${darkMode ? '#2d3748' : '#e2e8f0'}`,
-                                      cursor: 'pointer',
-                                      transition: 'all 0.2s',
-                                      height: '100%',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      '&:hover': {
-                                        borderColor: darkMode ? '#4a5568' : '#cbd5e0',
-                                        transform: 'translateY(-2px)',
-                                        boxShadow: '0 4px 6px rgba(0,0,0,0.05)'
-                                      }
-                                    }}
-                                  >
-                                    <Typography sx={{
-                                      fontSize: '0.95rem',
-                                      lineHeight: 1.4,
-                                      textAlign: currentLanguage === 'ar' ? 'right' : 'left'
-                                    }}>
-                                      {question}
-                                    </Typography>
-                                  </Paper>
-                                </Grid>
-                              ))}
-                            </Grid>
-                          </Box>
-                        </Box>
-                      ) : (
-                        <Box sx={{ width: '100%' }}>
-                          {messages.map((msg, index) => (
-                            <Box key={index} sx={{
-                              display: 'flex',
-                              mb: 2,
-                              justifyContent: msg.role === 'user'
-                                ? currentLanguage === 'ar' ? 'flex-start' : 'flex-end'
-                                : currentLanguage === 'ar' ? 'flex-end' : 'flex-start',
-                              px: { xs: 0.5, sm: 0 }
-                            }}>
-                              {msg.role !== 'user' && (
-                                <Avatar
-                                  sx={{
-                                    width: 32,
-                                    height: 32,
-                                    mr: 2,
-                                    mt: 1,
-                                    bgcolor: darkMode ? 'secondary.dark' : 'secondary.main',
-                                    color: '#fff'
-                                  }}
-                                >
-                                  <SchoolIcon fontSize="small" />
-                                </Avatar>
-                              )}
-                              <Paper
-                                elevation={0}
-                                sx={{
-                                  ...getMessageStyle(msg.role),
-                                  maxWidth: '85%'
-                                }}
-                              >
-                                {editingMessageId === msg.id ? (
-                                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                                    <TextField
-                                      fullWidth
-                                      multiline
-                                      value={editedMessageContent}
-                                      onChange={(e) => setEditedMessageContent(e.target.value)}
-                                      sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                          bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
-                                        }
-                                      }}
-                                    />
-                                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                                      <Button
-                                        size="small"
-                                        onClick={handleCancelEdit}
-                                        variant="outlined"
-                                      >
-                                        <CancelIcon fontSize="small" sx={{ mr: 0.5 }} />
-                                        {t('cancel')}
-                                      </Button>
-                                      <Button
-                                        size="small"
-                                        onClick={handleSaveEdit}
-                                        variant="contained"
-                                        color="primary"
-                                      >
-                                        <SaveIcon fontSize="small" sx={{ mr: 0.5 }} />
-                                        {t('save')}
-                                      </Button>
-                                    </Box>
-                                  </Box>
-                                ) : (
-                                  <>
-                                    <Box sx={{
-                                      '& p': { margin: '0.5em 0' },
-                                      '& code': {
-                                        backgroundColor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
-                                        padding: '0.2em 0.4em',
-                                        borderRadius: '3px',
-                                        fontSize: '85%',
-                                        fontFamily: 'monospace',
-                                      },
-                                      '& pre': {
-                                        backgroundColor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
-                                        padding: '1em',
-                                        borderRadius: '4px',
-                                        overflow: 'auto',
-                                        '& code': {
-                                          backgroundColor: 'transparent',
-                                          padding: 0,
-                                        }
-                                      },
-                                      '& ul, & ol': { marginLeft: '1.5em' },
-                                      '& blockquote': {
-                                        borderLeft: '3px solid',
-                                        borderColor: 'primary.main',
-                                        marginLeft: 0,
-                                        paddingLeft: '1em',
-                                        fontStyle: 'italic',
-                                      },
-                                      '& table': {
-                                        borderCollapse: 'collapse',
-                                        width: '100%',
-                                        '& th, & td': {
-                                          border: '1px solid',
-                                          borderColor: 'divider',
-                                          padding: '0.5em',
-                                        }
-                                      },
-                                      '& a': {
-                                        color: msg.role === 'user' ? 'inherit' : 'primary.main',
-                                        textDecoration: 'underline',
-                                      }
-                                    }}>
-                                      <ReactMarkdown
-                                        remarkPlugins={[remarkGfm]}
-                                        components={{
-                                          code({ node, inline, className, children, ...props }) {
-                                            return (
-                                              <code
-                                                style={{
-                                                  backgroundColor: darkMode
-                                                    ? 'rgba(255, 255, 255, 0.1)'
-                                                    : 'rgba(0, 0, 0, 0.1)',
-                                                  padding: inline ? '0.2em 0.4em' : '1em',
-                                                  borderRadius: '3px',
-                                                  display: inline ? 'inline' : 'block',
-                                                  overflowX: 'auto',
-                                                  color: msg.role === 'user' ? '#fff' : 'inherit'
-                                                }}
-                                                {...props}
-                                              >
-                                                {children}
-                                              </code>
-                                            );
-                                          }
-                                        }}
-                                      >
-                                        {msg.content}
-                                      </ReactMarkdown>
-                                    </Box>
-                                    <Box sx={{
-                                      position: 'absolute',
-                                      bottom: -16,
-                                      right: -16,
-                                      display: 'flex',
-                                      gap: 0.5
-                                    }}>
-                                      {msg.role === 'user' && (
-                                        <Tooltip title={t('edit')}>
-                                          <IconButton
-                                            size="small"
-                                            onClick={() => handleEditMessage(msg.id, msg.content)}
-                                            sx={{
-                                              bgcolor: darkMode ? 'background.paper' : 'background.paper',
-                                              color: darkMode ? '#fff' : 'text.primary',
-                                              boxShadow: 1,
-                                              '&:hover': {
-                                                bgcolor: darkMode ? 'background.default' : 'background.default'
-                                              }
-                                            }}
-                                          >
-                                            <EditIcon fontSize="small" />
-                                          </IconButton>
-                                        </Tooltip>
-                                      )}
-                                      {msg.role === 'assistant' && (
-                                        <IconButton
-                                          size="small"
-                                          onClick={() => speakText(msg.content, msg.id)}
-                                          disabled={!supported}
-                                          sx={{
-                                            bgcolor: darkMode ? 'primary.dark' : 'primary.main',
-                                            color: '#fff',
-                                            boxShadow: 1,
-                                            '&:hover': {
-                                              bgcolor: darkMode ? 'primary.main' : 'primary.dark'
-                                            },
-                                            '&.Mui-disabled': {
-                                              bgcolor: 'rgba(0, 0, 0, 0.12)',
-                                              color: 'rgba(0, 0, 0, 0.26)'
-                                            }
-                                          }}
-                                        >
-                                          <VolumeUpIcon fontSize="small" />
-                                        </IconButton>
-                                      )}
-                                    </Box>
-                                  </>
-                                )}
-                              </Paper>
-                              {msg.role === 'user' && (
-                                <Avatar
-                                  sx={{
-                                    width: 32,
-                                    height: 32,
-                                    ml: 2,
-                                    mt: 1,
-                                    bgcolor: darkMode ? 'primary.dark' : 'primary.main',
-                                    color: '#fff'
-                                  }}
-                                >
-                                  <PersonIcon fontSize="small" />
-                                </Avatar>
-                              )}
-                            </Box>
-                          ))}
-
-                          {isLoading && (
-                            <Box sx={{ display: 'flex', mb: 2 }}>
-                              <Avatar
-                                sx={{
-                                  width: 32,
-                                  height: 32,
-                                  mr: 2,
-                                  mt: 1,
-                                  bgcolor: darkMode ? 'secondary.dark' : 'secondary.main',
-                                  color: '#fff'
-                                }}
-                              >
-                                <SchoolIcon fontSize="small" />
-                              </Avatar>
-                              <Paper
-                                elevation={0}
-                                sx={{
-                                  bgcolor: darkMode ? 'background.paper' : 'background.paper',
-                                  p: 2,
-                                  borderRadius: '8px'
-                                }}
-                              >
-                                <Typography>{t('thinking')}</Typography>
-                              </Paper>
-                            </Box>
-                          )}
-                          <div ref={messagesEndRef} />
-                        </Box>
-                      )}
-                    </Container>
-                  </Box>
-
-                  {/* Input container - Update the styling */}
-                  <Box
-                    sx={{
-                      borderTop: `1px solid ${darkMode ? '#2d3748' : '#e2e8f0'}`,
-                      bgcolor: 'background.paper',
-                      position: 'sticky',
-                      bottom: 0,
-                      width: '100%',
-                      zIndex: 1
-                    }}
-                  >
-                    <Container
-                      maxWidth="md"
-                      disableGutters
-                      sx={{
-                        px: { xs: 1, sm: 3 },
-                        py: { xs: 1, sm: 2 }
-                      }}
-                    >
-                      <TextField
-                        fullWidth
-                        variant="outlined"
-                        placeholder={t('writeMessage')}
-                        value={inputValue}
-                        onChange={handleInputChange}
-                        onKeyPress={handleKeyPress}
-                        disabled={isLoading}
-                        multiline
-                        maxRows={4}
-                        className="chat-input"
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            borderRadius: '24px',
-                            paddingRight: '8px',
-                            bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
-                            border: `1px solid ${darkMode ? '#2d3748' : '#e2e8f0'}`,
-                            '&:hover': {
-                              borderColor: darkMode ? '#4a5568' : '#cbd5e0'
-                            },
-                            '&.Mui-focused': {
-                              borderColor: darkMode ? '#4a6fa5' : '#2c5282',
-                              boxShadow: `0 0 0 2px ${darkMode ? 'rgba(74, 111, 165, 0.2)' : 'rgba(44, 82, 130, 0.2)'}`
-                            }
-                          },
-                          '& .MuiInputAdornment-root': {
-                            [currentLanguage === 'ar' ? 'marginLeft' : 'marginRight']: 0
-                          }
-                        }}
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position="end">
-                              <Box sx={{
-                                display: 'flex',
-                                flexDirection: currentLanguage === 'ar' ? 'row-reverse' : 'row',
-                                gap: 1
-                              }}>
-                                <Tooltip title={isRecording ? t('stopRecording') : t('startRecording')}>
-                                  <IconButton
-                                    onClick={toggleRecording}
-                                    disabled={!browserSupportsSpeechRecognition}
-                                    sx={{
-                                      color: isRecording ? 'error.main' : 'inherit'
-                                    }}
-                                  >
-                                    <MicIcon />
-                                  </IconButton>
-                                </Tooltip>
-                                <Fab
-                                  color="primary"
-                                  size="small"
-                                  onClick={handleSubmit}
-                                  disabled={!inputValue.trim() || isLoading}
-                                  sx={{
-                                    boxShadow: 'none',
-                                    '&:disabled': {
-                                      bgcolor: darkMode ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)'
-                                    }
-                                  }}
-                                >
-                                  {isLoading ? (
-                                    <CircularProgress size={24} color="inherit" />
-                                  ) : (
-                                    <SendIcon />
-                                  )}
-                                </Fab>
-                              </Box>
-                            </InputAdornment>
-                          )
-                        }}
-                      />
-                      <Typography variant="caption" sx={{
-                        display: 'block',
-                        textAlign: 'center',
-                        mt: 1,
-                        color: 'text.secondary'
-                      }}>
-                        {t('disclaimer')}
-                      </Typography>
-                    </Container>
-                  </Box>
+                  <ChatInput
+                    inputValue={chatState.inputValue}
+                    onInputChange={handleInputChange}
+                    onKeyPress={handleKeyPress}
+                    onSubmit={chatHandlers.handleSubmit}
+                    isLoading={chatState.isLoading}
+                    currentLanguage={currentLanguage}
+                    darkMode={darkMode}
+                    isRecording={chatState.isRecording}
+                    onToggleRecording={toggleRecording}
+                    browserSupportsSpeechRecognition={browserSupportsSpeechRecognition}
+                    onSearch={handleSearch}
+                    onResearch={handleResearch}
+                    isResearchMode={isResearchMode}
+                  />
                 </Box>
-              </Box >
-            </Box>
-          } />
-      </Routes>
-
-      <Dialog
-        open={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
-        fullWidth
-        maxWidth="sm"
-        PaperProps={{
-          sx: {
-            bgcolor: darkMode ? '#1e1e1e' : '#ffffff'
-          }
-        }}
-      >
-        <DialogTitle sx={{
-          bgcolor: darkMode ? 'primary.dark' : 'primary.main',
-          color: '#fff',
-          fontWeight: 600
-        }}>
-          {t('settings')}
-        </DialogTitle>
-        <DialogContent dividers sx={{ py: 2 }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {/* Theme Toggle */}
-            <FormControlLabel
-              control={<Switch checked={darkMode} onChange={toggleDarkMode} />}
-              label={t('darkMode')}
-              sx={{
-                justifyContent: 'space-between',
-                mx: 0,
-                py: 1
-              }}
-            />
-
-            {/* Auto Read Toggle */}
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={autoRead}
-                  onChange={(e) => setAutoRead(e.target.checked)}
-                  disabled={!supported}
-                />
-              }
-              label={t('autoRead')}
-              sx={{
-                justifyContent: 'space-between',
-                mx: 0,
-                py: 1
-              }}
-            />
-
-            {/* Language Selection */}
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                {t('languageSection')}
-              </Typography>
-              <Box sx={{ display: 'flex', gap: 1 }}>
-                {LANGUAGES.map((lang) => (
-                  <Button
-                    key={lang.code}
-                    variant={currentLanguage === lang.code ? 'contained' : 'outlined'}
-                    onClick={() => changeLanguage(lang.code)}
-                    sx={{
-                      minWidth: 'auto',
-                      px: 2,
-                      py: 1
-                    }}
-                  >
-                    <Typography sx={{ fontSize: '1.2rem', mr: 1 }}>
-                      {lang.flag}
-                    </Typography>
-                    {lang.label}
-                  </Button>
-                ))}
               </Box>
             </Box>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setSettingsOpen(false)}>
-            {t('close')}
-          </Button>
-        </DialogActions>
-           </Dialog>
+          }
+        />
+      </Routes>
 
-      {/* Rename Dialog */}
-      <Dialog
-        open={renameDialogOpen}
-        onClose={() => setRenameDialogOpen(false)}
-        fullWidth
-        maxWidth="xs"
-        PaperProps={{
-          sx: {
-            bgcolor: darkMode ? '#1e1e1e' : '#ffffff'
-          }
-        }}
-      >
-        <DialogTitle sx={{
-          bgcolor: darkMode ? 'primary.dark' : 'primary.main',
-          color: '#fff',
-          fontWeight: 600
-        }}>
-          {t('editTitle')}
-        </DialogTitle>
-        <DialogContent sx={{ py: 2, mt: 1 }}>
-          <TextField
-            fullWidth
-            value={newChatTitle}
-            onChange={(e) => setNewChatTitle(e.target.value)}
-            placeholder={t('newConversation')}
-            autoFocus
-            InputProps={{
-              sx: {
-                bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
-              }
-            }}
-          />
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button
-            onClick={() => setRenameDialogOpen(false)}
-            variant="outlined"
-          >
-            {t('cancel')}
-          </Button>
-          <Button
-            onClick={handleRenameSubmit}
-            variant="contained"
-            disabled={!newChatTitle.trim()}
-          >
-            {t('save')}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <SettingsDialog
+        open={chatState.settingsOpen}
+        onClose={() => chatState.setSettingsOpen(false)}
+        darkMode={darkMode}
+        onToggleDarkMode={toggleDarkMode}
+        autoRead={chatState.autoRead}
+        onToggleAutoRead={chatState.setAutoRead}
+        currentLanguage={currentLanguage}
+        onChangeLanguage={changeLanguage}
+        supported={supported}
+      />
 
-      <Menu
-        anchorEl={chatMenuAnchorEl}
-        open={Boolean(chatMenuAnchorEl)}
-        onClose={handleChatMenuClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: currentLanguage === 'ar' ? 'left' : 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: currentLanguage === 'ar' ? 'left' : 'right' }}
-      >
-        <MenuItem
-          onClick={() => {
-            const chat = conversationHistory.find(c => c.id === chatMenuChatId);
-            handleEditTitle(chatMenuChatId, chat?.title || '');
-            handleChatMenuClose();
-          }}
-          sx={{ direction: currentLanguage === 'ar' ? 'rtl' : 'ltr' }}
-        >
-          <EditIcon fontSize="small" sx={{ mr: currentLanguage === 'ar' ? 0 : 1, ml: currentLanguage === 'ar' ? 1 : 0 }} />
-          {t('edit')}
-        </MenuItem>
-        <MenuItem
-          onClick={(e) => {
-            handleDeleteChat(chatMenuChatId, e);
-            handleChatMenuClose();
-          }}
-          sx={{ direction: currentLanguage === 'ar' ? 'rtl' : 'ltr' }}
-        >
-          <DeleteIcon fontSize="small" sx={{ mr: currentLanguage === 'ar' ? 0 : 1, ml: currentLanguage === 'ar' ? 1 : 0 }} />
-          {t('delete')}
-        </MenuItem>
-      </Menu>
+      <RenameDialog
+        open={chatState.renameDialogOpen}
+        onClose={() => chatState.setRenameDialogOpen(false)}
+        darkMode={darkMode}
+        currentLanguage={currentLanguage}
+        newChatTitle={chatState.newChatTitle}
+        onTitleChange={chatState.setNewChatTitle}
+        onSubmit={() => chatHandlers.handleRenameSubmit(chatState.newChatTitle)}
+      />
 
-      <style>
-        {`
-          @keyframes floatCenter {
-            0%   { transform: translate(-50%, -50%) rotate(0deg);}
-            25%  { transform: translate(-50%, calc(-50% - 50px)) rotate(7deg);}
-            50%  { transform: translate(-50%, calc(-50% + 50px)) rotate(-7deg);}
-            75%  { transform: translate(-50%, calc(-50% - 50px)) rotate(7deg);}
-            100% { transform: translate(-50%, -50%) rotate(0deg);}
-          }
-          @keyframes floatNodeTL {
-            0%   { transform: translate(-50%, -50%) rotate(0deg);}
-            25%  { transform: translate(-50%, calc(-50% - 40px)) rotate(-7deg);}
-            50%  { transform: translate(-50%, calc(-50% + 40px)) rotate(7deg);}
-            75%  { transform: translate(-50%, calc(-50% - 40px)) rotate(-7deg);}
-            100% { transform: translate(-50%, -50%) rotate(0deg);}
-          }
-          @keyframes floatNodeTR {
-            0%   { transform: translate(50%, -50%) rotate(0deg);}
-            25%  { transform: translate(50%, calc(-50% - 40px)) rotate(7deg);}
-            50%  { transform: translate(50%, calc(-50% + 40px)) rotate(-7deg);}
-            75%  { transform: translate(50%, calc(-50% - 40px)) rotate(7deg);}
-            100% { transform: translate(50%, -50%) rotate(0deg);}
-          }
-          @keyframes floatNodeBL {
-            0%   { transform: translate(-50%, 50%) rotate(0deg);}
-            25%  { transform: translate(-50%, calc(50% + 40px)) rotate(7deg);}
-            50%  { transform: translate(-50%, calc(50% - 40px)) rotate(-7deg);}
-            75%  { transform: translate(-50%, calc(50% + 40px)) rotate(7deg);}
-            100% { transform: translate(-50%, 50%) rotate(0deg);}
-          }
-          @keyframes floatNodeBR {
-            0%   { transform: translate(50%, 50%) rotate(0deg);}
-            25%  { transform: translate(50%, calc(50% + 40px)) rotate(-7deg);}
-            50%  { transform: translate(50%, calc(50% - 40px)) rotate(7deg);}
-            75%  { transform: translate(50%, calc(50% + 40px)) rotate(-7deg);}
-            100% { transform: translate(50%, 50%) rotate(0deg);}
-          }
-          @keyframes floatNodeML {
-            0%   { transform: translate(-50%, -50%) rotate(0deg);}
-            25%  { transform: translate(calc(-50% - 30px), -50%) rotate(5deg);}
-            50%  { transform: translate(calc(-50% + 30px), -50%) rotate(-5deg);}
-            75%  { transform: translate(calc(-50% - 30px), -50%) rotate(5deg);}
-            100% { transform: translate(-50%, -50%) rotate(0deg);}
-          }
-          @keyframes floatNodeMR {
-            0%   { transform: translate(50%, -50%) rotate(0deg);}
-            25%  { transform: translate(calc(50% + 30px), -50%) rotate(-5deg);}
-            50%  { transform: translate(calc(50% - 30px), -50%) rotate(5deg);}
-            75%  { transform: translate(calc(50% + 30px), -50%) rotate(-5deg);}
-            100% { transform: translate(50%, -50%) rotate(0deg);}
-          }
-        `}
-      </style>
-    </ThemeProvider >
+      <ChatMenu
+        anchorEl={chatState.chatMenuAnchorEl}
+        open={Boolean(chatState.chatMenuAnchorEl)}
+        onClose={chatHandlers.handleChatMenuClose}
+        currentLanguage={currentLanguage}
+        chatId={chatState.chatMenuChatId}
+        conversationHistory={chatState.conversationHistory}
+        onEditTitle={chatHandlers.handleEditTitle}
+        onDeleteChat={chatHandlers.handleDeleteChat}
+      />
+    </ThemeProvider>
   );
 }
 
-class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError(error) {
-    return { hasError: true };
-  }
-
-  componentDidCatch(error, errorInfo) {
-    console.error('Error:', error);
-    console.error('Error Info:', errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: '100vh',
-            p: 3,
-            textAlign: 'center'
-          }}
-        >
-          <Typography variant="h5" color="error" gutterBottom>
-            Something went wrong
-          </Typography>
-          <Button
-            variant="contained"
-            onClick={() => window.location.reload()}
-            sx={{ mt: 2 }}
-          >
-            Reload Page
-          </Button>
-        </Box>
-      );
-    }
-
-    return this.props.children;
-  }
-}
-
-// Wrap the App component with ErrorBoundary in index.js or where you render the App
 export default function AppWithErrorBoundary() {
   return (
     <ErrorBoundary>

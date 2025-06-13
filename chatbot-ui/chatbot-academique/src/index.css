@@ -1,42 +1,666 @@
+/* Import modern fonts - must come first */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@300;400;500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* CSS Variables for consistent theming */
+:root {
+  --primary-green: #10a37f;
+  --primary-green-dark: #0d8f6b;
+  --primary-green-light: rgba(16, 163, 127, 0.1);
+
+  --bg-light: #f8fafc;
+  --bg-dark: #0a0a0a;
+  --surface-light: rgba(255, 255, 255, 0.9);
+  --surface-dark: rgba(255, 255, 255, 0.05);
+
+  --text-light: rgba(0, 0, 0, 0.87);
+  --text-dark: rgba(255, 255, 255, 0.9);
+  --text-secondary-light: rgba(0, 0, 0, 0.6);
+  --text-secondary-dark: rgba(255, 255, 255, 0.6);
+
+  --border-light: rgba(0, 0, 0, 0.08);
+  --border-dark: rgba(255, 255, 255, 0.1);
+
+  --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --shadow-dark: 0 4px 20px rgba(0, 0, 0, 0.3);
+
+  --blur-backdrop: blur(20px);
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Global styles */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
   overscroll-behavior: none;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  font-variant-ligatures: contextual;
+  line-height: 1.6;
 }
 
-/* Custom scrollbar */
+/* Enhanced scrollbar styles */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
+  border-radius: 3px;
+  transition: var(--transition-smooth);
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.3);
 }
 
-/* Animation for typing indicator */
+/* Dark mode scrollbar */
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+[data-theme="dark"] * {
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+/* Selection styles */
+::selection {
+  background: var(--primary-green-light);
+  color: var(--primary-green);
+}
+
+/* Focus styles */
+:focus-visible {
+  outline: 2px solid var(--primary-green);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Animation keyframes */
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 var(--primary-green-light);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(16, 163, 127, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 163, 127, 0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 100% 0;
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(16, 163, 127, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(16, 163, 127, 0.6);
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40%, 43% {
+    transform: translate3d(0, -8px, 0);
+  }
+  70% {
+    transform: translate3d(0, -4px, 0);
+  }
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
+@keyframes wiggle {
+  0%, 7% {
+    transform: rotateZ(0);
+  }
+  15% {
+    transform: rotateZ(-15deg);
+  }
+  20% {
+    transform: rotateZ(10deg);
+  }
+  25% {
+    transform: rotateZ(-10deg);
+  }
+  30% {
+    transform: rotateZ(6deg);
+  }
+  35% {
+    transform: rotateZ(-4deg);
+  }
+  40%, 100% {
+    transform: rotateZ(0);
+  }
+}
+
+/* Utility classes */
 .typing-indicator {
   animation: blink 1.5s infinite;
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+.slide-in-right {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.pulse-glow {
+  animation: pulse 2s infinite;
+}
+
+.shimmer-effect {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.glow-effect {
+  animation: glow 2s ease-in-out infinite;
+}
+
+.bounce-effect {
+  animation: bounce 1s ease-in-out;
+}
+
+.wiggle-effect {
+  animation: wiggle 0.5s ease-in-out;
+}
+
+/* Enhanced hover effects */
+.hover-lift {
+  transition: var(--transition-smooth);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-light);
+}
+
+[data-theme="dark"] .hover-lift:hover {
+  box-shadow: var(--shadow-dark);
+}
+
+.hover-scale {
+  transition: var(--transition-bounce);
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+.hover-glow {
+  transition: var(--transition-smooth);
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(16, 163, 127, 0.3);
+}
+
+/* RTL Support */
+[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="rtl"] .MuiListItemIcon-root {
+  margin-left: 16px;
+  margin-right: 0;
+}
+
+[dir="rtl"] .MuiListItemText-root {
+  text-align: right;
+}
+
+[dir="rtl"] .MuiButton-startIcon {
+  margin-left: 8px;
+  margin-right: -4px;
+}
+
+[dir="rtl"] .MuiButton-endIcon {
+  margin-left: -4px;
+  margin-right: 8px;
+}
+
+/* Arabic text improvements */
+[lang="ar"] {
+  font-family: 'Segoe UI', 'Tahoma', 'Arial', sans-serif;
+  line-height: 1.6;
+}
+
+[lang="ar"] .MuiTypography-root {
+  text-align: right;
+  direction: rtl;
+}
+
+[lang="ar"] .MuiListItemText-primary {
+  text-align: right;
+  direction: rtl;
+}
+
+[lang="ar"] .MuiListItemText-secondary {
+  text-align: right;
+  direction: rtl;
+}
+
+/* Message Bubble Animations */
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes copySuccess {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes bubbleHover {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-2px);
+  }
+}
+
+/* Message bubble styling */
+.message-bubble {
+  animation: messageSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.message-bubble:hover {
+  animation: bubbleHover 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.copy-success {
+  animation: copySuccess 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enhanced scrollbar for message area */
+.message-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.message-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.message-container::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+
+.message-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .message-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .message-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Enhanced RTL Support */
+[dir="rtl"] .MuiChip-root {
+  direction: rtl;
+}
+
+[dir="rtl"] .MuiButton-root {
+  direction: rtl;
+}
+
+[dir="rtl"] .MuiButton-startIcon {
+  margin-left: 8px;
+  margin-right: -4px;
+}
+
+[dir="rtl"] .MuiButton-endIcon {
+  margin-left: -4px;
+  margin-right: 8px;
+}
+
+[dir="rtl"] .MuiTextField-root {
+  direction: rtl;
+}
+
+[dir="rtl"] .MuiInputLabel-root {
+  transform-origin: top right;
+  right: 14px;
+  left: auto;
+}
+
+[dir="rtl"] .MuiInputLabel-shrink {
+  transform: translate(0, -9px) scale(0.75);
+  transform-origin: top right;
+}
+
+[dir="rtl"] .MuiOutlinedInput-root {
+  text-align: right;
+}
+
+[dir="rtl"] .MuiFormHelperText-root {
+  text-align: right;
+  margin-left: 0;
+  margin-right: 14px;
+}
+
+[dir="rtl"] .MuiListItemIcon-root {
+  min-width: 32px;
+  margin-left: 16px;
+  margin-right: 0;
+}
+
+[dir="rtl"] .MuiListItemText-root {
+  text-align: right;
+  padding-left: 0;
+  padding-right: 16px;
+}
+
+[dir="rtl"] .MuiTab-root {
+  direction: rtl;
+}
+
+[dir="rtl"] .MuiTabs-root {
+  direction: rtl;
+}
+
+/* Arabic font improvements */
+[lang="ar"] * {
+  font-family: 'Segoe UI', 'Tahoma', 'Arial', sans-serif !important;
+}
+
+[lang="ar"] .MuiTypography-root {
+  text-align: right;
+  direction: rtl;
+  line-height: 1.7;
+}
+
+[lang="ar"] .MuiButton-root {
+  font-family: 'Segoe UI', 'Tahoma', 'Arial', sans-serif !important;
+}
+
+[lang="ar"] .MuiTextField-root {
+  font-family: 'Segoe UI', 'Tahoma', 'Arial', sans-serif !important;
+}
+
+[lang="ar"] .MuiInputBase-input {
+  text-align: right;
+  direction: rtl;
+}
+
+[lang="ar"] .MuiInputLabel-root {
+  text-align: right;
+  direction: rtl;
+  transform-origin: top right;
+}
+
+/* Fix for number positioning in Arabic */
+[lang="ar"] .MuiChip-label {
+  direction: ltr;
+  unicode-bidi: plaintext;
+}
+
+[lang="ar"] .number-display {
+  direction: ltr;
+  unicode-bidi: plaintext;
+  display: inline-block;
+}
+
+/* Enhanced Arabic text alignment - Centered layout like English */
+[lang="ar"] .login-container {
+  direction: rtl !important;
+  text-align: center !important;
+}
+
+[lang="ar"] .login-container .MuiTypography-h4 {
+  direction: rtl !important;
+  text-align: center !important;
+  unicode-bidi: bidi-override !important;
+  width: 100% !important;
+  display: block !important;
+}
+
+[lang="ar"] .login-container .MuiTypography-subtitle1 {
+  direction: rtl !important;
+  text-align: center !important;
+  unicode-bidi: bidi-override !important;
+  width: 100% !important;
+  display: block !important;
+}
+
+/* Ensure form fields have proper RTL text direction but centered layout */
+[lang="ar"] .login-container .MuiTextField-root {
+  direction: rtl !important;
+}
+
+[lang="ar"] .login-container .MuiInputBase-input {
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+[lang="ar"] .login-container .MuiInputLabel-root {
+  right: 14px !important;
+  left: auto !important;
+  transform-origin: top right !important;
+}
+
+/* Buttons remain centered */
+[lang="ar"] .login-container .MuiButton-root {
+  text-align: center !important;
+}
+
+/* New Chat Button RTL */
+[lang="ar"] .new-chat-button {
+  direction: rtl !important;
+  flex-direction: row-reverse !important;
+}
+
+[lang="ar"] .new-chat-text {
+  direction: rtl !important;
+  text-align: right !important;
+  unicode-bidi: bidi-override;
+}
+
+/* Fix for Arabic text in buttons */
+[lang="ar"] .MuiButton-root {
+  direction: rtl;
+}
+
+[lang="ar"] .MuiButton-root span {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Login form RTL improvements */
+[dir="rtl"] .login-container {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="rtl"] .login-container * {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Typography RTL fixes */
+[dir="rtl"] .MuiTypography-h4 {
+  direction: rtl;
+  text-align: right;
+  unicode-bidi: bidi-override;
+}
+
+[dir="rtl"] .MuiTypography-subtitle1 {
+  direction: rtl;
+  text-align: right;
+  unicode-bidi: bidi-override;
+}
+
+/* Chat-specific styles */
+.chat-input {
+  transition: var(--transition-smooth);
+}
+
+.chat-input:focus-within {
+  transform: translateY(-2px);
+}
+
+.message-bubble {
+  transition: var(--transition-smooth);
+}
+
+.message-bubble:hover {
+  transform: translateY(-1px);
+}
+
+/* Responsive design helpers */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --border-light: rgba(0, 0, 0, 0.3);
+    --border-dark: rgba(255, 255, 255, 0.3);
+  }
+}
+
+/* Print styles */
+@media print {
+  * {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
 }
