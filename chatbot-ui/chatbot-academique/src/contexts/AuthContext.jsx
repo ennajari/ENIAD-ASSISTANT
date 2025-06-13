@@ -5,7 +5,8 @@ import {
   signOut as firebaseSignOut,
   onAuthStateChanged
 } from 'firebase/auth';
-import { auth } from '../firebase';
+import { auth, googleProvider } from '../firebase';
+import firebaseStorageService from '../services/firebaseStorageService';
 
 const AuthContext = createContext();
 
@@ -19,34 +20,48 @@ export function AuthProvider({ children }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       console.log('🔐 Auth state changed:', user ? 'User logged in' : 'User logged out');
 
       if (user) {
-        // Validate academic domain
-        const isAcademicEmail = validateAcademicEmail(user.email);
-        if (!isAcademicEmail) {
-          console.warn('⚠️ Non-academic email detected:', user.email);
-          setError('Please use an academic email address to access ENIAD Assistant');
-          firebaseSignOut(auth);
-          return;
+        try {
+          // Store user profile with academic validation
+          const userProfile = {
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+            domain: user.email.split('@')[1],
+            lastLogin: new Date().toISOString(),
+            emailVerified: user.emailVerified
+          };
+
+          // Save user profile to Firebase
+          await firebaseStorageService.saveUserProfile(user);
+
+          // Load user conversations from Firebase
+          const conversations = await firebaseStorageService.getUserConversations(user.uid);
+          if (conversations.length > 0) {
+            localStorage.setItem('conversationHistory', JSON.stringify(conversations));
+            console.log(`✅ Loaded ${conversations.length} conversations from Firebase`);
+          }
+
+          setUser(userProfile);
+          setError(null);
+          console.log('✅ User authenticated and data synced:', userProfile);
+        } catch (error) {
+          console.error('❌ Error during user setup:', error);
+          setUser({
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+            domain: user.email.split('@')[1],
+            lastLogin: new Date().toISOString(),
+            emailVerified: user.emailVerified
+          });
+          // Don't block login for Firebase storage errors
         }
-
-        // Store user profile with academic validation
-        const userProfile = {
-          uid: user.uid,
-          email: user.email,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-          isAcademic: isAcademicEmail,
-          domain: user.email.split('@')[1],
-          lastLogin: new Date().toISOString(),
-          emailVerified: user.emailVerified
-        };
-
-        setUser(userProfile);
-        setError(null);
-        console.log('✅ Academic user authenticated:', userProfile);
       } else {
         setUser(null);
         setError(null);
@@ -58,47 +73,30 @@ export function AuthProvider({ children }) {
     return unsubscribe;
   }, []);
 
-  // Validate academic email domains
-  const validateAcademicEmail = (email) => {
-    if (!email) return false;
-
-    const academicDomains = [
-      // Educational domains
-      '.edu', '.edu.', '.ac.', '.university', '.univ',
-      // Specific academic institutions
-      'eniad.edu.tn', 'eniad.tn', 'enit.rnu.tn', 'enis.rnu.tn',
-      'esprit.tn', 'isg.rnu.tn', 'fsb.rnu.tn', 'fst.rnu.tn',
-      // International academic domains
-      'gmail.com', 'outlook.com', 'hotmail.com', // Temporary for testing
-      // Add more academic domains as needed
-    ];
-
-    const domain = email.toLowerCase().split('@')[1];
-    return academicDomains.some(acadDomain =>
-      domain.includes(acadDomain) || domain.endsWith(acadDomain)
-    );
+  // Save conversation to Firebase when user is logged in
+  const saveConversation = async (conversation) => {
+    if (user && conversation) {
+      try {
+        await firebaseStorageService.saveConversation(user.uid, conversation);
+        console.log('✅ Conversation saved to Firebase:', conversation.id);
+      } catch (error) {
+        console.warn('⚠️ Failed to save conversation to Firebase:', error);
+      }
+    }
   };
 
-  // Google Sign In with academic validation
+  // Google Sign In with Firebase storage integration
   const signInWithGoogle = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const provider = new GoogleAuthProvider();
+      if (!googleProvider) {
+        throw new Error('Google provider not configured');
+      }
 
-      // Configure provider for academic accounts
-      provider.setCustomParameters({
-        hd: 'eniad.edu.tn', // Hosted domain for ENIAD (optional)
-        prompt: 'select_account'
-      });
-
-      // Add scopes for academic information
-      provider.addScope('email');
-      provider.addScope('profile');
-
-      console.log('🔐 Initiating Google Sign-In...');
-      const result = await signInWithPopup(auth, provider);
+      console.log('🔐 Initiating Google Academic Sign-In...');
+      const result = await signInWithPopup(auth, googleProvider);
 
       console.log('✅ Google Sign-In successful:', result.user.email);
       return result.user;
@@ -147,8 +145,8 @@ export function AuthProvider({ children }) {
     error,
     signInWithGoogle,
     signOut,
-    isAuthenticated: !!user,
-    isAcademicUser: user?.isAcademic || false
+    saveConversation,
+    isAuthenticated: !!user
   };
 
   return (

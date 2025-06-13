@@ -230,6 +230,17 @@ class RAGApiService {
     try {
       console.log('🔍 Checking RAG system health at:', this.ragSystemURL);
 
+      // Check if RAG system URL is configured
+      if (!this.ragSystemURL || this.ragSystemURL === '' || this.ragSystemURL === 'undefined') {
+        return {
+          status: 'error',
+          error: 'RAG system URL not configured',
+          projectId: this.projectId,
+          baseURL: this.ragSystemURL || 'Not configured',
+          message: 'Please set VITE_RAG_SYSTEM_BASE_URL=http://localhost:8000 in your .env file'
+        };
+      }
+
       // Try to check RAG system health
       const response = await this.ragApi.get('/health');
 
@@ -263,12 +274,31 @@ class RAGApiService {
       }
     } catch (error) {
       console.warn('⚠️ RAG system health check failed:', error.message);
+
+      // Provide more specific error messages
+      let errorMessage = error.message;
+      let helpMessage = 'Cannot connect to RAG system.';
+
+      if (error.code === 'ECONNREFUSED' || error.message.includes('ECONNREFUSED')) {
+        errorMessage = 'Connection refused - RAG service not running';
+        helpMessage = 'Make sure the RAG service is running on port 8000. Run: python simple_rag_system.py';
+      } else if (error.code === 'ENOTFOUND' || error.message.includes('ENOTFOUND')) {
+        errorMessage = 'Host not found - Check RAG system URL';
+        helpMessage = 'Verify VITE_RAG_SYSTEM_BASE_URL in your .env file';
+      } else if (error.message.includes('timeout')) {
+        errorMessage = 'Connection timeout - RAG service not responding';
+        helpMessage = 'RAG service may be overloaded or not responding';
+      } else if (error.message.includes('Network Error')) {
+        errorMessage = 'Network Error';
+        helpMessage = 'Check if RAG service is running: python simple_rag_system.py';
+      }
+
       return {
         status: 'error',
-        error: error.message,
+        error: errorMessage,
         projectId: this.projectId,
-        baseURL: this.ragSystemURL,
-        message: 'Cannot connect to RAG system. Make sure the RAG service is running on port 8000.'
+        baseURL: this.ragSystemURL || 'Not configured',
+        message: helpMessage
       };
     }
   }
