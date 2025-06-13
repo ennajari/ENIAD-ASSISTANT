@@ -99,6 +99,8 @@ function App() {
   useEffect(() => {
     const loadConversations = async () => {
       try {
+        console.log('🔄 Loading conversations for user:', user ? user.email : 'anonymous');
+
         // Initialize static suggestions on app load
         staticSuggestionsService.forceRefresh();
         setSuggestionsRefreshTrigger(prev => prev + 1);
@@ -112,6 +114,8 @@ function App() {
           chatState.setConversationHistory
         );
 
+        console.log(`📋 Loaded ${conversations.length} conversations from ${user ? 'Firebase' : 'local storage'}`);
+
         // Handle current chat selection
         const savedCurrentChatId = localStorage.getItem('currentChatId');
 
@@ -121,14 +125,14 @@ function App() {
             if (currentChat) {
               chatState.setCurrentChatId(savedCurrentChatId);
               chatState.setMessages(currentChat.messages || []);
-              console.log('✅ Restored current chat:', savedCurrentChatId);
+              console.log('✅ Restored current chat:', savedCurrentChatId, 'with', currentChat.messages?.length || 0, 'messages');
             } else {
               // Current chat ID not found, load first available chat
               const firstChat = conversations[0];
               chatState.setCurrentChatId(firstChat.id);
               chatState.setMessages(firstChat.messages || []);
               localStorage.setItem('currentChatId', firstChat.id);
-              console.log('✅ Loaded first available chat:', firstChat.id);
+              console.log('✅ Loaded first available chat:', firstChat.id, 'with', firstChat.messages?.length || 0, 'messages');
             }
           } else {
             // No current chat ID, load first available chat
@@ -136,7 +140,7 @@ function App() {
             chatState.setCurrentChatId(firstChat.id);
             chatState.setMessages(firstChat.messages || []);
             localStorage.setItem('currentChatId', firstChat.id);
-            console.log('✅ Loaded first chat:', firstChat.id);
+            console.log('✅ Loaded first chat:', firstChat.id, 'with', firstChat.messages?.length || 0, 'messages');
           }
         } else {
           // No conversations found, create new chat
@@ -146,13 +150,22 @@ function App() {
 
       } catch (error) {
         console.error('❌ Error loading conversations:', error);
-        await chatHandlers.handleNewChat();
+        console.error('Error details:', error.stack);
+        // Create new chat as fallback
+        try {
+          await chatHandlers.handleNewChat();
+        } catch (newChatError) {
+          console.error('❌ Failed to create new chat:', newChatError);
+        }
       }
     };
 
     // Only load conversations if not in loading state
     if (!authLoading) {
+      console.log('🚀 Auth loading complete, loading conversations...');
       loadConversations();
+    } else {
+      console.log('⏳ Auth still loading, waiting...');
     }
   }, [user, authLoading]); // Depend on user and authLoading to reload conversations when login state changes
 
