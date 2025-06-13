@@ -73,14 +73,15 @@ const ChatHeader = ({
           <MenuIcon />
         </IconButton>
 
-        {/* ENIAD Logo */}
+        {/* ENIAD Logo - Clickable */}
         <Box
-          component="img"
-          src="/logo.png"
-          alt="ENIAD Logo"
+          component="a"
+          href="https://eniad.ump.ma/fr"
+          target="_blank"
+          rel="noopener noreferrer"
           sx={{
-            height: { xs: 32, sm: 40 },
-            width: 'auto',
+            display: 'flex',
+            alignItems: 'center',
             mr: currentLanguage === 'ar' ? 0 : 2,
             ml: currentLanguage === 'ar' ? 2 : 0,
             transition: 'all 0.2s ease',
@@ -88,7 +89,18 @@ const ChatHeader = ({
               transform: 'scale(1.05)',
             }
           }}
-        />
+        >
+          <Box
+            component="img"
+            src="/logo.png"
+            alt="ENIAD Logo - Visit Website"
+            sx={{
+              height: { xs: 32, sm: 40 },
+              width: 'auto',
+              cursor: 'pointer'
+            }}
+          />
+        </Box>
 
         <Typography
           variant="h6"

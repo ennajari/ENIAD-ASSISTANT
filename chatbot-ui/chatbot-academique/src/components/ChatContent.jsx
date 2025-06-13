@@ -181,24 +181,40 @@ const ChatContent = ({
             }}
           >
             <Box
-              component="img"
-              src="/logo.png"
-              alt="ENIAD Logo"
+              component="a"
+              href="https://eniad.ump.ma/fr"
+              target="_blank"
+              rel="noopener noreferrer"
               sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 width: 80,
                 height: 80,
                 mb: 2,
                 borderRadius: '50%',
-                objectFit: 'contain',
                 bgcolor: 'rgba(16, 163, 127, 0.1)',
                 p: 1,
                 transition: 'all 0.3s ease',
+                textDecoration: 'none',
                 '&:hover': {
                   transform: 'scale(1.05)',
                   boxShadow: '0 8px 25px rgba(16, 163, 127, 0.3)',
                 }
               }}
-            />
+            >
+              <Box
+                component="img"
+                src="/logo.png"
+                alt="ENIAD Logo - Visit Website"
+                sx={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain',
+                  cursor: 'pointer'
+                }}
+              />
+            </Box>
             <Typography variant="h5" sx={{ fontWeight: 600, mb: 1 }}>
               {t('assistant')}
             </Typography>
@@ -336,15 +352,34 @@ const ChatContent = ({
                     <PersonIcon fontSize="small" />
                   ) : (
                     <Box
-                      component="img"
-                      src="/logo.png"
-                      alt="ENIAD"
+                      component="a"
+                      href="https://eniad.ump.ma/fr"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
                         width: 20,
                         height: 20,
-                        objectFit: 'contain'
+                        textDecoration: 'none',
+                        '&:hover': {
+                          transform: 'scale(1.1)',
+                        }
                       }}
-                    />
+                    >
+                      <Box
+                        component="img"
+                        src="/logo.png"
+                        alt="ENIAD - Visit Website"
+                        sx={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'contain',
+                          cursor: 'pointer'
+                        }}
+                      />
+                    </Box>
                   )}
                 </Avatar>
                 <Typography sx={{
@@ -391,18 +426,29 @@ const ChatContent = ({
                 px: 1
               }}>
                 <Avatar
+                  component="a"
+                  href="https://eniad.ump.ma/fr"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   sx={{
                     width: 32,
                     height: 32,
                     bgcolor: 'rgba(16, 163, 127, 0.1)',
                     color: '#fff',
-                    p: 0.5
+                    p: 0.5,
+                    textDecoration: 'none',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      transform: 'scale(1.05)',
+                      boxShadow: '0 4px 12px rgba(16, 163, 127, 0.3)',
+                    }
                   }}
                 >
                   <Box
                     component="img"
                     src="/logo.png"
-                    alt="ENIAD"
+                    alt="ENIAD - Visit Website"
                     sx={{
                       width: 20,
                       height: 20,
