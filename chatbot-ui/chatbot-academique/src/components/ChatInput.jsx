@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import {
   Box,
   Container,
@@ -6,15 +6,12 @@ import {
   InputAdornment,
   IconButton,
   Tooltip,
-  Fab,
   CircularProgress,
   Typography
 } from '@mui/material';
 import {
   Mic as MicIcon,
-  Send as SendIcon,
-  Search as SearchIcon,
-  Psychology as BrainIcon
+  Send as SendIcon
 } from '@mui/icons-material';
 import { translations } from '../constants/config';
 import ResearchButton from './ResearchButton';
@@ -31,11 +28,8 @@ const ChatInput = ({
   isRecording = false,
   onToggleRecording = () => {},
   browserSupportsSpeechRecognition = false,
-  onSearch = () => {},
   onResearch = () => {},
-  isResearchMode = false,
-  onToggleSMA = () => {},
-  isSMAActive = false
+  isResearchMode = false
 }) => {
   const t = (key) => translations[currentLanguage]?.[key] || translations.en[key] || key;
 
@@ -120,7 +114,7 @@ const ChatInput = ({
             placeholder={t('writeMessage')}
             value={inputValue}
             onChange={handleInputChange}
-            onKeyPress={onKeyPress}
+            onKeyDown={onKeyPress}
             onFocus={handleInputFocus}
             onBlur={handleInputBlur}
             disabled={isLoading}
@@ -189,42 +183,7 @@ const ChatInput = ({
                   alignItems: 'center',
                   pr: 1
                 }}>
-                  {/* SMA Search Button */}
-                  <Tooltip title={isSMAActive ? t('smaActive') || 'SMA Active' : t('smaInactive') || 'Activate SMA'} arrow>
-                    <IconButton
-                      onClick={onToggleSMA}
-                      disabled={isLoading}
-                      size="small"
-                      sx={{
-                        width: 36,
-                        height: 36,
-                        color: isSMAActive
-                          ? '#10a37f'
-                          : darkMode
-                            ? 'rgba(255,255,255,0.7)'
-                            : 'rgba(0,0,0,0.6)',
-                        bgcolor: isSMAActive
-                          ? 'rgba(16,163,127,0.1)'
-                          : 'transparent',
-                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                        '&:hover': {
-                          bgcolor: isSMAActive
-                            ? 'rgba(16,163,127,0.2)'
-                            : darkMode
-                              ? 'rgba(255,255,255,0.1)'
-                              : 'rgba(0,0,0,0.05)',
-                          transform: 'scale(1.05)',
-                        },
-                        '&:disabled': {
-                          opacity: 0.4,
-                        }
-                      }}
-                    >
-                      <BrainIcon sx={{ fontSize: 20 }} />
-                    </IconButton>
-                  </Tooltip>
-
-                  {/* Research Button */}
+                  {/* Research Button (SMA) */}
                   <ResearchButton
                     onClick={onResearch}
                     disabled={isLoading}

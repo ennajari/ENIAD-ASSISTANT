@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   IconButton,
   Tooltip,
@@ -143,22 +143,22 @@ const ResearchButton = ({
 
   const translations = {
     en: {
-      research: 'Research Mode',
+      research: 'SMA Intelligence',
       tooltip: isActive
-        ? 'Research Mode Active - Enhanced AI with web search capabilities'
-        : 'Enable Research Mode - Get enhanced AI responses with web search'
+        ? 'SMA Active - Real-time Web Intelligence from ENIAD & UMP'
+        : 'Activate SMA - Smart Multi-Agent web monitoring and intelligence'
     },
     fr: {
-      research: 'Mode Recherche',
+      research: 'Intelligence SMA',
       tooltip: isActive
-        ? 'Mode Recherche Actif - IA améliorée avec recherche web'
-        : 'Activer le Mode Recherche - Obtenez des réponses IA améliorées avec recherche web'
+        ? 'SMA Activé - Intelligence Web en temps réel d\'ENIAD et UMP'
+        : 'Activer SMA - Surveillance et intelligence web multi-agents intelligente'
     },
     ar: {
-      research: 'وضع البحث',
+      research: 'ذكاء SMA',
       tooltip: isActive
-        ? 'وضع البحث نشط - ذكاء اصطناعي محسن مع البحث على الويب'
-        : 'تفعيل وضع البحث - احصل على إجابات ذكاء اصطناعي محسنة مع البحث على الويب'
+        ? 'SMA نشط - ذكاء الويب في الوقت الفعلي من ENIAD و UMP'
+        : 'تفعيل SMA - مراقبة وذكاء الويب متعدد الوكلاء الذكي'
     }
   };
 
