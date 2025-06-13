@@ -137,15 +137,15 @@ export const createChatHandlers = (
           console.log('🔍 Enhanced query with SMA context');
         }
 
-        // Query your RAG system
+        // Query your custom Llama3 model
         const ragResponse = await ragApiService.query({
-          query: enhancedQuery,
+          query: userMessage.content, // Use original query, not enhanced
           language: currentLanguage,
           userId: user?.uid,
           context,
           options: {
-            limit: 5, // Number of documents to retrieve
-            projectId: 'eniad-assistant' // Your project ID
+            chatId: currentChatId,
+            smaResults: smaResults // Pass SMA results to the model
           }
         });
 
@@ -227,20 +227,8 @@ export const createChatHandlers = (
         updateConversationHistory([...messages, userMessage, botMessage]);
       }
 
-      // Save conversation to RAG system if available
-      if (useRAG && currentChatId) {
-        try {
-          await ragApiService.saveConversation({
-            id: currentChatId,
-            messages: [userMessage, botMessage],
-            userId: user?.uid,
-            language: currentLanguage,
-            timestamp: new Date().toISOString()
-          });
-        } catch (saveError) {
-          console.warn('⚠️ Failed to save conversation to RAG:', saveError.message);
-        }
-      }
+      // Note: Conversation is automatically saved by your custom model API
+      console.log('💾 Conversation handled by custom model API');
 
     } catch (error) {
       console.error('❌ Error in handleSubmit:', error);

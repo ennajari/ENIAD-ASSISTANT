@@ -1,18 +1,18 @@
 /**
- * RAG API Service - Integration with ENIAD RAG Project
- * Handles communication with your custom RAG system
- * API Structure: /api/v1/nlp/index/answer/{project_id}
+ * RAG API Service - Integration with ENIAD Custom Llama3 Model
+ * Handles communication with your custom Llama3 model API
+ * API Structure: /api/chat (Next.js API route)
  */
 
 import axios from 'axios';
 
 class RAGApiService {
   constructor() {
-    // API Configuration - matches your RAG_Project structure
-    this.baseURL = import.meta.env.VITE_RAG_API_BASE_URL || 'http://localhost:8000';
+    // API Configuration - matches your custom model API
+    this.baseURL = import.meta.env.VITE_RAG_API_BASE_URL || '';
     this.apiKey = import.meta.env.VITE_RAG_API_KEY;
     this.projectId = import.meta.env.VITE_RAG_PROJECT_ID || 'eniad-assistant';
-    this.timeout = 30000; // 30 seconds timeout
+    this.timeout = 60000; // 60 seconds timeout for model inference
 
     // Initialize axios instance
     this.api = axios.create({
@@ -62,15 +62,15 @@ class RAGApiService {
   }
 
   /**
-   * Send a query to your RAG system
-   * Uses your endpoint: /api/v1/nlp/index/answer/{project_id}
+   * Send a query to your custom Llama3 model
+   * Uses your endpoint: /api/chat (Next.js API route)
    * @param {Object} params - Query parameters
    * @param {string} params.query - User's question
    * @param {string} params.language - Language code (fr, en, ar)
    * @param {string} params.userId - User ID for personalization
    * @param {Array} params.context - Previous conversation context
    * @param {Object} params.options - Additional options
-   * @returns {Promise<Object>} RAG response
+   * @returns {Promise<Object>} Model response
    */
   async query({
     query,
@@ -81,29 +81,41 @@ class RAGApiService {
   }) {
     try {
       const {
-        limit = 5,
-        projectId = this.projectId
+        chatId = this.generateChatId(),
+        smaResults = null
       } = options;
 
-      // Prepare payload according to your SearchRequest schema
+      // Enhance query with SMA results if available
+      let enhancedQuery = query.trim();
+      if (smaResults && smaResults.results && smaResults.results.length > 0) {
+        console.log('🧠 Enhancing query with SMA results');
+        const smaContext = smaResults.results.slice(0, 3).map(result =>
+          `${result.title}: ${result.content || result.summary || ''}`
+        ).join('\n');
+
+        enhancedQuery = `${query}\n\nRecent information from ENIAD/UMP websites:\n${smaContext}`;
+      }
+
+      // Prepare payload for your custom model API
       const payload = {
-        text: query.trim(),
-        limit: limit
+        chatId: chatId,
+        prompt: enhancedQuery
       };
 
-      console.log('📝 Sending RAG query to your system:', {
-        endpoint: `/api/v1/nlp/index/answer/${projectId}`,
+      console.log('📝 Sending query to custom Llama3 model:', {
+        endpoint: '/api/chat',
         query: query.substring(0, 100) + '...',
         language,
-        limit
+        chatId,
+        hasSMAResults: !!smaResults
       });
 
-      // Call your RAG answer endpoint
-      const response = await this.api.post(`/api/v1/nlp/index/answer/${projectId}`, payload);
+      // Call your custom model API endpoint
+      const response = await this.api.post('/api/chat', payload);
 
-      return this.formatYourRagResponse(response.data, query, language);
+      return this.formatCustomModelResponse(response.data, query, language, smaResults);
     } catch (error) {
-      console.error('❌ RAG query failed:', error);
+      console.error('❌ Custom model query failed:', error);
       throw error;
     }
   }
@@ -208,35 +220,112 @@ class RAGApiService {
   }
 
   /**
-   * Format your RAG API response
-   * @param {Object} data - Raw API response from your system
+   * Format your custom model API response
+   * @param {Object} data - Raw API response from your custom model
    * @param {string} originalQuery - Original user query
    * @param {string} language - Language code
+   * @param {Object} smaResults - SMA results if available
    * @returns {Object} Formatted response
    */
-  formatYourRagResponse(data, originalQuery, language) {
+  formatCustomModelResponse(data, originalQuery, language, smaResults = null) {
     // Check if the response is successful
-    if (data.signal !== 'RAG_ANSWER_SUCCESS') {
-      throw new Error(`RAG API returned error signal: ${data.signal}`);
+    if (!data.success) {
+      throw new Error(`Custom model API returned error: ${data.error || 'Unknown error'}`);
+    }
+
+    const messageData = data.data;
+
+    // Parse JSON response if the content contains structured data
+    let parsedContent = null;
+    try {
+      // Try to extract JSON from the response content
+      const jsonMatch = messageData.content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        parsedContent = JSON.parse(jsonMatch[0]);
+      }
+    } catch (error) {
+      console.log('📝 Response is not structured JSON, treating as plain text');
+    }
+
+    // Format the response based on whether it's structured or plain text
+    let formattedContent = messageData.content;
+    let intent = 'general';
+    let relatedQuestions = [];
+
+    if (parsedContent) {
+      // Structured response from your model
+      const parts = [];
+
+      if (parsedContent.contentment) {
+        parts.push(parsedContent.contentment);
+      }
+
+      if (parsedContent.main_answer) {
+        parts.push(parsedContent.main_answer);
+      }
+
+      if (parsedContent.details) {
+        parts.push(parsedContent.details);
+      }
+
+      formattedContent = parts.join('\n\n');
+      intent = parsedContent.intent || 'general';
+
+      // Extract related questions
+      if (parsedContent.related_questions && Array.isArray(parsedContent.related_questions)) {
+        parsedContent.related_questions.forEach(item => {
+          if (item.question1) relatedQuestions.push(item.question1);
+          if (item.question2) relatedQuestions.push(item.question2);
+          if (item.question3) relatedQuestions.push(item.question3);
+        });
+      }
     }
 
     return {
       id: Date.now().toString(),
-      content: data.answer || '',
-      sources: this.extractSourcesFromPrompt(data.full_prompt),
-      confidence: 0.85, // Your system doesn't return confidence, so we set a default
+      content: formattedContent,
+      sources: smaResults ? this.formatSMASources(smaResults) : [],
+      confidence: 0.9, // High confidence for custom model
       language: language,
-      tokens_used: 0, // Your system doesn't return token count
-      processing_time: 0, // Your system doesn't return processing time
+      tokens_used: 0, // Your API doesn't return token count
+      processing_time: 0, // Your API doesn't return processing time
+      intent: intent,
+      related_questions: relatedQuestions,
       metadata: {
-        model: 'eniad-rag-project',
-        timestamp: new Date().toISOString(),
-        signal: data.signal,
-        full_prompt: data.full_prompt,
-        chat_history: data.chat_history,
-        original_query: originalQuery
+        model: 'ahmed-ouka/llama3-8b-eniad-merged-32bit',
+        timestamp: messageData.timestamp ? new Date(messageData.timestamp).toISOString() : new Date().toISOString(),
+        original_query: originalQuery,
+        has_sma_enhancement: !!smaResults,
+        structured_response: !!parsedContent,
+        raw_content: messageData.content
       }
     };
+  }
+
+  /**
+   * Format SMA sources for display
+   * @param {Object} smaResults - SMA search results
+   * @returns {Array} Formatted sources
+   */
+  formatSMASources(smaResults) {
+    if (!smaResults || !smaResults.results) return [];
+
+    return smaResults.results.slice(0, 5).map((result, index) => ({
+      title: result.title || `SMA Result ${index + 1}`,
+      url: result.url || '',
+      type: result.type || 'web',
+      relevance: result.relevance || 0.8,
+      summary: result.summary || result.content || '',
+      source: 'SMA Web Intelligence'
+    }));
+  }
+
+  /**
+   * Generate a unique chat ID
+   * @returns {string} Chat ID
+   */
+  generateChatId() {
+    return `chat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
   /**
