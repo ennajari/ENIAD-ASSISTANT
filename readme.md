@@ -66,19 +66,33 @@
 
 ### **Installation**
 
+#### **🚀 Quick Setup (Recommended)**
 ```bash
 # Clone the repository
 git clone https://github.com/ennajari/ENIAD-ASSISTANT.git
 cd ENIAD-ASSISTANT
 
-# Install frontend dependencies
+# Run automated setup script
+# Linux/macOS:
+chmod +x fix-dependencies.sh && ./fix-dependencies.sh
+
+# Windows:
+fix-dependencies.bat
+```
+
+#### **🛠️ Manual Installation**
+```bash
+# Frontend dependencies
 cd chatbot-ui/chatbot-academique
 npm install --legacy-peer-deps
 
-# Install backend dependencies (RAG System)
-cd ../../RAG_Project/src
+# Backend dependencies
+cd ../../
 pip install -r requirements.txt
+pip install -r RAG_Project/src/requirements.txt
 ```
+
+📖 **For detailed setup instructions, see [SETUP.md](SETUP.md)**
 
 ### **Configuration**
 

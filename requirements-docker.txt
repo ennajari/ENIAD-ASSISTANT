@@ -1,0 +1,44 @@
+# ========================================
+# ENIAD Academic Assistant - Docker Requirements
+# ========================================
+# 
+# Optimized requirements for Docker deployment
+# Minimal dependencies for production containers
+#
+# ========================================
+
+# Core Web Framework (Production)
+fastapi==0.115.12
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+gunicorn==22.0.0
+
+# Essential Data Processing
+pandas==2.2.3
+numpy==2.2.4
+
+# Configuration
+pydantic-settings==2.8.1
+python-dotenv==1.1.0
+
+# File Handling
+aiofiles==24.1.0
+
+# AI & Language Models (Core)
+langchain==0.3.23
+langchain-community==0.3.21
+openai==1.78.1
+
+# Database
+motor==3.7.0
+qdrant-client==1.14.2
+
+# Security
+cryptography==42.0.8
+
+# Utilities
+requests==2.32.3
+uuid==1.30
+
+# Logging
+python-json-logger==2.0.7
