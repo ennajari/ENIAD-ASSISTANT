@@ -175,25 +175,17 @@ function App() {
     }
   }, []);
 
-  // Save conversations
+  // Save current chat ID to localStorage (conversation saving is handled by conversation state manager)
   useEffect(() => {
     try {
       if (chatState.currentChatId) {
         localStorage.setItem('currentChatId', chatState.currentChatId);
-
-        const updatedHistory = chatState.conversationHistory.map(chat =>
-          chat.id === chatState.currentChatId
-            ? { ...chat, messages: chatState.messages }
-            : chat
-        );
-
-        localStorage.setItem('conversationHistory', JSON.stringify(updatedHistory));
-        chatState.setConversationHistory(updatedHistory);
+        console.log('💾 Current chat ID saved to localStorage:', chatState.currentChatId);
       }
     } catch (error) {
-      console.error('Error saving conversations:', error);
+      console.error('Error saving current chat ID:', error);
     }
-  }, [chatState.messages, chatState.currentChatId]);
+  }, [chatState.currentChatId]);
 
   // Speech synthesis
   const speakText = (text, id) => {
