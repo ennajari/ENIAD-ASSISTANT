@@ -9,7 +9,13 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist",
+    "start:all": "cd ../.. && python start_all_services.py",
+    "start:frontend": "vite",
+    "start:rag": "cd ../../RAG_Project/src && python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload",
+    "start:sma": "cd ../../SMA_Service && python -m uvicorn main:app --host 0.0.0.0 --port 8001 --reload",
+    "start:api": "cd ../../eniad-api-server && node server.js",
+    "install:all": "npm install && cd ../../eniad-api-server && npm install && cd ../RAG_Project/src && pip install -r requirements.txt && cd ../../SMA_Service && pip install -r requirements.txt"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
