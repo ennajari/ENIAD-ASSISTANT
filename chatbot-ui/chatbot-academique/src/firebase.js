@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 // Firebase configuration with environment variables
@@ -89,6 +89,7 @@ VITE_FIREBASE_APP_ID=1:123456789012:web:abcdef123456
 let app = null;
 let auth = null;
 let db = null;
+let googleProvider = null;
 let initializationError = null;
 
 try {
@@ -99,12 +100,20 @@ try {
     auth = getAuth(app);
     db = getFirestore(app);
 
+    // Initialize Google Auth Provider with academic email restriction
+    googleProvider = new GoogleAuthProvider();
+    googleProvider.setCustomParameters({
+      hd: 'ump.ma', // Restrict to academic domain (University Mohammed Premier)
+      prompt: 'select_account'
+    });
+
     // Configure auth settings
     auth.useDeviceLanguage();
 
     console.log('✅ Firebase initialized successfully');
     console.log('Auth domain:', firebaseConfig.authDomain);
     console.log('Project ID:', firebaseConfig.projectId);
+    console.log('Google Provider configured for academic emails (ump.ma)');
   } else {
     initializationError = {
       code: 'config/missing-keys',
@@ -123,7 +132,7 @@ try {
 }
 
 // Export Firebase instances and utilities
-export { auth, db, initializationError };
+export { auth, db, googleProvider, initializationError };
 export const isFirebaseConfigured = () => auth !== null;
 export const getFirebaseError = () => initializationError;
 export default app;
