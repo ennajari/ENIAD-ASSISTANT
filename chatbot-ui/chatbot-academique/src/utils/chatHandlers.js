@@ -4,6 +4,8 @@ import staticSuggestionsService from '../services/staticSuggestionsService';
 import ragApiService from '../services/ragApiService';
 import speechService from '../services/speechService';
 import smaService from '../services/smaService';
+import translationService from '../services/translationService';
+import autoCorrectionService from '../services/autoCorrectionService';
 
 export const createChatHandlers = (
   chatState,
@@ -68,16 +70,47 @@ export const createChatHandlers = (
       useRAG = true,
       autoSpeak = false,
       speechQuality = 'high',
-      isSMAActive = false
+      isSMAActive = false,
+      autoCorrect = true,
+      smaStateHandlers = {}
     } = options;
+
+    const {
+      setIsSMALoading = () => {},
+      setIsSMACompleted = () => {},
+      setSmaStatusMessage = () => {}
+    } = smaStateHandlers;
+
+    // Step 1: Auto-correction (cost-free optimization)
+    let correctedInput = inputValue;
+    let correctionInfo = null;
+
+    if (autoCorrect) {
+      try {
+        correctionInfo = autoCorrectionService.autoCorrect(inputValue, currentLanguage);
+        correctedInput = correctionInfo.correctedText;
+
+        if (correctionInfo.hasChanges) {
+          console.log('✏️ Auto-correction applied:', {
+            original: inputValue,
+            corrected: correctedInput,
+            corrections: correctionInfo.corrections.length
+          });
+        }
+      } catch (correctionError) {
+        console.warn('⚠️ Auto-correction failed:', correctionError.message);
+      }
+    }
 
     const userMessage = {
       role: 'user',
-      content: inputValue,
+      content: correctedInput, // Use corrected input
+      originalContent: inputValue !== correctedInput ? inputValue : undefined,
       chatId: currentChatId,
       timestamp: new Date().toISOString(),
       id: Date.now().toString(),
-      userId: user?.uid
+      userId: user?.uid,
+      correctionInfo: correctionInfo?.hasChanges ? correctionInfo : undefined
     };
 
     setMessages(prev => [...prev, userMessage]);
@@ -88,17 +121,26 @@ export const createChatHandlers = (
       let botMessage;
       let smaResults = null;
 
-      // If SMA is active, perform web intelligence search first
+      // Step 2: SMA Web Intelligence (if active)
       if (isSMAActive) {
         try {
           console.log('🧠 SMA activated - performing web intelligence search');
 
+          // Update SMA loading state
+          setIsSMALoading(true);
+          setSmaStatusMessage('Scanning ENIAD & UMP websites...');
+
+          // Optimize query for SMA search (cost optimization)
+          const optimizedQuery = correctedInput.length > 100
+            ? correctedInput.substring(0, 100) + '...'
+            : correctedInput;
+
           smaResults = await smaService.activateSearch({
-            query: userMessage.content,
+            query: optimizedQuery,
             language: currentLanguage,
-            categories: ['news', 'documents', 'announcements', 'events', 'photos'],
+            categories: ['news', 'documents', 'announcements', 'events'],
             realTime: true,
-            maxResults: 10
+            maxResults: 5 // Reduced for cost optimization
           });
 
           console.log('✅ SMA search completed:', {
@@ -107,45 +149,78 @@ export const createChatHandlers = (
             websitesScanned: smaResults.metadata?.websites_scanned
           });
 
+          // Update SMA completion state
+          setIsSMALoading(false);
+          setIsSMACompleted(true);
+          setSmaStatusMessage(`Found ${smaResults.total_found || 0} results from web intelligence`);
+
+          // Step 3: Translation Agent (process SMA results)
+          if (smaResults && smaResults.results?.length > 0) {
+            try {
+              console.log('🌐 Translating SMA results to target language...');
+              setSmaStatusMessage('Translating web content...');
+
+              smaResults = await translationService.translateSMAResults(
+                smaResults,
+                currentLanguage
+              );
+
+              console.log('✅ SMA translation completed:', {
+                resultsTranslated: smaResults.results?.length || 0,
+                targetLanguage: currentLanguage
+              });
+
+              setSmaStatusMessage(`Web intelligence ready (${smaResults.results?.length || 0} sources)`);
+
+            } catch (translationError) {
+              console.warn('⚠️ SMA translation failed, using original results:', translationError.message);
+              setSmaStatusMessage('Translation failed, using original content');
+            }
+          }
+
           // Add SMA results to user message metadata
           userMessage.smaResults = smaResults;
 
         } catch (smaError) {
           console.warn('⚠️ SMA search failed, continuing with normal flow:', smaError.message);
+          setIsSMALoading(false);
+          setIsSMACompleted(false);
+          setSmaStatusMessage('SMA search failed, using standard responses');
         }
       }
 
       if (useRAG) {
-        // Use RAG API for intelligent responses
+        // Step 4: RAG + Custom Model (cost-optimized)
         console.log('🤖 Using RAG API for response generation');
 
-        // Prepare context from recent messages
-        const context = messages.slice(-10).map(msg => ({
+        // Prepare context from recent messages (limited for cost optimization)
+        const context = messages.slice(-5).map(msg => ({
           role: msg.role,
-          content: msg.content,
+          content: msg.content.length > 200 ? msg.content.substring(0, 200) + '...' : msg.content,
           timestamp: msg.timestamp
         }));
 
-        // Enhance query with SMA results if available
-        let enhancedQuery = userMessage.content;
-        if (smaResults && smaResults.results?.length > 0) {
-          const smaContext = smaResults.results.slice(0, 3).map(result =>
-            `${result.title}: ${result.content || result.summary || ''}`
-          ).join('\n');
+        // Smart context truncation for cost optimization
+        const truncatedQuery = correctedInput.length > 500
+          ? correctedInput.substring(0, 500) + '...'
+          : correctedInput;
 
-          enhancedQuery = `${userMessage.content}\n\nRecent information from ENIAD/UMP websites:\n${smaContext}`;
-          console.log('🔍 Enhanced query with SMA context');
-        }
+        console.log('💰 Cost optimization applied:', {
+          originalQueryLength: correctedInput.length,
+          truncatedQueryLength: truncatedQuery.length,
+          contextMessages: context.length,
+          smaResultsCount: smaResults?.results?.length || 0
+        });
 
         // Query your custom Llama3 model
         const ragResponse = await ragApiService.query({
-          query: userMessage.content, // Use original query, not enhanced
+          query: truncatedQuery, // Use truncated query for cost optimization
           language: currentLanguage,
           userId: user?.uid,
           context,
           options: {
             chatId: currentChatId,
-            smaResults: smaResults // Pass SMA results to the model
+            smaResults: smaResults // Pass translated SMA results to the model
           }
         });
 

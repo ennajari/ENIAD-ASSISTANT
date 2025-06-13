@@ -29,7 +29,10 @@ const ChatInput = ({
   onToggleRecording = () => {},
   browserSupportsSpeechRecognition = false,
   onResearch = () => {},
-  isResearchMode = false
+  isResearchMode = false,
+  isSMALoading = false,
+  isSMACompleted = false,
+  smaStatusMessage = ''
 }) => {
   const t = (key) => translations[currentLanguage]?.[key] || translations.en[key] || key;
 
@@ -190,6 +193,9 @@ const ChatInput = ({
                     currentLanguage={currentLanguage}
                     darkMode={darkMode}
                     isActive={isResearchMode}
+                    isLoading={isSMALoading}
+                    isCompleted={isSMACompleted}
+                    statusMessage={smaStatusMessage}
                     size="small"
                   />
 
