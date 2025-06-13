@@ -357,19 +357,77 @@ export const createChatHandlers = (
 
       if (currentChatId === chatId) {
         if (updatedHistory.length > 0) {
+          // Load the first available chat
           const firstChat = updatedHistory[0];
           setCurrentChatId(firstChat.id);
           localStorage.setItem('currentChatId', firstChat.id);
           setMessages(firstChat.messages);
         } else {
+          // No conversations left - create a fresh new chat
+          console.log('🗑️ Last conversation deleted, creating fresh chat');
+
+          // Clear current state
           setCurrentChatId(null);
           localStorage.removeItem('currentChatId');
           setMessages([]);
-          handleNewChat();
+          setInputValue('');
+          setEditingMessageId(null);
+          setEditedMessageContent('');
+
+          // Create a new chat immediately
+          const newChatId = Date.now().toString();
+          const newChat = {
+            id: newChatId,
+            title: t('newConversation'),
+            messages: [],
+            lastUpdated: new Date().toISOString()
+          };
+
+          // Set the new chat as current
+          setCurrentChatId(newChatId);
+          localStorage.setItem('currentChatId', newChatId);
+
+          // Add to conversation history
+          setConversationHistory([newChat]);
+          localStorage.setItem('conversationHistory', JSON.stringify([newChat]));
+
+          // Close mobile menu if open
+          setMobileOpen(false);
+
+          // Refresh static suggestions for new conversation
+          staticSuggestionsService.forceRefresh();
+          console.log('🔄 Static suggestions refreshed for new conversation after delete');
+
+          // Trigger UI refresh for suggestion cards
+          if (setSuggestionsRefreshTrigger) {
+            setSuggestionsRefreshTrigger(prev => prev + 1);
+          }
+
+          // Focus input after a short delay
+          setTimeout(() => {
+            document.querySelector('.chat-input input')?.focus();
+          }, 100);
         }
       }
     } catch (error) {
-      console.error('Error deleting chat:', error);
+      console.error('❌ Error deleting chat:', error);
+
+      // Fallback: ensure we have at least one conversation
+      if (conversationHistory.length === 0) {
+        console.log('🔄 Fallback: Creating emergency conversation');
+        const emergencyChat = {
+          id: Date.now().toString(),
+          title: t('newConversation'),
+          messages: [],
+          lastUpdated: new Date().toISOString()
+        };
+
+        setConversationHistory([emergencyChat]);
+        setCurrentChatId(emergencyChat.id);
+        setMessages([]);
+        localStorage.setItem('conversationHistory', JSON.stringify([emergencyChat]));
+        localStorage.setItem('currentChatId', emergencyChat.id);
+      }
     }
   };
 
