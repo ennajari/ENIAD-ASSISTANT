@@ -221,8 +221,8 @@ const ChatContent = ({
               {t('startPrompt')}
             </Typography>
 
-            <Box sx={{ width: '100%', maxWidth: 'md' }}>
-              <Grid container spacing={2} justifyContent="center">
+            <Box sx={{ width: '100%', maxWidth: 'lg', px: { xs: 2, sm: 3 } }}>
+              <Grid container spacing={{ xs: 2, sm: 3, md: 3 }} justifyContent="center" alignItems="stretch">
                 {(() => {
                   // Determine which suggestions to use
                   let suggestionsToShow = [];
@@ -249,25 +249,36 @@ const ChatContent = ({
                         elevation={0}
                         onClick={() => onQuestionClick(question)}
                         sx={{
-                          p: 2,
-                          borderRadius: '12px',
+                          p: { xs: 2.5, sm: 3 }, // Increased padding
+                          borderRadius: '16px', // More rounded corners
                           border: `1px solid ${darkMode ? '#2d3748' : '#e2e8f0'}`,
                           cursor: 'pointer',
-                          transition: 'all 0.2s',
-                          height: '100%',
+                          transition: 'all 0.3s ease',
+                          minHeight: { xs: 80, sm: 90, md: 100 }, // Minimum height to accommodate text
+                          height: 'auto', // Allow height to grow with content
                           display: 'flex',
                           alignItems: 'center',
+                          justifyContent: 'center',
+                          backgroundColor: darkMode ? '#1a202c' : '#ffffff',
                           '&:hover': {
                             borderColor: darkMode ? '#4a5568' : '#cbd5e0',
-                            transform: 'translateY(-2px)',
-                            boxShadow: '0 4px 6px rgba(0,0,0,0.05)'
+                            transform: 'translateY(-3px)',
+                            boxShadow: darkMode
+                              ? '0 8px 25px rgba(0,0,0,0.3)'
+                              : '0 8px 25px rgba(0,0,0,0.1)',
+                            backgroundColor: darkMode ? '#2d3748' : '#f7fafc'
                           }
                         }}
                       >
                         <Typography sx={{
-                          fontSize: '0.95rem',
-                          lineHeight: 1.4,
-                          textAlign: currentLanguage === 'ar' ? 'right' : 'left'
+                          fontSize: { xs: '0.9rem', sm: '0.95rem', md: '1rem' }, // Responsive font size
+                          lineHeight: 1.5, // Better line height for readability
+                          textAlign: 'center', // Center align for better appearance
+                          fontWeight: 500,
+                          color: darkMode ? '#e2e8f0' : '#2d3748',
+                          wordBreak: 'break-word', // Handle long words
+                          hyphens: 'auto', // Enable hyphenation
+                          padding: '4px 0', // Small vertical padding
                         }}>
                           {question || 'Loading...'}
                         </Typography>

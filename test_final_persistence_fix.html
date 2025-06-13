@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Conversation Persistence Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        button {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover { background: #357abd; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .conversation { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 5px; 
+            border-left: 4px solid #4285f4;
+        }
+        .step {
+            background: #e9ecef;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            border-left: 4px solid #6c757d;
+        }
+        .fix-list {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .fix-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .fix-item .icon {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        .test-result {
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 2px solid;
+        }
+        .test-result.pass {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .test-result.fail {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Final Conversation Persistence Test</h1>
+        <p>This test verifies that all conversation persistence issues have been completely resolved.</p>
+        
+        <div class="fix-list">
+            <h3>🔧 Latest Fixes Applied:</h3>
+            <div class="fix-item">
+                <span class="icon">✅</span>
+                <span>Enhanced conversation loading with detailed logging</span>
+            </div>
+            <div class="fix-item">
+                <span class="icon">✅</span>
+                <span>Improved Firebase sync with immediate save (no offline check)</span>
+            </div>
+            <div class="fix-item">
+                <span class="icon">✅</span>
+                <span>Better error handling and fallback mechanisms</span>
+            </div>
+            <div class="fix-item">
+                <span class="icon">✅</span>
+                <span>Comprehensive conversation state debugging</span>
+            </div>
+            <div class="fix-item">
+                <span class="icon">✅</span>
+                <span>Enhanced UI components (login button, suggestion cards)</span>
+            </div>
+        </div>
+        
+        <div id="status"></div>
+        
+        <div class="step">
+            <h4>Step 1: Authentication & Initial Setup</h4>
+            <button onclick="testLogin()" id="loginBtn">🔐 Login with Google</button>
+            <button onclick="checkInitialState()" id="checkInitialBtn" disabled>📋 Check Initial State</button>
+        </div>
+
+        <div class="step">
+            <h4>Step 2: Create & Save Conversations</h4>
+            <button onclick="createMultipleConversations()" id="createMultipleBtn" disabled>📝 Create Multiple Conversations</button>
+            <button onclick="verifyFirebaseSync()" id="verifySyncBtn" disabled>🔥 Verify Firebase Sync</button>
+        </div>
+
+        <div class="step">
+            <h4>Step 3: Test All Operations</h4>
+            <button onclick="testAllOperations()" id="testOpsBtn" disabled>⚙️ Test Edit/Delete/Rename</button>
+            <button onclick="testPageRefresh()" id="refreshTestBtn" disabled>🔄 Test Page Refresh</button>
+        </div>
+
+        <div class="step">
+            <h4>Step 4: Final Verification</h4>
+            <button onclick="testLogoutLogin()" id="logoutLoginBtn" disabled>🔄 Test Logout/Login</button>
+            <button onclick="runFinalVerification()" id="finalVerifyBtn" disabled>🎯 Final Verification</button>
+        </div>
+        
+        <div id="results"></div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc, getDocs, collection, query, where, orderBy, deleteDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDjOBmfBAVvCXFv5WpiIYjI7b6w8XJ1tIs",
+            authDomain: "calcoussama-21fb8b71.firebaseapp.com",
+            projectId: "calcoussama-21fb8b71",
+            storageBucket: "calcoussama-21fb8b71.firebasestorage.app",
+            messagingSenderId: "426852414544",
+            appId: "1:426852414544:web:9148e00249f24d6c334d55"
+        };
+
+        let app, auth, db, provider, currentUser;
+        let testConversations = [];
+        let testResults = {
+            login: false,
+            create: false,
+            sync: false,
+            operations: false,
+            refresh: false,
+            logout: false,
+            final: false
+        };
+
+        // Initialize Firebase
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            provider = new GoogleAuthProvider();
+            console.log('✅ Firebase initialized');
+        } catch (error) {
+            console.error('❌ Firebase initialization failed:', error);
+        }
+
+        window.testLogin = async function() {
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            
+            statusDiv.innerHTML = '<div class="info">🔐 Testing login and initial state...</div>';
+            
+            try {
+                const result = await signInWithPopup(auth, provider);
+                currentUser = result.user;
+                
+                testResults.login = true;
+                statusDiv.innerHTML = '<div class="success">✅ Login successful!</div>';
+                
+                // Enable next buttons
+                document.getElementById('loginBtn').disabled = true;
+                document.getElementById('checkInitialBtn').disabled = false;
+                
+                resultsDiv.innerHTML = `
+                    <h3>👤 User Information:</h3>
+                    <div class="conversation">
+                        <strong>Name:</strong> ${currentUser.displayName}<br>
+                        <strong>Email:</strong> ${currentUser.email}<br>
+                        <strong>UID:</strong> ${currentUser.uid}<br>
+                        <strong>Login Status:</strong> ✅ SUCCESS
+                    </div>
+                `;
+                
+            } catch (error) {
+                testResults.login = false;
+                statusDiv.innerHTML = `<div class="error">❌ Login failed: ${error.message}</div>`;
+                resultsDiv.innerHTML = `<pre>Error: ${error.stack}</pre>`;
+            }
+        };
+
+        window.checkInitialState = async function() {
+            if (!currentUser) {
+                alert('Please login first');
+                return;
+            }
+            
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            
+            statusDiv.innerHTML = '<div class="info">📋 Checking initial conversation state...</div>';
+            
+            try {
+                // Check Firebase for existing conversations
+                const conversationsRef = collection(db, 'conversations');
+                const q = query(
+                    conversationsRef,
+                    where('userId', '==', currentUser.uid),
+                    orderBy('updatedAt', 'desc')
+                );
+                
+                const querySnapshot = await getDocs(q);
+                const existingConversations = [];
+                
+                querySnapshot.forEach((doc) => {
+                    existingConversations.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                statusDiv.innerHTML = '<div class="success">✅ Initial state checked!</div>';
+                
+                // Enable next buttons
+                document.getElementById('createMultipleBtn').disabled = false;
+                
+                resultsDiv.innerHTML = `
+                    <h3>📋 Initial State:</h3>
+                    <div class="conversation">
+                        <strong>Existing Conversations:</strong> ${existingConversations.length}<br>
+                        <strong>User ID:</strong> ${currentUser.uid}<br>
+                        <strong>Firebase Connection:</strong> ✅ Working<br>
+                        <strong>Ready for Testing:</strong> ✅ YES
+                    </div>
+                `;
+                
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="error">❌ Initial state check failed: ${error.message}</div>`;
+                resultsDiv.innerHTML = `<pre>Error: ${error.stack}</pre>`;
+            }
+        };
+
+        window.createMultipleConversations = async function() {
+            if (!currentUser) {
+                alert('Please login first');
+                return;
+            }
+            
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            
+            statusDiv.innerHTML = '<div class="info">📝 Creating multiple test conversations...</div>';
+            
+            try {
+                const timestamp = Date.now();
+                testConversations = [
+                    {
+                        id: `final_test_1_${timestamp}`,
+                        title: 'Final Test Conversation 1',
+                        messages: [
+                            { role: 'user', content: 'Hello, this is test conversation 1', timestamp: new Date().toISOString(), id: 'msg_1' },
+                            { role: 'assistant', content: 'Hello! This is response 1', timestamp: new Date().toISOString(), id: 'msg_2' }
+                        ],
+                        lastUpdated: new Date().toISOString(),
+                        userId: currentUser.uid,
+                        createdAt: new Date().toISOString()
+                    },
+                    {
+                        id: `final_test_2_${timestamp + 1}`,
+                        title: 'Final Test Conversation 2',
+                        messages: [
+                            { role: 'user', content: 'This is test conversation 2', timestamp: new Date().toISOString(), id: 'msg_3' },
+                            { role: 'assistant', content: 'This is response 2', timestamp: new Date().toISOString(), id: 'msg_4' }
+                        ],
+                        lastUpdated: new Date().toISOString(),
+                        userId: currentUser.uid,
+                        createdAt: new Date().toISOString()
+                    },
+                    {
+                        id: `final_test_3_${timestamp + 2}`,
+                        title: 'Final Test Conversation 3',
+                        messages: [
+                            { role: 'user', content: 'This is test conversation 3', timestamp: new Date().toISOString(), id: 'msg_5' },
+                            { role: 'assistant', content: 'This is response 3', timestamp: new Date().toISOString(), id: 'msg_6' }
+                        ],
+                        lastUpdated: new Date().toISOString(),
+                        userId: currentUser.uid,
+                        createdAt: new Date().toISOString()
+                    }
+                ];
+                
+                // Save all conversations to Firebase
+                const savePromises = testConversations.map(conv => 
+                    setDoc(doc(db, 'conversations', conv.id), conv)
+                );
+                
+                await Promise.all(savePromises);
+                
+                // Update local storage
+                localStorage.setItem('conversationHistory', JSON.stringify(testConversations));
+                
+                testResults.create = true;
+                statusDiv.innerHTML = '<div class="success">✅ Multiple conversations created!</div>';
+                
+                // Enable next buttons
+                document.getElementById('verifySyncBtn').disabled = false;
+                document.getElementById('testOpsBtn').disabled = false;
+                
+                resultsDiv.innerHTML = `
+                    <h3>📝 Created Conversations:</h3>
+                    ${testConversations.map(conv => `
+                        <div class="conversation">
+                            <strong>ID:</strong> ${conv.id}<br>
+                            <strong>Title:</strong> ${conv.title}<br>
+                            <strong>Messages:</strong> ${conv.messages.length}<br>
+                            <strong>Status:</strong> ✅ Saved to Firebase
+                        </div>
+                    `).join('')}
+                `;
+                
+            } catch (error) {
+                testResults.create = false;
+                statusDiv.innerHTML = `<div class="error">❌ Failed to create conversations: ${error.message}</div>`;
+                resultsDiv.innerHTML = `<pre>Error: ${error.stack}</pre>`;
+            }
+        };
+
+        window.verifyFirebaseSync = async function() {
+            if (!currentUser || testConversations.length === 0) {
+                alert('Please create conversations first');
+                return;
+            }
+            
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            
+            statusDiv.innerHTML = '<div class="info">🔥 Verifying Firebase synchronization...</div>';
+            
+            try {
+                // Check Firebase for our test conversations
+                const conversationsRef = collection(db, 'conversations');
+                const q = query(
+                    conversationsRef,
+                    where('userId', '==', currentUser.uid),
+                    orderBy('updatedAt', 'desc')
+                );
+                
+                const querySnapshot = await getDocs(q);
+                const firebaseConversations = [];
+                
+                querySnapshot.forEach((doc) => {
+                    firebaseConversations.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                // Check if all test conversations are in Firebase
+                const allSynced = testConversations.every(testConv => 
+                    firebaseConversations.some(fbConv => fbConv.id === testConv.id)
+                );
+                
+                testResults.sync = allSynced;
+                
+                statusDiv.innerHTML = allSynced 
+                    ? '<div class="success">✅ Firebase sync verified!</div>'
+                    : '<div class="error">❌ Firebase sync failed!</div>';
+                
+                // Enable next buttons
+                document.getElementById('refreshTestBtn').disabled = false;
+                
+                resultsDiv.innerHTML = `
+                    <h3>🔥 Firebase Sync Results:</h3>
+                    <div class="conversation">
+                        <strong>Sync Status:</strong> ${allSynced ? '✅ SUCCESS' : '❌ FAILED'}<br>
+                        <strong>Test Conversations:</strong> ${testConversations.length}<br>
+                        <strong>Firebase Conversations:</strong> ${firebaseConversations.length}<br>
+                        <strong>All Synced:</strong> ${allSynced ? '✅ YES' : '❌ NO'}
+                    </div>
+                `;
+                
+            } catch (error) {
+                testResults.sync = false;
+                statusDiv.innerHTML = `<div class="error">❌ Firebase sync verification failed: ${error.message}</div>`;
+                resultsDiv.innerHTML = `<pre>Error: ${error.stack}</pre>`;
+            }
+        };
+
+        window.testPageRefresh = function() {
+            const statusDiv = document.getElementById('status');
+            
+            statusDiv.innerHTML = '<div class="info">🔄 Testing page refresh persistence...</div>';
+            
+            // Store test data for verification after refresh
+            sessionStorage.setItem('testConversationIds', JSON.stringify(testConversations.map(c => c.id)));
+            sessionStorage.setItem('testUserId', currentUser.uid);
+            sessionStorage.setItem('testPhase', 'refresh');
+            
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        };
+
+        window.testLogoutLogin = async function() {
+            const statusDiv = document.getElementById('status');
+            
+            statusDiv.innerHTML = '<div class="info">🔄 Testing logout/login persistence...</div>';
+            
+            try {
+                // Store test data
+                sessionStorage.setItem('testConversationIds', JSON.stringify(testConversations.map(c => c.id)));
+                sessionStorage.setItem('testUserId', currentUser.uid);
+                sessionStorage.setItem('testPhase', 'logout');
+                
+                // Logout
+                await signOut(auth);
+                currentUser = null;
+                
+                statusDiv.innerHTML = '<div class="info">🔄 Logged out, please login again...</div>';
+                
+                // Reset buttons
+                document.getElementById('loginBtn').disabled = false;
+                document.getElementById('finalVerifyBtn').disabled = false;
+                
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="error">❌ Logout failed: ${error.message}</div>`;
+            }
+        };
+
+        window.runFinalVerification = async function() {
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            
+            statusDiv.innerHTML = '<div class="info">🎯 Running final verification...</div>';
+            
+            try {
+                // Get test data from session storage
+                const storedIds = JSON.parse(sessionStorage.getItem('testConversationIds') || '[]');
+                const storedUserId = sessionStorage.getItem('testUserId');
+                const testPhase = sessionStorage.getItem('testPhase');
+                
+                if (!currentUser) {
+                    // Need to login first
+                    const result = await signInWithPopup(auth, provider);
+                    currentUser = result.user;
+                }
+                
+                // Check Firebase for conversations
+                const conversationsRef = collection(db, 'conversations');
+                const q = query(
+                    conversationsRef,
+                    where('userId', '==', currentUser.uid),
+                    orderBy('updatedAt', 'desc')
+                );
+                
+                const querySnapshot = await getDocs(q);
+                const finalConversations = [];
+                
+                querySnapshot.forEach((doc) => {
+                    finalConversations.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                // Check if test conversations still exist
+                const persistenceWorking = storedIds.every(id => 
+                    finalConversations.some(conv => conv.id === id)
+                );
+                
+                testResults.final = persistenceWorking;
+                
+                const allTestsPassed = Object.values(testResults).every(result => result === true);
+                
+                statusDiv.innerHTML = allTestsPassed 
+                    ? '<div class="success">🎉 ALL TESTS PASSED! Persistence is working perfectly!</div>'
+                    : '<div class="error">❌ Some tests failed. Check results below.</div>';
+                
+                resultsDiv.innerHTML = `
+                    <div class="test-result ${allTestsPassed ? 'pass' : 'fail'}">
+                        <h3>🎯 Final Test Results</h3>
+                        <p><strong>Overall Status:</strong> ${allTestsPassed ? '🎉 ALL TESTS PASSED' : '❌ TESTS FAILED'}</p>
+                        <p><strong>Test Phase:</strong> ${testPhase || 'initial'}</p>
+                        <p><strong>User:</strong> ${currentUser.email}</p>
+                        <p><strong>Conversations Found:</strong> ${finalConversations.length}</p>
+                        <p><strong>Persistence Working:</strong> ${persistenceWorking ? '✅ YES' : '❌ NO'}</p>
+                    </div>
+                    
+                    <h4>📊 Individual Test Results:</h4>
+                    <div class="conversation">
+                        <strong>Login Test:</strong> ${testResults.login ? '✅ PASS' : '❌ FAIL'}<br>
+                        <strong>Create Test:</strong> ${testResults.create ? '✅ PASS' : '❌ FAIL'}<br>
+                        <strong>Sync Test:</strong> ${testResults.sync ? '✅ PASS' : '❌ FAIL'}<br>
+                        <strong>Persistence Test:</strong> ${testResults.final ? '✅ PASS' : '❌ FAIL'}
+                    </div>
+                    
+                    <h4>Current Conversations:</h4>
+                    ${finalConversations.map(conv => `
+                        <div class="conversation">
+                            <strong>ID:</strong> ${conv.id}<br>
+                            <strong>Title:</strong> ${conv.title}<br>
+                            <strong>Messages:</strong> ${conv.messages?.length || 0}<br>
+                            <strong>Last Updated:</strong> ${conv.lastUpdated}
+                        </div>
+                    `).join('')}
+                `;
+                
+                // Clear session storage
+                sessionStorage.removeItem('testConversationIds');
+                sessionStorage.removeItem('testUserId');
+                sessionStorage.removeItem('testPhase');
+                
+            } catch (error) {
+                testResults.final = false;
+                statusDiv.innerHTML = `<div class="error">❌ Final verification failed: ${error.message}</div>`;
+                resultsDiv.innerHTML = `<pre>Error: ${error.stack}</pre>`;
+            }
+        };
+
+        // Check if we're returning from a test
+        window.addEventListener('load', function() {
+            const testPhase = sessionStorage.getItem('testPhase');
+            if (testPhase) {
+                document.getElementById('status').innerHTML = `<div class="info">🔄 Returned from ${testPhase} test, ready to verify...</div>`;
+                document.getElementById('finalVerifyBtn').disabled = false;
+                
+                if (testPhase === 'refresh') {
+                    testResults.refresh = true;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

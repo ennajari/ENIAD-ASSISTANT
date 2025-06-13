@@ -287,9 +287,10 @@ export default function Login() {
             elevation={6}
             className={lang === 'ar' ? 'login-container' : ''}
             sx={{
-              p: 5,
+              p: { xs: 4, sm: 5, md: 6 }, // Responsive padding
               width: '100%',
-              maxWidth: 450,
+              maxWidth: { xs: 400, sm: 500, md: 550 }, // Responsive max width
+              minWidth: 350, // Minimum width to ensure text fits
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -436,30 +437,38 @@ export default function Login() {
               fullWidth
               disabled={loading}
               sx={{
-                height: 48,
+                minHeight: 56, // Increased height
+                height: 'auto', // Allow height to grow with content
                 backgroundColor: '#4285f4',
                 color: 'white',
                 fontWeight: 600,
-                fontSize: '1rem',
+                fontSize: { xs: '0.9rem', sm: '1rem' }, // Responsive font size
                 borderRadius: 2,
-                letterSpacing: 0.5,
+                letterSpacing: 0.3,
                 display: 'flex',
                 flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
                 justifyContent: 'center',
                 alignItems: 'center',
                 border: 'none',
                 textAlign: 'center',
+                padding: '12px 16px', // Increased padding
+                whiteSpace: 'normal', // Allow text wrapping
+                lineHeight: 1.3,
                 '& .MuiButton-startIcon': {
                   marginLeft: direction === 'rtl' ? 8 : 0,
                   marginRight: direction === 'rtl' ? 0 : 8,
+                  flexShrink: 0, // Prevent icon from shrinking
                 },
                 '& .MuiButton-endIcon': {
                   marginLeft: direction === 'rtl' ? 0 : 8,
                   marginRight: direction === 'rtl' ? 8 : 0,
+                  flexShrink: 0, // Prevent icon from shrinking
                 },
                 '&:hover': {
                   backgroundColor: '#357abd',
                   border: 'none',
+                  transform: 'translateY(-1px)',
+                  boxShadow: '0 4px 12px rgba(66, 133, 244, 0.3)',
                 }
               }}
             >

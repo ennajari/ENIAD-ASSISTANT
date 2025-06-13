@@ -269,22 +269,27 @@ class ConversationStateManager {
         return newHistory;
       });
 
-      // Sync with Firebase if user is logged in
+      // Sync with Firebase if user is logged in (IMMEDIATE SYNC - NO OFFLINE CHECK)
       if (this.currentUser?.uid && completeConversation) {
-        if (this.isOnline) {
-          try {
-            await firebaseStorageService.saveConversation(this.currentUser.uid, completeConversation);
-            console.log('✅ Conversation saved to Firebase:', conversationId);
-          } catch (firebaseError) {
-            console.error('❌ Firebase save failed, adding to pending operations:', firebaseError);
-            this.addPendingOperation('update', completeConversation);
-          }
-        } else {
-          console.log('📴 Offline - adding to pending operations:', conversationId);
+        try {
+          console.log('🔥 Syncing conversation to Firebase immediately:', conversationId);
+          await firebaseStorageService.saveConversation(this.currentUser.uid, completeConversation);
+          console.log('✅ Conversation synced to Firebase successfully:', conversationId);
+        } catch (firebaseError) {
+          console.error('❌ Firebase sync failed:', firebaseError);
+          console.error('Firebase error details:', {
+            code: firebaseError.code,
+            message: firebaseError.message,
+            conversationId: conversationId,
+            userId: this.currentUser.uid
+          });
+          // Still add to pending operations for retry
           this.addPendingOperation('update', completeConversation);
         }
       } else if (!this.currentUser?.uid) {
         console.log('👤 No user logged in - conversation saved locally only');
+      } else {
+        console.log('❌ Missing conversation data for Firebase sync');
       }
 
       return true;
@@ -308,19 +313,27 @@ class ConversationStateManager {
 
       console.log('📥 Loading conversations from Firebase for user:', this.currentUser.email);
 
-      // Get local conversations for potential sync
-      const localConversations = JSON.parse(localStorage.getItem('conversationHistory') || '[]');
+      // Always get fresh data from Firebase first
+      console.log('🔥 Fetching conversations from Firebase for user:', this.currentUser.uid);
+      const firebaseConversations = await firebaseStorageService.getUserConversations(this.currentUser.uid);
+      console.log(`🔥 Retrieved ${firebaseConversations.length} conversations from Firebase`);
 
-      // Sync with Firebase (Firebase is source of truth)
-      const firebaseConversations = await firebaseStorageService.syncConversations(
-        this.currentUser.uid,
-        localConversations
-      );
+      // Log conversation details for debugging
+      firebaseConversations.forEach((conv, index) => {
+        console.log(`📄 Conversation ${index + 1}:`, {
+          id: conv.id,
+          title: conv.title,
+          messageCount: conv.messages?.length || 0,
+          lastUpdated: conv.lastUpdated,
+          userId: conv.userId
+        });
+      });
 
-      // Update local state with Firebase data
+      // Update local state and storage with Firebase data (Firebase is source of truth)
       setConversationHistory(firebaseConversations);
+      localStorage.setItem('conversationHistory', JSON.stringify(firebaseConversations));
 
-      console.log(`✅ Loaded ${firebaseConversations.length} conversations from Firebase`);
+      console.log(`✅ Loaded ${firebaseConversations.length} conversations from Firebase and updated local storage`);
 
       // If no conversations exist, we'll let the App.jsx create a new one
       if (firebaseConversations.length === 0) {
@@ -333,30 +346,40 @@ class ConversationStateManager {
       console.error('❌ Error loading conversations:', error);
 
       if (this.currentUser?.uid) {
-        // If user is logged in but Firebase failed, try to get their conversations directly
-        try {
-          const directConversations = await firebaseStorageService.getUserConversations(this.currentUser.uid);
-          setConversationHistory(directConversations);
-          localStorage.setItem('conversationHistory', JSON.stringify(directConversations));
-          console.log(`🔄 Fallback: Loaded ${directConversations.length} conversations directly from Firebase`);
-          return directConversations;
-        } catch (directError) {
-          console.error('❌ Direct Firebase load also failed:', directError);
-        }
-      }
+        // If Firebase failed, try local storage as fallback but warn user
+        const localConversations = JSON.parse(localStorage.getItem('conversationHistory') || '[]');
+        const userConversations = localConversations.filter(conv => conv.userId === this.currentUser.uid);
 
-      // Final fallback - clear everything for logged in users, keep local for anonymous
-      if (this.currentUser?.uid) {
-        console.log('🧹 Clearing conversations due to Firebase errors for logged-in user');
-        setConversationHistory([]);
-        localStorage.removeItem('conversationHistory');
-        return [];
+        setConversationHistory(userConversations);
+        console.log(`🔄 Fallback: Using ${userConversations.length} local conversations for user`);
+
+        // Try to sync local conversations to Firebase in background
+        if (userConversations.length > 0) {
+          this.syncLocalToFirebase(userConversations);
+        }
+
+        return userConversations;
       } else {
         // For anonymous users, keep local conversations
         const localConversations = JSON.parse(localStorage.getItem('conversationHistory') || '[]');
         setConversationHistory(localConversations);
         return localConversations;
       }
+    }
+  }
+
+  /**
+   * Sync local conversations to Firebase in background
+   */
+  async syncLocalToFirebase(localConversations) {
+    try {
+      console.log('🔄 Syncing local conversations to Firebase...');
+      for (const conversation of localConversations) {
+        await firebaseStorageService.saveConversation(this.currentUser.uid, conversation);
+      }
+      console.log('✅ Local conversations synced to Firebase');
+    } catch (error) {
+      console.error('❌ Failed to sync local conversations to Firebase:', error);
     }
   }
 
