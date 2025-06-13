@@ -204,8 +204,9 @@ const ChatHeader = ({
                   mt: 1.5,
                   minWidth: 200,
                   borderRadius: 2,
-                  bgcolor: darkMode ? '#2d3748' : '#ffffff',
-                  border: `1px solid ${darkMode ? '#4a5568' : '#e2e8f0'}`,
+                  bgcolor: darkMode ? 'rgba(45, 55, 72, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+                  backdropFilter: 'blur(20px)',
+                  border: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
                   '&:before': {
                     content: '""',
                     display: 'block',
@@ -215,8 +216,8 @@ const ChatHeader = ({
                     left: currentLanguage === 'ar' ? 14 : 'auto',
                     width: 10,
                     height: 10,
-                    bgcolor: darkMode ? '#2d3748' : '#ffffff',
-                    border: `1px solid ${darkMode ? '#4a5568' : '#e2e8f0'}`,
+                    bgcolor: darkMode ? 'rgba(45, 55, 72, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+                    border: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
                     borderRight: 'none',
                     borderBottom: 'none',
                     transform: 'translateY(-50%) rotate(45deg)',
@@ -234,37 +235,71 @@ const ChatHeader = ({
               }}
             >
               {/* User Info */}
-              <Box sx={{ px: 2, py: 1.5, borderBottom: `1px solid ${darkMode ? '#4a5568' : '#e2e8f0'}` }}>
+              <Box sx={{ px: 2, py: 1.5, borderBottom: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}>
                 <Typography variant="subtitle2" sx={{ fontWeight: 600, color: darkMode ? '#ffffff' : '#1a202c' }}>
                   {user.displayName || 'User'}
                 </Typography>
-                <Typography variant="caption" sx={{ color: darkMode ? '#a0aec0' : '#718096' }}>
+                <Typography variant="caption" sx={{ color: darkMode ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)' }}>
                   {user.email}
                 </Typography>
               </Box>
 
               {/* Menu Items */}
-              <MenuItem onClick={handleSettings} sx={{ py: 1.5 }}>
+              <MenuItem
+                onClick={handleSettings}
+                sx={{
+                  py: 1.5,
+                  '&:hover': {
+                    bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'
+                  }
+                }}
+              >
                 <ListItemIcon>
-                  <SettingsIcon fontSize="small" sx={{ color: darkMode ? '#a0aec0' : '#718096' }} />
+                  <SettingsIcon fontSize="small" sx={{ color: darkMode ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)' }} />
                 </ListItemIcon>
-                <ListItemText primary={t('settings')} />
+                <ListItemText
+                  primary={t('settings')}
+                  sx={{ color: darkMode ? '#ffffff' : '#1a202c' }}
+                />
               </MenuItem>
 
-              <MenuItem onClick={() => window.open('https://eniad.ump.ma/fr/contact', '_blank')} sx={{ py: 1.5 }}>
+              <MenuItem
+                onClick={() => window.open('https://eniad.ump.ma/fr/contact', '_blank')}
+                sx={{
+                  py: 1.5,
+                  '&:hover': {
+                    bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'
+                  }
+                }}
+              >
                 <ListItemIcon>
-                  <ContactIcon fontSize="small" sx={{ color: darkMode ? '#a0aec0' : '#718096' }} />
+                  <ContactIcon fontSize="small" sx={{ color: darkMode ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)' }} />
                 </ListItemIcon>
-                <ListItemText primary={t('contact') || 'Contact us'} />
+                <ListItemText
+                  primary={t('contact') || 'Contact us'}
+                  sx={{ color: darkMode ? '#ffffff' : '#1a202c' }}
+                />
               </MenuItem>
 
-              <Divider sx={{ my: 0.5 }} />
+              <Divider sx={{ my: 0.5, borderColor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)' }} />
 
-              <MenuItem onClick={handleLogout} sx={{ py: 1.5, color: '#e53e3e' }}>
+              <MenuItem
+                onClick={handleLogout}
+                sx={{
+                  py: 1.5,
+                  color: '#ef4444',
+                  '&:hover': {
+                    bgcolor: 'rgba(239, 68, 68, 0.1)'
+                  }
+                }}
+              >
                 <ListItemIcon>
-                  <LogoutIcon fontSize="small" sx={{ color: '#e53e3e' }} />
+                  <LogoutIcon fontSize="small" sx={{ color: '#ef4444' }} />
                 </ListItemIcon>
-                <ListItemText primary={t('logout')} />
+                <ListItemText
+                  primary={t('logout')}
+                  sx={{ color: '#ef4444' }}
+                />
               </MenuItem>
             </Menu>
           </>

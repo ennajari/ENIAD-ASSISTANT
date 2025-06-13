@@ -38,6 +38,7 @@ const ChatSidebar = ({
   prefersDarkMode = false,
   conversationHistory = [],
   currentChatId = null,
+  user = null,
   onNewChat = () => {},
   onLoadChat = () => {},
   onChatMenuOpen = () => {},
@@ -301,8 +302,8 @@ const ChatSidebar = ({
         </Tooltip>
       </Box>
 
-      {/* Chat History Section */}
-      {!sidebarCollapsed && (
+      {/* Chat History Section - Only show when user is logged in */}
+      {!sidebarCollapsed && user && (
         <Box sx={{
           px: 2,
           pb: 1,
@@ -383,7 +384,34 @@ const ChatSidebar = ({
         </Box>
       )}
 
-      <Collapse in={showHistory && !sidebarCollapsed}>
+      {/* Login prompt when user is not logged in */}
+      {!sidebarCollapsed && !user && (
+        <Box sx={{
+          px: 2,
+          pb: 1,
+          direction: currentLanguage === 'ar' ? 'rtl' : 'ltr'
+        }}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: darkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.5)',
+              textAlign: 'center',
+              fontStyle: 'italic',
+              py: 2,
+              direction: currentLanguage === 'ar' ? 'rtl' : 'ltr'
+            }}
+          >
+            {currentLanguage === 'ar'
+              ? 'سجل الدخول لحفظ محادثاتك'
+              : currentLanguage === 'fr'
+              ? 'Connectez-vous pour sauvegarder vos conversations'
+              : 'Login to save your conversations'
+            }
+          </Typography>
+        </Box>
+      )}
+
+      <Collapse in={showHistory && !sidebarCollapsed && user}>
         <List sx={{
           overflow: 'auto',
           flex: 1,
