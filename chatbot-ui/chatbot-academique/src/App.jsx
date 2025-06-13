@@ -94,7 +94,7 @@ function App() {
     }
   );
 
-  // Load saved conversations on mount
+  // Load saved conversations on mount and user changes
   useEffect(() => {
     try {
       // Initialize static suggestions on app load
@@ -102,50 +102,63 @@ function App() {
       setSuggestionsRefreshTrigger(prev => prev + 1);
       console.log('🔄 Static suggestions initialized on app load');
 
-      const savedHistory = localStorage.getItem('conversationHistory');
-      const savedCurrentChatId = localStorage.getItem('currentChatId');
+      // Only load conversations if user is logged in
+      if (user) {
+        console.log('👤 User logged in, loading conversations...');
+        const savedHistory = localStorage.getItem('conversationHistory');
+        const savedCurrentChatId = localStorage.getItem('currentChatId');
 
-      if (savedHistory) {
-        const parsedHistory = JSON.parse(savedHistory);
+        if (savedHistory) {
+          const parsedHistory = JSON.parse(savedHistory);
 
-        // Ensure we have valid conversation history
-        if (parsedHistory && Array.isArray(parsedHistory) && parsedHistory.length > 0) {
-          chatState.setConversationHistory(parsedHistory);
+          // Filter conversations for current user (if userId exists)
+          const userConversations = parsedHistory.filter(chat =>
+            !chat.userId || chat.userId === user.uid
+          );
 
-          if (savedCurrentChatId) {
-            chatState.setCurrentChatId(savedCurrentChatId);
-            const currentChat = parsedHistory.find(chat => chat.id === savedCurrentChatId);
-            if (currentChat) {
-              chatState.setMessages(currentChat.messages);
+          // Ensure we have valid conversation history
+          if (userConversations && Array.isArray(userConversations) && userConversations.length > 0) {
+            chatState.setConversationHistory(userConversations);
+
+            if (savedCurrentChatId) {
+              const currentChat = userConversations.find(chat => chat.id === savedCurrentChatId);
+              if (currentChat) {
+                chatState.setCurrentChatId(savedCurrentChatId);
+                chatState.setMessages(currentChat.messages);
+              } else {
+                // Current chat ID not found, load first available chat
+                const firstChat = userConversations[0];
+                chatState.setCurrentChatId(firstChat.id);
+                chatState.setMessages(firstChat.messages);
+                localStorage.setItem('currentChatId', firstChat.id);
+              }
             } else {
-              // Current chat ID not found, load first available chat
-              const firstChat = parsedHistory[0];
+              // No current chat ID, load first available chat
+              const firstChat = userConversations[0];
               chatState.setCurrentChatId(firstChat.id);
               chatState.setMessages(firstChat.messages);
               localStorage.setItem('currentChatId', firstChat.id);
             }
           } else {
-            // No current chat ID, load first available chat
-            const firstChat = parsedHistory[0];
-            chatState.setCurrentChatId(firstChat.id);
-            chatState.setMessages(firstChat.messages);
-            localStorage.setItem('currentChatId', firstChat.id);
+            // No user conversations, create new chat
+            console.log('📝 No user conversations found, creating new chat');
+            chatHandlers.handleNewChat();
           }
         } else {
-          // Invalid or empty history, create new chat
-          console.log('📝 Invalid conversation history, creating new chat');
+          // No saved history, create new chat
+          console.log('📝 No conversation history found, creating new chat');
           chatHandlers.handleNewChat();
         }
       } else {
-        // No saved history, create new chat
-        console.log('📝 No conversation history found, creating new chat');
+        // User not logged in, create anonymous chat
+        console.log('👤 No user logged in, creating anonymous chat');
         chatHandlers.handleNewChat();
       }
     } catch (error) {
       console.error('Error loading saved conversations:', error);
       chatHandlers.handleNewChat();
     }
-  }, []);
+  }, [user]); // Depend on user to reload conversations when login state changes
 
   // Handle transcript changes
   useEffect(() => {
@@ -263,7 +276,19 @@ function App() {
   // Auth handler
   const handleAuthAction = () => {
     if (user) {
-      auth.signOut();
+      // Clear user-specific data on logout
+      chatState.setConversationHistory([]);
+      chatState.setMessages([]);
+      chatState.setCurrentChatId(null);
+      localStorage.removeItem('conversationHistory');
+      localStorage.removeItem('currentChatId');
+
+      // Sign out
+      auth.signOut().then(() => {
+        console.log('✅ User logged out and data cleared');
+        // Create a fresh new chat after logout
+        chatHandlers.handleNewChat();
+      });
     } else {
       navigate('/login');
     }
@@ -343,6 +368,7 @@ function App() {
                 prefersDarkMode={prefersDarkMode}
                 conversationHistory={chatState.conversationHistory}
                 currentChatId={chatState.currentChatId}
+                user={user}
                 onNewChat={chatHandlers.handleNewChat}
                 onLoadChat={chatHandlers.handleLoadChat}
                 onChatMenuOpen={chatHandlers.handleChatMenuOpen}
