@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Connection Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover { background: #357abd; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        pre { background: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 Firebase Connection Test</h1>
+        <p>This page will test your Firebase configuration for the ENIAD AI Assistant.</p>
+        
+        <div id="status"></div>
+        
+        <button onclick="testFirebaseConnection()">Test Firebase Connection</button>
+        <button onclick="testGoogleAuth()" id="authBtn" disabled>Test Google Authentication</button>
+        
+        <div id="results"></div>
+        
+        <h3>📋 Setup Checklist:</h3>
+        <ul>
+            <li>✅ Go to <a href="https://console.firebase.google.com" target="_blank">Firebase Console</a></li>
+            <li>✅ Enable Authentication → Google provider</li>
+            <li>✅ Add <code>localhost</code> to authorized domains</li>
+            <li>✅ Create Firestore database</li>
+            <li>✅ Copy configuration to .env file</li>
+        </ul>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDjOBmfBAVvCXFv5WpiIYjI7b6w8XJ1tIs",
+            authDomain: "calcoussama-21fb8b71.firebaseapp.com",
+            projectId: "calcoussama-21fb8b71",
+            storageBucket: "calcoussama-21fb8b71.firebasestorage.app",
+            messagingSenderId: "426852414544",
+            appId: "1:426852414544:web:9148e00249f24d6c334d55"
+        };
+
+        let app, auth, db, provider;
+
+        window.testFirebaseConnection = function() {
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            
+            statusDiv.innerHTML = '<div class="info">🔍 Testing Firebase connection...</div>';
+            
+            try {
+                // Initialize Firebase
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                provider = new GoogleAuthProvider();
+                
+                statusDiv.innerHTML = '<div class="success">✅ Firebase initialized successfully!</div>';
+                document.getElementById('authBtn').disabled = false;
+                
+                resultsDiv.innerHTML = `
+                    <h3>📊 Firebase Status:</h3>
+                    <pre>
+✅ Firebase App: Initialized
+✅ Authentication: Ready
+✅ Firestore: Ready
+✅ Google Provider: Configured
+
+🔧 Configuration:
+- Project ID: ${firebaseConfig.projectId}
+- Auth Domain: ${firebaseConfig.authDomain}
+- Storage Bucket: ${firebaseConfig.storageBucket}
+                    </pre>
+                `;
+                
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="error">❌ Firebase initialization failed: ${error.message}</div>`;
+                resultsDiv.innerHTML = `
+                    <h3>🚨 Error Details:</h3>
+                    <pre>${error.stack}</pre>
+                    
+                    <h3>🔧 Troubleshooting:</h3>
+                    <ul>
+                        <li>Check if your Firebase project exists</li>
+                        <li>Verify API key is correct</li>
+                        <li>Ensure project ID matches your Firebase project</li>
+                        <li>Check browser console for more details</li>
+                    </ul>
+                `;
+            }
+        };
+
+        window.testGoogleAuth = async function() {
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            
+            if (!auth || !provider) {
+                statusDiv.innerHTML = '<div class="error">❌ Firebase not initialized. Run connection test first.</div>';
+                return;
+            }
+            
+            statusDiv.innerHTML = '<div class="info">🔐 Testing Google authentication...</div>';
+            
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                
+                statusDiv.innerHTML = '<div class="success">✅ Google authentication successful!</div>';
+                
+                // Test Firestore write
+                try {
+                    await setDoc(doc(db, 'test', 'connection'), {
+                        timestamp: new Date(),
+                        user: user.email,
+                        test: 'Firebase connection test'
+                    });
+                    
+                    resultsDiv.innerHTML = `
+                        <h3>🎉 Authentication Success:</h3>
+                        <pre>
+✅ User: ${user.displayName}
+✅ Email: ${user.email}
+✅ UID: ${user.uid}
+✅ Firestore: Write test successful
+
+🔥 Firebase is working correctly!
+You can now use the ENIAD AI Assistant.
+                        </pre>
+                        <button onclick="auth.signOut()">Sign Out</button>
+                    `;
+                    
+                } catch (firestoreError) {
+                    resultsDiv.innerHTML = `
+                        <h3>⚠️ Authentication OK, Firestore Issue:</h3>
+                        <pre>
+✅ User: ${user.displayName}
+✅ Email: ${user.email}
+❌ Firestore Error: ${firestoreError.message}
+
+🔧 Fix: Enable Firestore database in Firebase Console
+                        </pre>
+                    `;
+                }
+                
+            } catch (error) {
+                let errorMessage = error.message;
+                let troubleshooting = '';
+                
+                if (error.code === 'auth/popup-closed-by-user') {
+                    errorMessage = 'Sign-in popup was closed';
+                    troubleshooting = 'Please try again and complete the sign-in process';
+                } else if (error.code === 'auth/popup-blocked') {
+                    errorMessage = 'Sign-in popup was blocked';
+                    troubleshooting = 'Please allow popups for this site and try again';
+                } else if (error.code === 'auth/operation-not-allowed') {
+                    errorMessage = 'Google sign-in not enabled';
+                    troubleshooting = 'Enable Google provider in Firebase Console → Authentication → Sign-in method';
+                } else if (error.code === 'auth/unauthorized-domain') {
+                    errorMessage = 'Domain not authorized';
+                    troubleshooting = 'Add localhost to authorized domains in Firebase Console';
+                }
+                
+                statusDiv.innerHTML = `<div class="error">❌ Authentication failed: ${errorMessage}</div>`;
+                resultsDiv.innerHTML = `
+                    <h3>🚨 Authentication Error:</h3>
+                    <pre>
+Error Code: ${error.code}
+Error Message: ${errorMessage}
+
+🔧 Troubleshooting: ${troubleshooting}
+                    </pre>
+                `;
+            }
+        };
+
+        // Auto-run connection test
+        window.addEventListener('load', () => {
+            setTimeout(testFirebaseConnection, 1000);
+        });
+    </script>
+</body>
+</html>
