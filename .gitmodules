@@ -1,3 +1,15 @@
+# ========================================
+# ENIAD Academic Assistant - Git Submodules
+# ========================================
+
+# 🤖 RAG Project Submodule
+# Advanced Retrieval-Augmented Generation system
+# Maintained by colleague - will be updated when ready
 [submodule "RAG_Project"]
 	path = RAG_Project
 	url = https://github.com/Abdelilah04116/RAG_Project.git
+	branch = main
+	# Fetch strategy: only fetch when explicitly requested
+	update = none
+	# Ignore dirty state in main project status
+	ignore = dirty
