@@ -36,8 +36,9 @@ function App() {
   const { speak, speaking, supported } = useSpeechSynthesis();
   const { t } = useTranslation(currentLanguage);
 
-  // Research mode state
+  // Research mode and SMA state
   const [isResearchMode, setIsResearchMode] = useState(false);
+  const [isSMAActive, setIsSMAActive] = useState(false);
 
   // Suggestions refresh trigger
   const [suggestionsRefreshTrigger, setSuggestionsRefreshTrigger] = useState(0);
@@ -69,7 +70,20 @@ function App() {
   const theme = createAppTheme(darkMode, currentLanguage, drawerOpen);
 
   // Chat handlers
-  const chatHandlers = createChatHandlers(chatState, currentLanguage, t, messagesEndRef, setSuggestionsRefreshTrigger);
+  const chatHandlers = createChatHandlers(
+    chatState,
+    currentLanguage,
+    t,
+    messagesEndRef,
+    setSuggestionsRefreshTrigger,
+    user,
+    {
+      useRAG: true,
+      autoSpeak: false,
+      speechQuality: 'high',
+      isSMAActive: isSMAActive
+    }
+  );
 
   // Load saved conversations on mount
   useEffect(() => {
@@ -84,18 +98,38 @@ function App() {
 
       if (savedHistory) {
         const parsedHistory = JSON.parse(savedHistory);
-        chatState.setConversationHistory(parsedHistory);
 
-        if (savedCurrentChatId) {
-          chatState.setCurrentChatId(savedCurrentChatId);
-          const currentChat = parsedHistory.find(chat => chat.id === savedCurrentChatId);
-          if (currentChat) {
-            chatState.setMessages(currentChat.messages);
+        // Ensure we have valid conversation history
+        if (parsedHistory && Array.isArray(parsedHistory) && parsedHistory.length > 0) {
+          chatState.setConversationHistory(parsedHistory);
+
+          if (savedCurrentChatId) {
+            chatState.setCurrentChatId(savedCurrentChatId);
+            const currentChat = parsedHistory.find(chat => chat.id === savedCurrentChatId);
+            if (currentChat) {
+              chatState.setMessages(currentChat.messages);
+            } else {
+              // Current chat ID not found, load first available chat
+              const firstChat = parsedHistory[0];
+              chatState.setCurrentChatId(firstChat.id);
+              chatState.setMessages(firstChat.messages);
+              localStorage.setItem('currentChatId', firstChat.id);
+            }
+          } else {
+            // No current chat ID, load first available chat
+            const firstChat = parsedHistory[0];
+            chatState.setCurrentChatId(firstChat.id);
+            chatState.setMessages(firstChat.messages);
+            localStorage.setItem('currentChatId', firstChat.id);
           }
         } else {
+          // Invalid or empty history, create new chat
+          console.log('📝 Invalid conversation history, creating new chat');
           chatHandlers.handleNewChat();
         }
       } else {
+        // No saved history, create new chat
+        console.log('📝 No conversation history found, creating new chat');
         chatHandlers.handleNewChat();
       }
     } catch (error) {
@@ -241,6 +275,19 @@ function App() {
       // You can modify the chat behavior here for research mode
     } else {
       console.log('💬 Deactivating research mode - returning to standard chat');
+    }
+  };
+
+  // SMA toggle handler
+  const handleToggleSMA = () => {
+    setIsSMAActive(prev => !prev);
+    console.log('🧠 SMA toggled:', !isSMAActive);
+
+    if (!isSMAActive) {
+      console.log('🧠 Activating SMA - Smart Multi-Agent web intelligence');
+      // SMA is now active and will enhance responses with real-time web data
+    } else {
+      console.log('💬 Deactivating SMA - returning to standard RAG responses');
     }
   };
 
@@ -399,6 +446,8 @@ function App() {
                     onSearch={handleSearch}
                     onResearch={handleResearch}
                     isResearchMode={isResearchMode}
+                    onToggleSMA={handleToggleSMA}
+                    isSMAActive={isSMAActive}
                   />
                 </Box>
               </Box>

@@ -73,6 +73,13 @@ export const translations = {
     indexInfo: "Info de l'index",
     lastCheck: "Dernière vérification",
     ragStatusHelp: "Ceci montre l'état de connexion à votre système RAG_Project. Assurez-vous que votre serveur FastAPI fonctionne sur le point de terminaison configuré.",
+    // SMA System
+    smaActive: "SMA Activé - Intelligence Web en temps réel",
+    smaInactive: "Activer SMA - Surveillance intelligente des sites",
+    smaSearching: "SMA en cours de recherche...",
+    smaEnhanced: "Réponse enrichie par SMA",
+    smaWebIntelligence: "Intelligence Web SMA",
+    smaRealTimeData: "Données en temps réel d'ENIAD et UMP",
   },
   en: {
     newChat: "New Chat",
@@ -137,6 +144,13 @@ export const translations = {
     indexInfo: "Index Info",
     lastCheck: "Last Check",
     ragStatusHelp: "This shows the connection status to your RAG_Project system. Make sure your FastAPI server is running on the configured endpoint.",
+    // SMA System
+    smaActive: "SMA Active - Real-time Web Intelligence",
+    smaInactive: "Activate SMA - Smart Website Monitoring",
+    smaSearching: "SMA searching...",
+    smaEnhanced: "SMA-enhanced response",
+    smaWebIntelligence: "SMA Web Intelligence",
+    smaRealTimeData: "Real-time data from ENIAD and UMP",
   },
   ar: {
     newChat: "محادثة جديدة",
@@ -201,5 +215,12 @@ export const translations = {
     indexInfo: "معلومات الفهرس",
     lastCheck: "آخر فحص",
     ragStatusHelp: "يُظهر هذا حالة الاتصال بنظام RAG_Project الخاص بك. تأكد من تشغيل خادم FastAPI على نقطة النهاية المكونة.",
+    // SMA System
+    smaActive: "Sما نشط - ذكاء الويب في الوقت الفعلي",
+    smaInactive: "تفعيل SMA - مراقبة ذكية للمواقع",
+    smaSearching: "SMA يبحث...",
+    smaEnhanced: "استجابة محسّنة بـ SMA",
+    smaWebIntelligence: "ذكاء الويب SMA",
+    smaRealTimeData: "بيانات في الوقت الفعلي من ENIAD و UMP",
   }
 };
