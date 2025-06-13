@@ -180,17 +180,25 @@ const ChatContent = ({
               px: 2
             }}
           >
-            <Avatar sx={{
-              width: 80,
-              height: 80,
-              mb: 2,
-              bgcolor: 'primary.main',
-              '& .MuiSvgIcon-root': {
-                fontSize: '2.5rem'
-              }
-            }}>
-              <SchoolIcon />
-            </Avatar>
+            <Box
+              component="img"
+              src="/logo.png"
+              alt="ENIAD Logo"
+              sx={{
+                width: 80,
+                height: 80,
+                mb: 2,
+                borderRadius: '50%',
+                objectFit: 'contain',
+                bgcolor: 'rgba(16, 163, 127, 0.1)',
+                p: 1,
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'scale(1.05)',
+                  boxShadow: '0 8px 25px rgba(16, 163, 127, 0.3)',
+                }
+              }}
+            />
             <Typography variant="h5" sx={{ fontWeight: 600, mb: 1 }}>
               {t('assistant')}
             </Typography>
@@ -327,7 +335,16 @@ const ChatContent = ({
                   {msg.role === 'user' ? (
                     <PersonIcon fontSize="small" />
                   ) : (
-                    <SchoolIcon fontSize="small" />
+                    <Box
+                      component="img"
+                      src="/logo.png"
+                      alt="ENIAD"
+                      sx={{
+                        width: 20,
+                        height: 20,
+                        objectFit: 'contain'
+                      }}
+                    />
                   )}
                 </Avatar>
                 <Typography sx={{
@@ -377,11 +394,21 @@ const ChatContent = ({
                   sx={{
                     width: 32,
                     height: 32,
-                    bgcolor: '#6366f1',
+                    bgcolor: 'rgba(16, 163, 127, 0.1)',
                     color: '#fff',
+                    p: 0.5
                   }}
                 >
-                  <SchoolIcon fontSize="small" />
+                  <Box
+                    component="img"
+                    src="/logo.png"
+                    alt="ENIAD"
+                    sx={{
+                      width: 20,
+                      height: 20,
+                      objectFit: 'contain'
+                    }}
+                  />
                 </Avatar>
                 <Typography sx={{
                   fontSize: '14px',

@@ -134,16 +134,24 @@ const ChatSidebar = ({
       }}>
         {!sidebarCollapsed && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Avatar sx={{
-              width: 32,
-              height: 32,
-              bgcolor: '#10a37f',
-              fontSize: '14px',
-              fontWeight: 700,
-              boxShadow: '0 2px 8px rgba(16,163,127,0.3)',
-            }}>
-              <SchoolIcon fontSize="small" />
-            </Avatar>
+            <Box
+              component="img"
+              src="/logo.png"
+              alt="ENIAD Logo"
+              sx={{
+                width: 32,
+                height: 32,
+                borderRadius: '50%',
+                objectFit: 'contain',
+                bgcolor: 'rgba(16, 163, 127, 0.1)',
+                p: 0.5,
+                boxShadow: '0 2px 8px rgba(16,163,127,0.3)',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  transform: 'scale(1.05)',
+                }
+              }}
+            />
             <Typography variant="h6" sx={{
               fontWeight: 700,
               color: darkMode ? '#fff' : 'text.primary',

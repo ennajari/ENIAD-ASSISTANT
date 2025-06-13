@@ -5,7 +5,8 @@ import {
   IconButton,
   Typography,
   Button,
-  Tooltip
+  Tooltip,
+  Box
 } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
 import { DRAWER_WIDTH, LANGUAGES, translations } from '../constants/config';
@@ -71,6 +72,23 @@ const ChatHeader = ({
         >
           <MenuIcon />
         </IconButton>
+
+        {/* ENIAD Logo */}
+        <Box
+          component="img"
+          src="/logo.png"
+          alt="ENIAD Logo"
+          sx={{
+            height: { xs: 32, sm: 40 },
+            width: 'auto',
+            mr: currentLanguage === 'ar' ? 0 : 2,
+            ml: currentLanguage === 'ar' ? 2 : 0,
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              transform: 'scale(1.05)',
+            }
+          }}
+        />
 
         <Typography
           variant="h6"
