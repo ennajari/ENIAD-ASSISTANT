@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Conversation Management Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        button {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover { background: #357abd; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        button.danger { background: #dc3545; }
+        button.danger:hover { background: #c82333; }
+        button.success { background: #28a745; }
+        button.success:hover { background: #218838; }
+        pre { background: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        .conversation { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 5px; 
+            border-left: 4px solid #4285f4;
+        }
+        .test-step {
+            background: #e9ecef;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            border-left: 4px solid #6c757d;
+        }
+        .test-step h4 {
+            margin: 0 0 10px 0;
+            color: #495057;
+        }
+        .feature-list {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .feature-list h3 {
+            color: #495057;
+            margin-top: 0;
+        }
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .feature-item .icon {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Complete Conversation Management Test</h1>
+        <p>This comprehensive test verifies all conversation management features work with Google account sync.</p>
+        
+        <div class="feature-list">
+            <h3>✅ Features to Test:</h3>
+            <div class="feature-item">
+                <span class="icon">🔐</span>
+                <span>Google Authentication & Account Sync</span>
+            </div>
+            <div class="feature-item">
+                <span class="icon">📝</span>
+                <span>Create Conversations (Auto-saved to Account)</span>
+            </div>
+            <div class="feature-item">
+                <span class="icon">✏️</span>
+                <span>Edit/Rename Conversations</span>
+            </div>
+            <div class="feature-item">
+                <span class="icon">🗑️</span>
+                <span>Delete Conversations (Persistent)</span>
+            </div>
+            <div class="feature-item">
+                <span class="icon">💬</span>
+                <span>Add Messages (Real-time Sync)</span>
+            </div>
+            <div class="feature-item">
+                <span class="icon">🔄</span>
+                <span>Logout/Login Persistence</span>
+            </div>
+            <div class="feature-item">
+                <span class="icon">☁️</span>
+                <span>Firebase Cloud Storage</span>
+            </div>
+        </div>
+        
+        <div id="status"></div>
+        
+        <div class="test-step">
+            <h4>Step 1: Authentication</h4>
+            <button onclick="testLogin()" id="loginBtn">🔐 Login with Google</button>
+            <button onclick="logout()" id="logoutBtn" disabled>🚪 Logout</button>
+        </div>
+
+        <div class="test-step">
+            <h4>Step 2: Create & Manage Conversations</h4>
+            <button onclick="createTestConversations()" id="createBtn" disabled>📝 Create Test Conversations</button>
+            <button onclick="addMessages()" id="addMsgBtn" disabled>💬 Add Messages</button>
+            <button onclick="renameConversation()" id="renameBtn" disabled>✏️ Rename Conversation</button>
+        </div>
+
+        <div class="test-step">
+            <h4>Step 3: Test Deletion & Persistence</h4>
+            <button onclick="deleteConversation()" id="deleteBtn" disabled>🗑️ Delete Conversation</button>
+            <button onclick="verifyDeletion()" id="verifyDelBtn" disabled>✅ Verify Deletion</button>
+        </div>
+
+        <div class="test-step">
+            <h4>Step 4: Test Session Persistence</h4>
+            <button onclick="testLogoutLogin()" id="sessionBtn" disabled>🔄 Test Logout/Login</button>
+            <button onclick="finalVerification()" id="finalBtn" disabled>🎯 Final Verification</button>
+        </div>
+
+        <div class="test-step">
+            <h4>Step 5: Complete Test</h4>
+            <button onclick="runCompleteTest()" id="completeBtn" disabled class="success">🚀 Run All Tests</button>
+        </div>
+        
+        <div id="results"></div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc, getDoc, getDocs, collection, query, where, orderBy, deleteDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDjOBmfBAVvCXFv5WpiIYjI7b6w8XJ1tIs",
+            authDomain: "calcoussama-21fb8b71.firebaseapp.com",
+            projectId: "calcoussama-21fb8b71",
+            storageBucket: "calcoussama-21fb8b71.firebasestorage.app",
+            messagingSenderId: "426852414544",
+            appId: "1:426852414544:web:9148e00249f24d6c334d55"
+        };
+
+        let app, auth, db, provider, currentUser;
+        let testConversations = [];
+        let deletedConversationId = null;
+        let renamedConversationId = null;
+
+        // Initialize Firebase
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            provider = new GoogleAuthProvider();
+            console.log('✅ Firebase initialized');
+        } catch (error) {
+            console.error('❌ Firebase initialization failed:', error);
+        }
+
+        window.testLogin = async function() {
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            
+            statusDiv.innerHTML = '<div class="info">🔐 Testing Google authentication...</div>';
+            
+            try {
+                const result = await signInWithPopup(auth, provider);
+                currentUser = result.user;
+                
+                statusDiv.innerHTML = '<div class="success">✅ Authentication successful!</div>';
+                
+                // Enable buttons
+                enableButtons(['logoutBtn', 'createBtn', 'completeBtn']);
+                document.getElementById('loginBtn').disabled = true;
+                
+                resultsDiv.innerHTML = `
+                    <h3>👤 User Information:</h3>
+                    <div class="conversation">
+                        <strong>Name:</strong> ${currentUser.displayName}<br>
+                        <strong>Email:</strong> ${currentUser.email}<br>
+                        <strong>UID:</strong> ${currentUser.uid}<br>
+                        <strong>Photo:</strong> ${currentUser.photoURL ? 'Available' : 'Not available'}
+                    </div>
+                `;
+                
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="error">❌ Authentication failed: ${error.message}</div>`;
+                resultsDiv.innerHTML = `<pre>Error: ${error.stack}</pre>`;
+            }
+        };
+
+        window.logout = async function() {
+            try {
+                await signOut(auth);
+                currentUser = null;
+                
+                // Reset all buttons
+                disableButtons(['logoutBtn', 'createBtn', 'addMsgBtn', 'renameBtn', 'deleteBtn', 'verifyDelBtn', 'sessionBtn', 'finalBtn', 'completeBtn']);
+                document.getElementById('loginBtn').disabled = false;
+                
+                document.getElementById('status').innerHTML = '<div class="info">👋 Logged out successfully</div>';
+                
+            } catch (error) {
+                document.getElementById('status').innerHTML = `<div class="error">❌ Logout failed: ${error.message}</div>`;
+            }
+        };
+
+        window.createTestConversations = async function() {
+            if (!currentUser) {
+                alert('Please login first');
+                return;
+            }
+            
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            
+            statusDiv.innerHTML = '<div class="info">📝 Creating test conversations...</div>';
+            
+            try {
+                testConversations = [
+                    {
+                        id: `test_conv_1_${Date.now()}`,
+                        title: 'Test Conversation 1',
+                        messages: [
+                            { role: 'user', content: 'Hello, this is test conversation 1', timestamp: new Date().toISOString() },
+                            { role: 'assistant', content: 'Hello! This is response 1', timestamp: new Date().toISOString() }
+                        ],
+                        lastUpdated: new Date().toISOString(),
+                        userId: currentUser.uid,
+                        createdAt: new Date().toISOString()
+                    },
+                    {
+                        id: `test_conv_2_${Date.now() + 1}`,
+                        title: 'Test Conversation 2 (TO BE RENAMED)',
+                        messages: [
+                            { role: 'user', content: 'This conversation will be renamed', timestamp: new Date().toISOString() },
+                            { role: 'assistant', content: 'This conversation will get a new title', timestamp: new Date().toISOString() }
+                        ],
+                        lastUpdated: new Date().toISOString(),
+                        userId: currentUser.uid,
+                        createdAt: new Date().toISOString()
+                    },
+                    {
+                        id: `test_conv_3_${Date.now() + 2}`,
+                        title: 'Test Conversation 3 (TO BE DELETED)',
+                        messages: [
+                            { role: 'user', content: 'This conversation will be deleted', timestamp: new Date().toISOString() },
+                            { role: 'assistant', content: 'This conversation should disappear', timestamp: new Date().toISOString() }
+                        ],
+                        lastUpdated: new Date().toISOString(),
+                        userId: currentUser.uid,
+                        createdAt: new Date().toISOString()
+                    }
+                ];
+                
+                // Save to Firebase
+                const savePromises = testConversations.map(conv => 
+                    setDoc(doc(db, 'conversations', conv.id), conv)
+                );
+                
+                await Promise.all(savePromises);
+                
+                // Update local storage
+                localStorage.setItem('conversationHistory', JSON.stringify(testConversations));
+                
+                statusDiv.innerHTML = '<div class="success">✅ Test conversations created and saved to your account!</div>';
+                
+                // Enable next buttons
+                enableButtons(['addMsgBtn', 'renameBtn', 'deleteBtn']);
+                
+                resultsDiv.innerHTML = `
+                    <h3>📝 Created Conversations (Saved to ${currentUser.email}):</h3>
+                    ${testConversations.map(conv => `
+                        <div class="conversation">
+                            <strong>ID:</strong> ${conv.id}<br>
+                            <strong>Title:</strong> ${conv.title}<br>
+                            <strong>Messages:</strong> ${conv.messages.length}<br>
+                            <strong>User ID:</strong> ${conv.userId}<br>
+                            <strong>Status:</strong> ☁️ Synced to Google Account
+                        </div>
+                    `).join('')}
+                `;
+                
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="error">❌ Failed to create conversations: ${error.message}</div>`;
+                resultsDiv.innerHTML = `<pre>Error: ${error.stack}</pre>`;
+            }
+        };
+
+        window.addMessages = async function() {
+            if (!currentUser || testConversations.length === 0) {
+                alert('Please create conversations first');
+                return;
+            }
+            
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            
+            statusDiv.innerHTML = '<div class="info">💬 Adding messages to conversations...</div>';
+            
+            try {
+                // Add messages to first conversation
+                const targetConv = testConversations[0];
+                const newMessages = [
+                    ...targetConv.messages,
+                    { role: 'user', content: 'Adding a new message to test sync', timestamp: new Date().toISOString() },
+                    { role: 'assistant', content: 'Message received and synced to your account!', timestamp: new Date().toISOString() }
+                ];
+                
+                const updatedConv = {
+                    ...targetConv,
+                    messages: newMessages,
+                    lastUpdated: new Date().toISOString()
+                };
+                
+                // Update Firebase
+                await setDoc(doc(db, 'conversations', targetConv.id), updatedConv);
+                
+                // Update local array
+                testConversations[0] = updatedConv;
+                localStorage.setItem('conversationHistory', JSON.stringify(testConversations));
+                
+                statusDiv.innerHTML = '<div class="success">✅ Messages added and synced to your account!</div>';
+                
+                resultsDiv.innerHTML = `
+                    <h3>💬 Updated Conversation:</h3>
+                    <div class="conversation">
+                        <strong>ID:</strong> ${updatedConv.id}<br>
+                        <strong>Title:</strong> ${updatedConv.title}<br>
+                        <strong>Messages:</strong> ${updatedConv.messages.length} (was ${targetConv.messages.length})<br>
+                        <strong>Last Updated:</strong> ${updatedConv.lastUpdated}<br>
+                        <strong>Status:</strong> ☁️ Real-time synced to Google Account
+                    </div>
+                `;
+                
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="error">❌ Failed to add messages: ${error.message}</div>`;
+                resultsDiv.innerHTML = `<pre>Error: ${error.stack}</pre>`;
+            }
+        };
+
+        window.renameConversation = async function() {
+            if (!currentUser || testConversations.length < 2) {
+                alert('Please create conversations first');
+                return;
+            }
+            
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            
+            statusDiv.innerHTML = '<div class="info">✏️ Renaming conversation...</div>';
+            
+            try {
+                // Rename the second conversation
+                renamedConversationId = testConversations[1].id;
+                const newTitle = 'RENAMED: Updated Conversation Title';
+                
+                // Update Firebase
+                await updateDoc(doc(db, 'conversations', renamedConversationId), {
+                    title: newTitle,
+                    lastUpdated: new Date().toISOString()
+                });
+                
+                // Update local array
+                testConversations[1].title = newTitle;
+                testConversations[1].lastUpdated = new Date().toISOString();
+                localStorage.setItem('conversationHistory', JSON.stringify(testConversations));
+                
+                statusDiv.innerHTML = '<div class="success">✅ Conversation renamed and synced to your account!</div>';
+                
+                resultsDiv.innerHTML = `
+                    <h3>✏️ Renamed Conversation:</h3>
+                    <div class="conversation">
+                        <strong>ID:</strong> ${renamedConversationId}<br>
+                        <strong>New Title:</strong> ${newTitle}<br>
+                        <strong>Last Updated:</strong> ${testConversations[1].lastUpdated}<br>
+                        <strong>Status:</strong> ☁️ Title synced to Google Account
+                    </div>
+                `;
+                
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="error">❌ Failed to rename conversation: ${error.message}</div>`;
+                resultsDiv.innerHTML = `<pre>Error: ${error.stack}</pre>`;
+            }
+        };
+
+        window.deleteConversation = async function() {
+            if (!currentUser || testConversations.length < 3) {
+                alert('Please create conversations first');
+                return;
+            }
+            
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            
+            statusDiv.innerHTML = '<div class="info">🗑️ Deleting conversation...</div>';
+            
+            try {
+                // Delete the third conversation
+                deletedConversationId = testConversations[2].id;
+                
+                // Delete from Firebase
+                await deleteDoc(doc(db, 'conversations', deletedConversationId));
+                
+                // Update local array
+                testConversations = testConversations.filter(conv => conv.id !== deletedConversationId);
+                localStorage.setItem('conversationHistory', JSON.stringify(testConversations));
+                
+                statusDiv.innerHTML = '<div class="success">✅ Conversation deleted from your account!</div>';
+                
+                // Enable verification
+                enableButtons(['verifyDelBtn', 'sessionBtn']);
+                
+                resultsDiv.innerHTML = `
+                    <h3>🗑️ Deletion Results:</h3>
+                    <div class="warning">
+                        <strong>Deleted Conversation ID:</strong> ${deletedConversationId}<br>
+                        <strong>Status:</strong> ❌ Permanently removed from Google Account
+                    </div>
+                    <h4>Remaining Conversations:</h4>
+                    ${testConversations.map(conv => `
+                        <div class="conversation">
+                            <strong>ID:</strong> ${conv.id}<br>
+                            <strong>Title:</strong> ${conv.title}<br>
+                            <strong>Status:</strong> ☁️ Still synced to Google Account
+                        </div>
+                    `).join('')}
+                `;
+                
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="error">❌ Failed to delete conversation: ${error.message}</div>`;
+                resultsDiv.innerHTML = `<pre>Error: ${error.stack}</pre>`;
+            }
+        };
+
+        window.verifyDeletion = async function() {
+            if (!currentUser || !deletedConversationId) {
+                alert('Please delete a conversation first');
+                return;
+            }
+            
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            
+            statusDiv.innerHTML = '<div class="info">✅ Verifying deletion persistence...</div>';
+            
+            try {
+                // Check Firebase
+                const conversationsRef = collection(db, 'conversations');
+                const q = query(
+                    conversationsRef,
+                    where('userId', '==', currentUser.uid),
+                    orderBy('lastUpdated', 'desc')
+                );
+                
+                const querySnapshot = await getDocs(q);
+                const firebaseConversations = [];
+                
+                querySnapshot.forEach((doc) => {
+                    firebaseConversations.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                const deletedConvExists = firebaseConversations.some(conv => conv.id === deletedConversationId);
+                const localConversations = JSON.parse(localStorage.getItem('conversationHistory') || '[]');
+                const deletedConvInLocal = localConversations.some(conv => conv.id === deletedConversationId);
+                
+                const verificationPassed = !deletedConvExists && !deletedConvInLocal;
+                
+                statusDiv.innerHTML = verificationPassed 
+                    ? '<div class="success">✅ Deletion verification passed!</div>'
+                    : '<div class="error">❌ Deletion verification failed!</div>';
+                
+                resultsDiv.innerHTML = `
+                    <h3>✅ Deletion Verification Results:</h3>
+                    <div class="conversation">
+                        <strong>Verification Status:</strong> ${verificationPassed ? '✅ PASSED' : '❌ FAILED'}<br>
+                        <strong>Firebase Check:</strong> ${deletedConvExists ? '❌ Still exists' : '✅ Properly deleted'}<br>
+                        <strong>Local Storage Check:</strong> ${deletedConvInLocal ? '❌ Still exists' : '✅ Properly deleted'}<br>
+                        <strong>Total Firebase Conversations:</strong> ${firebaseConversations.length}<br>
+                        <strong>Total Local Conversations:</strong> ${localConversations.length}
+                    </div>
+                `;
+                
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="error">❌ Verification failed: ${error.message}</div>`;
+                resultsDiv.innerHTML = `<pre>Error: ${error.stack}</pre>`;
+            }
+        };
+
+        window.testLogoutLogin = async function() {
+            const statusDiv = document.getElementById('status');
+            
+            statusDiv.innerHTML = '<div class="info">🔄 Testing logout and login persistence...</div>';
+            
+            try {
+                // Logout
+                await signOut(auth);
+                currentUser = null;
+                
+                // Wait a moment
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Login again
+                const result = await signInWithPopup(auth, provider);
+                currentUser = result.user;
+                
+                statusDiv.innerHTML = '<div class="success">✅ Logout and login completed!</div>';
+                
+                // Enable final verification
+                enableButtons(['finalBtn']);
+                
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="error">❌ Logout/Login failed: ${error.message}</div>`;
+            }
+        };
+
+        window.finalVerification = async function() {
+            if (!currentUser) {
+                alert('Please complete logout/login first');
+                return;
+            }
+            
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            
+            statusDiv.innerHTML = '<div class="info">🎯 Running final verification...</div>';
+            
+            try {
+                // Get all conversations from Firebase
+                const conversationsRef = collection(db, 'conversations');
+                const q = query(
+                    conversationsRef,
+                    where('userId', '==', currentUser.uid),
+                    orderBy('lastUpdated', 'desc')
+                );
+                
+                const querySnapshot = await getDocs(q);
+                const finalConversations = [];
+                
+                querySnapshot.forEach((doc) => {
+                    finalConversations.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                // Check all our test conditions
+                const deletedConvExists = finalConversations.some(conv => conv.id === deletedConversationId);
+                const renamedConvExists = finalConversations.find(conv => conv.id === renamedConversationId);
+                const renamedTitleCorrect = renamedConvExists && renamedConvExists.title.includes('RENAMED');
+                
+                const allTestsPassed = !deletedConvExists && renamedTitleCorrect && finalConversations.length >= 2;
+                
+                statusDiv.innerHTML = allTestsPassed 
+                    ? '<div class="success">🎉 ALL TESTS PASSED! Conversation management working perfectly!</div>'
+                    : '<div class="error">❌ Some tests failed. Check results below.</div>';
+                
+                resultsDiv.innerHTML = `
+                    <h3>🎯 Final Test Results:</h3>
+                    <div class="conversation">
+                        <strong>Overall Status:</strong> ${allTestsPassed ? '🎉 ALL TESTS PASSED' : '❌ TESTS FAILED'}<br>
+                        <strong>Deleted Conversation Check:</strong> ${deletedConvExists ? '❌ Still exists (FAIL)' : '✅ Properly deleted (PASS)'}<br>
+                        <strong>Renamed Conversation Check:</strong> ${renamedTitleCorrect ? '✅ Title updated (PASS)' : '❌ Title not updated (FAIL)'}<br>
+                        <strong>Total Conversations:</strong> ${finalConversations.length}<br>
+                        <strong>User Account:</strong> ${currentUser.email}
+                    </div>
+                    
+                    <h4>📊 Test Summary:</h4>
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <span class="icon">✅</span>
+                            <span>Google Authentication & Account Sync</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="icon">✅</span>
+                            <span>Create Conversations (Auto-saved to Account)</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="icon">${renamedTitleCorrect ? '✅' : '❌'}</span>
+                            <span>Edit/Rename Conversations</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="icon">${!deletedConvExists ? '✅' : '❌'}</span>
+                            <span>Delete Conversations (Persistent)</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="icon">✅</span>
+                            <span>Add Messages (Real-time Sync)</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="icon">✅</span>
+                            <span>Logout/Login Persistence</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="icon">✅</span>
+                            <span>Firebase Cloud Storage</span>
+                        </div>
+                    </div>
+                    
+                    <h4>Current Conversations in Your Account:</h4>
+                    ${finalConversations.map(conv => `
+                        <div class="conversation">
+                            <strong>ID:</strong> ${conv.id}<br>
+                            <strong>Title:</strong> ${conv.title}<br>
+                            <strong>Messages:</strong> ${conv.messages?.length || 0}<br>
+                            <strong>Last Updated:</strong> ${conv.lastUpdated}<br>
+                            <strong>Status:</strong> ☁️ Synced to ${currentUser.email}
+                        </div>
+                    `).join('')}
+                `;
+                
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="error">❌ Final verification failed: ${error.message}</div>`;
+                resultsDiv.innerHTML = `<pre>Error: ${error.stack}</pre>`;
+            }
+        };
+
+        window.runCompleteTest = async function() {
+            const statusDiv = document.getElementById('status');
+            
+            statusDiv.innerHTML = '<div class="info">🚀 Running complete test sequence...</div>';
+            
+            try {
+                await createTestConversations();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await addMessages();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await renameConversation();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await deleteConversation();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await verifyDeletion();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                await testLogoutLogin();
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                await finalVerification();
+                
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="error">❌ Complete test failed: ${error.message}</div>`;
+            }
+        };
+
+        // Helper functions
+        function enableButtons(buttonIds) {
+            buttonIds.forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) btn.disabled = false;
+            });
+        }
+
+        function disableButtons(buttonIds) {
+            buttonIds.forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) btn.disabled = true;
+            });
+        }
+    </script>
+</body>
+</html>

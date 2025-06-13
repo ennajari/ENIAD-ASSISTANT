@@ -24,7 +24,9 @@ import {
   MoreHoriz as MoreHorizIcon,
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
-  History as HistoryIcon
+  History as HistoryIcon,
+  Cloud as CloudIcon,
+  CloudOff as CloudOffIcon
 } from '@mui/icons-material';
 import { DRAWER_WIDTH, translations } from '../constants/config';
 
@@ -321,8 +323,8 @@ const ChatSidebar = ({
           >
             <Button
               variant="text"
-              startIcon={currentLanguage !== 'ar' ? <HistoryIcon fontSize="small" /> : null}
-              endIcon={currentLanguage === 'ar' ? <HistoryIcon fontSize="small" /> : null}
+              startIcon={currentLanguage !== 'ar' ? <CloudIcon fontSize="small" /> : null}
+              endIcon={currentLanguage === 'ar' ? <CloudIcon fontSize="small" /> : null}
               onClick={() => setShowHistory(!showHistory)}
               sx={{
                 color: darkMode ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)',
@@ -356,7 +358,12 @@ const ChatSidebar = ({
                 }
               }}
             >
-              {t('chatHistory')}
+              {currentLanguage === 'ar'
+                ? 'محادثاتك المحفوظة'
+                : currentLanguage === 'fr'
+                ? 'Vos conversations sauvegardées'
+                : 'Your saved conversations'
+              }
             </Button>
 
             <Chip
@@ -497,7 +504,10 @@ const ChatSidebar = ({
                       <ListItemIcon sx={{
                         minWidth: 32,
                         [currentLanguage === 'ar' ? 'ml' : 'mr']: 1.5,
-                        order: currentLanguage === 'ar' ? 3 : 1
+                        order: currentLanguage === 'ar' ? 3 : 1,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 0.5
                       }}>
                         <ChatIcon
                           fontSize="small"
@@ -507,6 +517,17 @@ const ChatSidebar = ({
                               : (darkMode ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)')
                           }}
                         />
+                        {/* Cloud sync indicator for logged-in users */}
+                        {user && convo.userId === user.uid && (
+                          <CloudIcon
+                            fontSize="small"
+                            sx={{
+                              color: '#10a37f',
+                              opacity: 0.7,
+                              fontSize: '0.75rem'
+                            }}
+                          />
+                        )}
                       </ListItemIcon>
                       <ListItemText
                         primary={convo.title}
@@ -540,27 +561,30 @@ const ChatSidebar = ({
                           flex: 1
                         }}
                       />
-                      <IconButton
-                        size="small"
-                        onClick={e => {
-                          e.stopPropagation();
-                          onChatMenuOpen(e, convo.id);
-                        }}
-                        sx={{
-                          width: 28,
-                          height: 28,
-                          opacity: 0.7,
-                          transition: 'all 0.2s ease',
-                          order: currentLanguage === 'ar' ? 1 : 3,
-                          '&:hover': {
-                            opacity: 1,
-                            bgcolor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                            transform: 'scale(1.1)',
-                          }
-                        }}
-                      >
-                        <MoreHorizIcon fontSize="small" />
-                      </IconButton>
+                      {/* Only show menu button when user is logged in */}
+                      {user && (
+                        <IconButton
+                          size="small"
+                          onClick={e => {
+                            e.stopPropagation();
+                            onChatMenuOpen(e, convo.id);
+                          }}
+                          sx={{
+                            width: 28,
+                            height: 28,
+                            opacity: 0.7,
+                            transition: 'all 0.2s ease',
+                            order: currentLanguage === 'ar' ? 1 : 3,
+                            '&:hover': {
+                              opacity: 1,
+                              bgcolor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                              transform: 'scale(1.1)',
+                            }
+                          }}
+                        >
+                          <MoreHorizIcon fontSize="small" />
+                        </IconButton>
+                      )}
                     </>
                   )}
                 </ListItemButton>
