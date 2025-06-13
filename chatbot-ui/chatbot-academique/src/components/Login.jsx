@@ -222,7 +222,7 @@ export default function Login() {
         alignItems: 'center',
         justifyContent: 'center',
         position: 'relative',
-        bgcolor: 'linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%)',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         overflow: 'hidden',
         direction,
         fontFamily: lang === 'ar'
@@ -232,16 +232,15 @@ export default function Login() {
       dir={direction}
       lang={lang}
     >
-      {/* Decorative background circles */}
+      {/* Decorative background elements - DeepSeek style */}
       <Box
         sx={{
           position: 'absolute',
-          top: -120,
-          left: -120,
-          width: 320,
-          height: 320,
-          bgcolor: 'primary.light',
-          opacity: 0.18,
+          top: -100,
+          left: -100,
+          width: 300,
+          height: 300,
+          background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
           borderRadius: '50%',
           zIndex: 0,
         }}
@@ -249,12 +248,11 @@ export default function Login() {
       <Box
         sx={{
           position: 'absolute',
-          bottom: -100,
-          right: -100,
-          width: 220,
-          height: 220,
-          bgcolor: 'secondary.light',
-          opacity: 0.13,
+          bottom: -80,
+          right: -80,
+          width: 200,
+          height: 200,
+          background: 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)',
           borderRadius: '50%',
           zIndex: 0,
         }}
@@ -262,12 +260,11 @@ export default function Login() {
       <Box
         sx={{
           position: 'absolute',
-          top: 60,
-          right: -60,
-          width: 140,
-          height: 140,
-          bgcolor: 'primary.main',
-          opacity: 0.10,
+          top: '20%',
+          right: '10%',
+          width: 120,
+          height: 120,
+          background: 'radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%)',
           borderRadius: '50%',
           zIndex: 0,
         }}
@@ -284,21 +281,21 @@ export default function Login() {
           }}
         >
           <Paper
-            elevation={6}
-            className={lang === 'ar' ? 'login-container' : ''}
+            elevation={0}
             sx={{
-              p: 5,
+              p: { xs: 4, sm: 6 },
               width: '100%',
-              maxWidth: 450,
+              maxWidth: 480,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              borderRadius: 4,
-              boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.18)',
-              backdropFilter: 'blur(2px)',
-              bgcolor: 'background.paper',
+              borderRadius: 3,
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
               direction,
-              textAlign: 'center', // Always center the container
+              textAlign: 'center',
               '& *': {
                 fontFamily: lang === 'ar'
                   ? '"Segoe UI", "Tahoma", "Arial", sans-serif !important'
@@ -311,12 +308,6 @@ export default function Login() {
                   direction: 'rtl !important',
                   width: '100% !important',
                   unicodeBidi: 'bidi-override !important',
-                },
-                '& .MuiTabs-root': {
-                  direction: 'rtl !important',
-                },
-                '& .MuiTab-root': {
-                  direction: 'rtl !important',
                 }
               })
             }}
@@ -361,16 +352,17 @@ export default function Login() {
             </Box>
 
             <Typography
-              variant="h4"
+              variant="h3"
               component="h1"
               gutterBottom
-              className={lang === 'ar' ? 'login-title' : ''}
               sx={{
-                mb: 2,
-                fontWeight: 800,
-                letterSpacing: lang === 'ar' ? 0 : 1,
-                color: 'primary.main',
-                textShadow: '0 2px 8px rgba(44,82,130,0.08)',
+                mb: 1,
+                fontWeight: 700,
+                letterSpacing: lang === 'ar' ? 0 : -0.5,
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
                 fontFamily: lang === 'ar'
                   ? '"Segoe UI", "Tahoma", "Arial", sans-serif'
                   : '"Inter", "Roboto", "Helvetica Neue", Arial, sans-serif',
@@ -431,7 +423,7 @@ export default function Login() {
               {t.academicOnly}
             </Typography>
 
-            {/* Google Academic Sign In Button */}
+            {/* Google Academic Sign In Button - DeepSeek Style */}
             <Button
               variant="contained"
               {...(direction === 'rtl'
@@ -442,38 +434,43 @@ export default function Login() {
               fullWidth
               disabled={loading}
               sx={{
-                height: 56,
-                backgroundColor: '#4285f4',
+                height: 64,
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 color: 'white',
                 fontWeight: 600,
                 fontSize: '1.1rem',
-                borderRadius: 3,
-                letterSpacing: 0.5,
+                borderRadius: 2,
+                letterSpacing: 0.3,
                 display: 'flex',
                 flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
                 justifyContent: 'center',
                 alignItems: 'center',
                 border: 'none',
                 textAlign: 'center',
-                boxShadow: '0 4px 12px rgba(66, 133, 244, 0.3)',
+                boxShadow: '0 8px 24px rgba(102, 126, 234, 0.4)',
+                textTransform: 'none',
                 '& .MuiButton-startIcon': {
-                  marginLeft: direction === 'rtl' ? 8 : 0,
-                  marginRight: direction === 'rtl' ? 0 : 8,
+                  marginLeft: direction === 'rtl' ? 12 : 0,
+                  marginRight: direction === 'rtl' ? 0 : 12,
                 },
                 '& .MuiButton-endIcon': {
-                  marginLeft: direction === 'rtl' ? 0 : 8,
-                  marginRight: direction === 'rtl' ? 8 : 0,
+                  marginLeft: direction === 'rtl' ? 0 : 12,
+                  marginRight: direction === 'rtl' ? 12 : 0,
                 },
                 '&:hover': {
-                  backgroundColor: '#357abd',
-                  boxShadow: '0 6px 16px rgba(66, 133, 244, 0.4)',
-                  transform: 'translateY(-1px)',
+                  background: 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)',
+                  boxShadow: '0 12px 32px rgba(102, 126, 234, 0.5)',
+                  transform: 'translateY(-2px)',
+                },
+                '&:active': {
+                  transform: 'translateY(0px)',
                 },
                 '&:disabled': {
-                  backgroundColor: '#ccc',
-                  color: '#666'
+                  background: 'linear-gradient(135deg, #a0aec0 0%, #718096 100%)',
+                  color: '#ffffff',
+                  opacity: 0.6
                 },
-                transition: 'all 0.3s ease'
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
               }}
             >
               {loading ? t.signing : t.signin}
