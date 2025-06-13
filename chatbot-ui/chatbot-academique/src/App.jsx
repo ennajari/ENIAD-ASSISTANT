@@ -121,12 +121,14 @@ function App() {
             if (currentChat) {
               chatState.setCurrentChatId(savedCurrentChatId);
               chatState.setMessages(currentChat.messages || []);
+              console.log('✅ Restored current chat:', savedCurrentChatId);
             } else {
               // Current chat ID not found, load first available chat
               const firstChat = conversations[0];
               chatState.setCurrentChatId(firstChat.id);
               chatState.setMessages(firstChat.messages || []);
               localStorage.setItem('currentChatId', firstChat.id);
+              console.log('✅ Loaded first available chat:', firstChat.id);
             }
           } else {
             // No current chat ID, load first available chat
@@ -134,6 +136,7 @@ function App() {
             chatState.setCurrentChatId(firstChat.id);
             chatState.setMessages(firstChat.messages || []);
             localStorage.setItem('currentChatId', firstChat.id);
+            console.log('✅ Loaded first chat:', firstChat.id);
           }
         } else {
           // No conversations found, create new chat
@@ -142,13 +145,16 @@ function App() {
         }
 
       } catch (error) {
-        console.error('Error loading conversations:', error);
+        console.error('❌ Error loading conversations:', error);
         await chatHandlers.handleNewChat();
       }
     };
 
-    loadConversations();
-  }, [user]); // Depend on user to reload conversations when login state changes
+    // Only load conversations if not in loading state
+    if (!authLoading) {
+      loadConversations();
+    }
+  }, [user, authLoading]); // Depend on user and authLoading to reload conversations when login state changes
 
   // Handle transcript changes
   useEffect(() => {
@@ -186,6 +192,27 @@ function App() {
       console.error('Error saving current chat ID:', error);
     }
   }, [chatState.currentChatId]);
+
+  // Add window focus listener to reload conversations when user comes back
+  useEffect(() => {
+    const handleWindowFocus = async () => {
+      if (user && !authLoading) {
+        console.log('🔄 Window focused, reloading conversations...');
+        try {
+          conversationStateManager.setCurrentUser(user);
+          const conversations = await conversationStateManager.loadConversations(
+            chatState.setConversationHistory
+          );
+          console.log(`✅ Reloaded ${conversations.length} conversations on window focus`);
+        } catch (error) {
+          console.error('❌ Error reloading conversations on focus:', error);
+        }
+      }
+    };
+
+    window.addEventListener('focus', handleWindowFocus);
+    return () => window.removeEventListener('focus', handleWindowFocus);
+  }, [user, authLoading]);
 
   // Speech synthesis
   const speakText = (text, id) => {

@@ -39,16 +39,13 @@ export function AuthProvider({ children }) {
           // Save user profile to Firebase
           await firebaseStorageService.saveUserProfile(user);
 
-          // Load user conversations from Firebase
-          const conversations = await firebaseStorageService.getUserConversations(user.uid);
-          if (conversations.length > 0) {
-            localStorage.setItem('conversationHistory', JSON.stringify(conversations));
-            console.log(`✅ Loaded ${conversations.length} conversations from Firebase`);
-          }
-
           setUser(userProfile);
           setError(null);
-          console.log('✅ User authenticated and data synced:', userProfile);
+          console.log('✅ User authenticated:', userProfile);
+
+          // Note: Conversation loading is now handled by conversation state manager in App.jsx
+          // This prevents conflicts and ensures proper state management
+
         } catch (error) {
           console.error('❌ Error during user setup:', error);
           setUser({
@@ -65,6 +62,10 @@ export function AuthProvider({ children }) {
       } else {
         setUser(null);
         setError(null);
+        // Clear local storage when user logs out
+        localStorage.removeItem('conversationHistory');
+        localStorage.removeItem('currentChatId');
+        console.log('🧹 User logged out, local data cleared');
       }
 
       setLoading(false);
