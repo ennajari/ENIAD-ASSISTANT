@@ -34,33 +34,40 @@ class ConversationStateManager {
    */
   async createConversation(conversationData, setConversationHistory) {
     try {
+      console.log('📝 Creating new conversation:', conversationData.id);
+
       const conversation = {
         ...conversationData,
         userId: this.currentUser?.uid,
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        lastUpdated: new Date().toISOString()
       };
 
       // Update local state immediately
       setConversationHistory(prev => [conversation, ...prev]);
-      
+
       // Update local storage
       const currentHistory = JSON.parse(localStorage.getItem('conversationHistory') || '[]');
       const updatedHistory = [conversation, ...currentHistory];
       localStorage.setItem('conversationHistory', JSON.stringify(updatedHistory));
+      console.log('💾 Local storage updated with new conversation:', conversation.id);
 
       // Sync with Firebase if user is logged in
       if (this.currentUser?.uid) {
         if (this.isOnline) {
-          await firebaseStorageService.performRealTimeSync(
-            this.currentUser.uid, 
-            'create', 
-            conversation
-          );
-          console.log('✅ New conversation synced to Firebase:', conversation.id);
+          try {
+            await firebaseStorageService.saveConversation(this.currentUser.uid, conversation);
+            console.log('✅ New conversation saved to Firebase:', conversation.id);
+          } catch (firebaseError) {
+            console.error('❌ Firebase save failed, adding to pending operations:', firebaseError);
+            this.addPendingOperation('create', conversation);
+          }
         } else {
+          console.log('📴 Offline - adding to pending operations:', conversation.id);
           this.addPendingOperation('create', conversation);
         }
+      } else {
+        console.log('👤 No user logged in - conversation saved locally only');
       }
 
       return conversation;
@@ -190,49 +197,73 @@ class ConversationStateManager {
    */
   async updateConversation(conversationId, updatedMessages, setConversationHistory) {
     try {
-      const updatedConversation = {
-        id: conversationId,
-        messages: updatedMessages,
-        lastUpdated: new Date().toISOString(),
-        userId: this.currentUser?.uid
-      };
+      console.log('🔄 Updating conversation:', conversationId, 'with', updatedMessages.length, 'messages');
 
-      // Update local state
+      let completeConversation = null;
+
+      // Update local state and get complete conversation data
       setConversationHistory(prev => {
+        console.log('🔍 Looking for conversation in history:', conversationId);
+        console.log('📋 Current conversation history:', prev.map(c => ({ id: c.id, title: c.title })));
+
         const existingChat = prev.find(c => c.id === conversationId);
-        const title = existingChat?.title || 
-          updatedMessages.find(m => m.role === 'user')?.content?.substring(0, 30) || 
-          'Nouvelle conversation';
+        console.log('🎯 Found existing chat:', existingChat ? 'YES' : 'NO');
+
+        // Generate title from first user message if no existing title
+        const title = existingChat?.title ||
+          updatedMessages.find(m => m.role === 'user')?.content?.substring(0, 30) ||
+          'New Conversation';
 
         const updatedChat = {
-          ...existingChat,
-          ...updatedConversation,
-          title: title.length > 30 ? title.substring(0, 30) + '...' : title
+          id: conversationId,
+          title: title.length > 30 ? title.substring(0, 30) + '...' : title,
+          messages: updatedMessages,
+          lastUpdated: new Date().toISOString(),
+          userId: this.currentUser?.uid,
+          createdAt: existingChat?.createdAt || new Date().toISOString(),
+          // Preserve any other existing fields
+          ...existingChat
         };
+
+        console.log('📝 Updated chat object:', {
+          id: updatedChat.id,
+          title: updatedChat.title,
+          messageCount: updatedChat.messages.length,
+          userId: updatedChat.userId
+        });
+
+        // Store complete conversation for Firebase sync
+        completeConversation = updatedChat;
 
         const newHistory = [
           updatedChat,
           ...prev.filter(c => c.id !== conversationId)
         ];
 
-        // Update local storage
+        // Update local storage immediately
         localStorage.setItem('conversationHistory', JSON.stringify(newHistory));
-        
+        console.log('💾 Local storage updated with conversation:', conversationId);
+        console.log('📊 New history length:', newHistory.length);
+
         return newHistory;
       });
 
       // Sync with Firebase if user is logged in
-      if (this.currentUser?.uid) {
+      if (this.currentUser?.uid && completeConversation) {
         if (this.isOnline) {
-          await firebaseStorageService.performRealTimeSync(
-            this.currentUser.uid, 
-            'update', 
-            updatedConversation
-          );
-          console.log('✅ Conversation updated in Firebase:', conversationId);
+          try {
+            await firebaseStorageService.saveConversation(this.currentUser.uid, completeConversation);
+            console.log('✅ Conversation saved to Firebase:', conversationId);
+          } catch (firebaseError) {
+            console.error('❌ Firebase save failed, adding to pending operations:', firebaseError);
+            this.addPendingOperation('update', completeConversation);
+          }
         } else {
-          this.addPendingOperation('update', updatedConversation);
+          console.log('📴 Offline - adding to pending operations:', conversationId);
+          this.addPendingOperation('update', completeConversation);
         }
+      } else if (!this.currentUser?.uid) {
+        console.log('👤 No user logged in - conversation saved locally only');
       }
 
       return true;
