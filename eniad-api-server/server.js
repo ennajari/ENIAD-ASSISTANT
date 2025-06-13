@@ -93,7 +93,7 @@ const conversations = new Map();
 
 // Your custom model configuration
 const LLAMA3_CONFIG = {
-  baseURL: 'https://gorafrenk--llama3-openai-compatible-serve.modal.run/v1',
+  baseURL: 'https://abdellah-ennajari-23--llama3-openai-compatible-serve.modal.run/v1',
   apiKey: 'super-secret-key',
   model: 'ahmed-ouka/llama3-8b-eniad-merged-32bit'
 };

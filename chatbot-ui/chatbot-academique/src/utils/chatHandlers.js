@@ -251,23 +251,30 @@ export const createChatHandlers = (
         });
 
       } else {
-        // Fallback to original API
-        console.log('📡 Using fallback API');
-        const response = await axios.post(API_URL, {
+        // Fallback to direct API (OpenAI-compatible format)
+        console.log('📡 Using direct API fallback with OpenAI format');
+        const response = await axios.post(`${API_URL}/v1/chat/completions`, {
+          model: 'ahmed-ouka/llama3-8b-eniad-merged-32bit',
           messages: [...messages, userMessage].map(({ role, content }) => ({ role, content })),
+          temperature: 0.7,
+          max_tokens: 1000
         }, {
           headers: {
             'Content-Type': 'application/json',
-            'ngrok-skip-browser-warning': 'true'
+            'Authorization': 'Bearer super-secret-key'
           }
         });
 
         botMessage = {
           role: 'assistant',
-          content: response.data.reply || response.data.response || response.data,
+          content: response.data.choices?.[0]?.message?.content || response.data.reply || response.data.response || 'Sorry, I could not generate a response.',
           id: Date.now().toString(),
           chatId: currentChatId,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          metadata: {
+            model: 'ahmed-ouka/llama3-8b-eniad-merged-32bit',
+            usage: response.data.usage
+          }
         };
       }
 
