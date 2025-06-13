@@ -1,2 +1,69 @@
-scikit-learn
-numpy
+# ========================================
+# ENIAD Academic Assistant - Requirements
+# ========================================
+#
+# This file contains all Python dependencies for the ENIAD Academic Assistant project.
+# It includes dependencies for the RAG system, data processing, and additional utilities.
+#
+# Installation:
+# pip install -r requirements.txt
+#
+# For development:
+# pip install -r requirements.txt -r requirements-dev.txt
+#
+# ========================================
+
+# Core Web Framework
+fastapi==0.115.12
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+
+# Data Processing & Analysis
+pandas==2.2.3
+numpy==2.2.4
+scikit-learn==1.5.1
+
+# Configuration & Environment
+pydantic-settings==2.8.1
+python-dotenv==1.1.0
+
+# File Handling
+aiofiles==24.1.0
+PyMuPDF==1.25.5
+file-saver==2.0.5
+
+# AI & Language Models
+langchain==0.3.23
+langchain-community==0.3.21
+openai==1.78.1
+cohere==5.15.0
+
+# Database & Storage
+motor==3.7.0
+qdrant-client==1.14.2
+pymongo==4.8.0
+
+# Speech Services (Optional)
+# Uncomment if using speech features
+# azure-cognitiveservices-speech==1.38.0
+# google-cloud-texttospeech==2.16.4
+# elevenlabs==1.8.0
+
+# Utilities
+uuid==1.30
+requests==2.32.3
+python-json-logger==2.0.7
+
+# Development & Testing (Optional)
+# pytest==8.2.2
+# pytest-asyncio==0.23.7
+# black==24.4.2
+# flake8==7.1.0
+
+# Security
+cryptography==42.0.8
+python-jose[cryptography]==3.3.0
+
+# Additional Utilities
+tqdm==4.66.4
+colorama==0.4.6
