@@ -338,10 +338,11 @@ const ChatSidebar = ({
                 flex: 1,
                 justifyContent: currentLanguage === 'ar' ? 'flex-end' : 'flex-start',
                 direction: currentLanguage === 'ar' ? 'rtl' : 'ltr',
-                whiteSpace: 'nowrap',
+                whiteSpace: sidebarCollapsed ? 'nowrap' : 'normal',
                 overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                fontSize: '0.85rem',
+                textOverflow: sidebarCollapsed ? 'ellipsis' : 'unset',
+                fontSize: '0.8rem',
+                lineHeight: 1.2,
                 '& .MuiButton-startIcon': {
                   marginLeft: currentLanguage === 'ar' ? 8 : 0,
                   marginRight: currentLanguage === 'ar' ? 0 : 8,
@@ -361,8 +362,8 @@ const ChatSidebar = ({
               {currentLanguage === 'ar'
                 ? 'محادثاتك المحفوظة'
                 : currentLanguage === 'fr'
-                ? 'Vos conversations sauvegardées'
-                : 'Your saved conversations'
+                ? 'Conversations sauvegardées'
+                : 'Saved conversations'
               }
             </Button>
 
