@@ -8,13 +8,25 @@ import axios from 'axios';
 
 class RAGApiService {
   constructor() {
-    // API Configuration - matches your custom model API
+    // Enhanced API Server Configuration (Custom Model + RAG + SMA)
     this.baseURL = import.meta.env.VITE_RAG_API_BASE_URL || '';
     this.apiKey = import.meta.env.VITE_RAG_API_KEY;
     this.projectId = import.meta.env.VITE_RAG_PROJECT_ID || 'eniad-assistant';
     this.timeout = 60000; // 60 seconds timeout for model inference
 
-    // Initialize axios instance
+    // RAG System Configuration (for direct monitoring)
+    this.ragSystemURL = import.meta.env.VITE_RAG_SYSTEM_BASE_URL || 'http://localhost:8000';
+
+    // Debug configuration
+    console.log('🔧 RAG API Service Configuration:', {
+      baseURL: this.baseURL,
+      ragSystemURL: this.ragSystemURL,
+      hasApiKey: !!this.apiKey,
+      projectId: this.projectId,
+      timeout: this.timeout
+    });
+
+    // Initialize axios instance for Enhanced API Server
     this.api = axios.create({
       baseURL: this.baseURL,
       timeout: this.timeout,
@@ -22,6 +34,16 @@ class RAGApiService {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         ...(this.apiKey && { 'Authorization': `Bearer ${this.apiKey}` })
+      }
+    });
+
+    // Initialize axios instance for RAG System monitoring
+    this.ragApi = axios.create({
+      baseURL: this.ragSystemURL,
+      timeout: 10000, // 10 seconds timeout for health checks
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
       }
     });
 
@@ -99,7 +121,10 @@ class RAGApiService {
       // Prepare payload for your custom model API
       const payload = {
         chatId: chatId,
-        prompt: enhancedQuery
+        prompt: query, // Use original query, let server handle enhancement
+        enableSMA: !!smaResults, // Enable SMA if we have results
+        enableRAG: true, // Always enable RAG
+        language: language
       };
 
       console.log('📝 Sending query to custom Llama3 model:', {
@@ -159,8 +184,8 @@ class RAGApiService {
   }
 
   /**
-   * Get project index information
-   * Uses your endpoint: /api/v1/nlp/index/info/{project_id}
+   * Get project index information from RAG system
+   * Uses RAG system endpoint: /api/v1/nlp/index/info/{project_id}
    * @param {string} projectId - Project ID
    * @returns {Promise<Object>} Index information
    */
@@ -168,11 +193,12 @@ class RAGApiService {
     try {
       const pid = projectId || this.projectId;
 
-      console.log('📊 Getting project info from your RAG system:', {
-        endpoint: `/api/v1/nlp/index/info/${pid}`
+      console.log('📊 Getting project info from RAG system:', {
+        endpoint: `/api/v1/nlp/index/info/${pid}`,
+        ragSystemURL: this.ragSystemURL
       });
 
-      const response = await this.api.get(`/api/v1/nlp/index/info/${pid}`);
+      const response = await this.ragApi.get(`/api/v1/nlp/index/info/${pid}`);
 
       if (response.data.signal === 'VECTORDB_COLLECTION_RETRIEVED') {
         return {
@@ -197,24 +223,52 @@ class RAGApiService {
   }
 
   /**
-   * Get system health status by checking project info
+   * Get RAG system health status by checking the RAG system directly
    * @returns {Promise<Object>} Health status
    */
   async getHealthStatus() {
     try {
-      const projectInfo = await this.getProjectInfo();
-      return {
-        status: projectInfo.status === 'success' ? 'healthy' : 'unhealthy',
-        projectId: this.projectId,
-        baseURL: this.baseURL,
-        ...projectInfo
-      };
+      console.log('🔍 Checking RAG system health at:', this.ragSystemURL);
+
+      // Try to check RAG system health
+      const response = await this.ragApi.get('/health');
+
+      if (response.status === 200) {
+        // Also try to get collection info
+        try {
+          const infoResponse = await this.ragApi.get(`/api/v1/nlp/index/info/${this.projectId}`);
+          return {
+            status: 'healthy',
+            projectId: this.projectId,
+            baseURL: this.ragSystemURL,
+            info: infoResponse.data,
+            message: 'RAG system is operational'
+          };
+        } catch (infoError) {
+          return {
+            status: 'healthy',
+            projectId: this.projectId,
+            baseURL: this.ragSystemURL,
+            message: 'RAG system is running but collection info unavailable',
+            warning: infoError.message
+          };
+        }
+      } else {
+        return {
+          status: 'unhealthy',
+          projectId: this.projectId,
+          baseURL: this.ragSystemURL,
+          error: `RAG system returned status ${response.status}`
+        };
+      }
     } catch (error) {
+      console.warn('⚠️ RAG system health check failed:', error.message);
       return {
-        status: 'unhealthy',
+        status: 'error',
         error: error.message,
         projectId: this.projectId,
-        baseURL: this.baseURL
+        baseURL: this.ragSystemURL,
+        message: 'Cannot connect to RAG system. Make sure the RAG service is running on port 8000.'
       };
     }
   }
@@ -399,16 +453,58 @@ class RAGApiService {
   }
 
   /**
-   * Test API connection
-   * @returns {Promise<boolean>} Connection status
+   * Test API connection with detailed debugging
+   * @returns {Promise<Object>} Connection status with details
    */
   async testConnection() {
+    console.log('🔍 Testing connection to custom model API...');
+
     try {
-      await this.getHealthStatus();
-      return true;
+      // Test with a simple ping-like request
+      const testPayload = {
+        chatId: 'test_connection_' + Date.now(),
+        prompt: 'Hello, this is a connection test.'
+      };
+
+      console.log('📡 Testing API endpoint:', {
+        url: `${this.baseURL}/api/chat`,
+        method: 'POST',
+        payload: testPayload
+      });
+
+      const response = await this.api.post('/api/chat', testPayload);
+
+      console.log('✅ Connection test successful:', {
+        status: response.status,
+        hasData: !!response.data,
+        success: response.data?.success
+      });
+
+      return {
+        status: 'connected',
+        endpoint: `${this.baseURL}/api/chat`,
+        response: response.data
+      };
     } catch (error) {
-      console.error('❌ RAG API connection test failed:', error);
-      return false;
+      console.error('❌ Connection test failed:', {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        endpoint: `${this.baseURL}/api/chat`,
+        baseURL: this.baseURL
+      });
+
+      return {
+        status: 'failed',
+        endpoint: `${this.baseURL}/api/chat`,
+        error: error.message,
+        details: {
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          isNetworkError: !error.response,
+          baseURL: this.baseURL
+        }
+      };
     }
   }
 }

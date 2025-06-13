@@ -3,12 +3,17 @@ import {
   IconButton,
   Tooltip,
   keyframes,
-  styled
+  styled,
+  CircularProgress,
+  Box,
+  Typography
 } from '@mui/material';
 import {
   Science as ScienceIcon,
   AutoAwesome as AutoAwesomeIcon,
-  Psychology as PsychologyIcon
+  Psychology as PsychologyIcon,
+  CheckCircle as CheckCircleIcon,
+  Search as SearchIcon
 } from '@mui/icons-material';
 
 // ChatGPT-style animations
@@ -137,28 +142,52 @@ const ResearchButton = ({
   currentLanguage = 'en',
   darkMode = false,
   isActive = false,
-  size = 'small'
+  isLoading = false,
+  isCompleted = false,
+  size = 'small',
+  statusMessage = ''
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   const translations = {
     en: {
       research: 'SMA Intelligence',
-      tooltip: isActive
+      tooltip: isLoading
+        ? 'SMA Loading - Scanning ENIAD & UMP websites...'
+        : isCompleted
+        ? 'SMA Completed - Web intelligence gathered successfully'
+        : isActive
         ? 'SMA Active - Real-time Web Intelligence from ENIAD & UMP'
-        : 'Activate SMA - Smart Multi-Agent web monitoring and intelligence'
+        : 'Activate SMA - Smart Multi-Agent web monitoring and intelligence',
+      loading: 'Scanning...',
+      completed: 'Completed',
+      active: 'SMA Active'
     },
     fr: {
       research: 'Intelligence SMA',
-      tooltip: isActive
+      tooltip: isLoading
+        ? 'SMA en cours - Analyse des sites ENIAD et UMP...'
+        : isCompleted
+        ? 'SMA Terminé - Intelligence web collectée avec succès'
+        : isActive
         ? 'SMA Activé - Intelligence Web en temps réel d\'ENIAD et UMP'
-        : 'Activer SMA - Surveillance et intelligence web multi-agents intelligente'
+        : 'Activer SMA - Surveillance et intelligence web multi-agents intelligente',
+      loading: 'Analyse...',
+      completed: 'Terminé',
+      active: 'SMA Activé'
     },
     ar: {
       research: 'ذكاء SMA',
-      tooltip: isActive
+      tooltip: isLoading
+        ? 'SMA قيد التحميل - فحص مواقع ENIAD و UMP...'
+        : isCompleted
+        ? 'SMA مكتمل - تم جمع ذكاء الويب بنجاح'
+        : isActive
         ? 'SMA نشط - ذكاء الويب في الوقت الفعلي من ENIAD و UMP'
-        : 'تفعيل SMA - مراقبة وذكاء الويب متعدد الوكلاء الذكي'
+        : 'تفعيل SMA - مراقبة وذكاء الويب متعدد الوكلاء الذكي',
+      loading: 'فحص...',
+      completed: 'مكتمل',
+      active: 'SMA نشط'
     }
   };
 
@@ -178,7 +207,29 @@ const ResearchButton = ({
 
   // Get appropriate icon based on state
   const getIcon = () => {
-    if (isActive) {
+    if (isLoading) {
+      return (
+        <CircularProgress
+          size={size === 'small' ? 14 : 18}
+          thickness={4}
+          sx={{
+            color: '#10a37f',
+            filter: 'drop-shadow(0 0 4px rgba(16, 163, 127, 0.5))',
+          }}
+        />
+      );
+    } else if (isCompleted) {
+      return (
+        <CheckCircleIcon
+          sx={{
+            fontSize: size === 'small' ? 16 : 20,
+            color: '#10a37f',
+            filter: 'drop-shadow(0 0 4px rgba(16, 163, 127, 0.5))',
+            animation: `${pulseGlow} 1s ease-out`,
+          }}
+        />
+      );
+    } else if (isActive) {
       return (
         <AutoAwesomeIcon
           sx={{
@@ -199,7 +250,7 @@ const ResearchButton = ({
       );
     } else {
       return (
-        <ScienceIcon
+        <SearchIcon
           sx={{
             fontSize: size === 'small' ? 16 : 20,
             transition: 'all 0.3s ease',
@@ -210,19 +261,51 @@ const ResearchButton = ({
   };
 
   return (
-    <Tooltip title={t.tooltip} placement="top" arrow>
-      <AnimatedIconButton
-        onClick={handleClick}
-        disabled={disabled}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        isActive={isActive}
-        darkMode={darkMode}
-        size={size}
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      <Tooltip
+        title={
+          <Box>
+            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+              {t.tooltip}
+            </Typography>
+            {statusMessage && (
+              <Typography variant="caption" sx={{ opacity: 0.8, mt: 0.5, display: 'block' }}>
+                {statusMessage}
+              </Typography>
+            )}
+          </Box>
+        }
+        placement="top"
+        arrow
       >
-        {getIcon()}
-      </AnimatedIconButton>
-    </Tooltip>
+        <AnimatedIconButton
+          onClick={handleClick}
+          disabled={disabled || isLoading}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          isActive={isActive || isLoading || isCompleted}
+          darkMode={darkMode}
+          size={size}
+        >
+          {getIcon()}
+        </AnimatedIconButton>
+      </Tooltip>
+
+      {(isLoading || isCompleted || isActive) && (
+        <Typography
+          variant="caption"
+          sx={{
+            color: isLoading ? '#10a37f' : isCompleted ? '#10a37f' : '#10a37f',
+            fontWeight: 500,
+            fontSize: '0.7rem',
+            opacity: 0.8,
+            minWidth: 'fit-content'
+          }}
+        >
+          {isLoading ? t.loading : isCompleted ? t.completed : t.active}
+        </Typography>
+      )}
+    </Box>
   );
 };
 

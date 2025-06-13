@@ -24,6 +24,7 @@ import { createChatHandlers } from './utils/chatHandlers';
 import { useTranslation } from './utils/translations';
 import { auth } from './firebase';
 import staticSuggestionsService from './services/staticSuggestionsService';
+import ApiConnectionTest from './components/Debug/ApiConnectionTest';
 
 function App() {
   const navigate = useNavigate();
@@ -38,6 +39,9 @@ function App() {
 
   // SMA (Smart Multi-Agent) state - using research button
   const [isSMAActive, setIsSMAActive] = useState(false);
+  const [isSMALoading, setIsSMALoading] = useState(false);
+  const [isSMACompleted, setIsSMACompleted] = useState(false);
+  const [smaStatusMessage, setSmaStatusMessage] = useState('');
 
   // Suggestions refresh trigger
   const [suggestionsRefreshTrigger, setSuggestionsRefreshTrigger] = useState(0);
@@ -80,7 +84,13 @@ function App() {
       useRAG: true,
       autoSpeak: false,
       speechQuality: 'high',
-      isSMAActive: isSMAActive
+      isSMAActive: isSMAActive,
+      autoCorrect: true,
+      smaStateHandlers: {
+        setIsSMALoading,
+        setIsSMACompleted,
+        setSmaStatusMessage
+      }
     }
   );
 
@@ -263,15 +273,23 @@ function App() {
 
   // SMA Research handler (using research button for SMA)
   const handleResearch = () => {
-    setIsSMAActive(prev => !prev);
-    console.log('🧠 SMA toggled:', !isSMAActive);
+    const newSMAState = !isSMAActive;
+    setIsSMAActive(newSMAState);
 
-    if (!isSMAActive) {
+    // Reset states when toggling
+    setIsSMALoading(false);
+    setIsSMACompleted(false);
+    setSmaStatusMessage('');
+
+    console.log('🧠 SMA toggled:', newSMAState);
+
+    if (newSMAState) {
       console.log('🧠 Activating SMA - Smart Multi-Agent web intelligence');
       console.log('🔍 SMA will scan ENIAD and UMP websites for real-time information');
-      // SMA is now active and will enhance responses with real-time web data
+      setSmaStatusMessage('SMA activated - Ready to enhance responses with web intelligence');
     } else {
       console.log('💬 Deactivating SMA - returning to standard RAG responses');
+      setSmaStatusMessage('');
     }
   };
 
@@ -297,6 +315,7 @@ function App() {
       <CssBaseline />
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/debug" element={<ApiConnectionTest />} />
         <Route
           path="/"
           element={
@@ -417,6 +436,9 @@ function App() {
                     browserSupportsSpeechRecognition={browserSupportsSpeechRecognition}
                     onResearch={handleResearch}
                     isResearchMode={isSMAActive}
+                    isSMALoading={isSMALoading}
+                    isSMACompleted={isSMACompleted}
+                    smaStatusMessage={smaStatusMessage}
                   />
                 </Box>
               </Box>
