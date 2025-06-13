@@ -7,6 +7,7 @@ import smaService from '../services/smaService';
 import translationService from '../services/translationService';
 import autoCorrectionService from '../services/autoCorrectionService';
 import firebaseStorageService from '../services/firebaseStorageService';
+import conversationStateManager from '../services/conversationStateManager';
 
 export const createChatHandlers = (
   chatState,
@@ -39,6 +40,9 @@ export const createChatHandlers = (
     setChatMenuChatId
   } = chatState;
 
+  // Set current user in conversation state manager
+  conversationStateManager.setCurrentUser(user);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -46,38 +50,15 @@ export const createChatHandlers = (
   const updateConversationHistory = async (updatedMessages) => {
     if (!currentChatId) return;
 
-    setConversationHistory(prev => {
-      const existingChat = prev.find(c => c.id === currentChatId);
-      const title = existingChat?.title || updatedMessages.find(m => m.role === 'user')?.content?.substring(0, 30) || 'Nouvelle conversation';
-
-      const updatedChat = {
-        id: currentChatId,
-        title: title.length > 30 ? title.substring(0, 30) + '...' : title,
-        messages: updatedMessages,
-        lastUpdated: new Date().toISOString(),
-        userId: user?.uid
-      };
-
-      // Save to Firebase if user is logged in
-      if (user?.uid) {
-        firebaseStorageService.saveConversation(user.uid, updatedChat)
-          .then(() => {
-            console.log('✅ Conversation saved to Firebase:', currentChatId);
-          })
-          .catch(error => {
-            console.warn('⚠️ Failed to save conversation to Firebase:', error);
-          });
-      }
-
-      // Update local storage
-      const newHistory = [
-        updatedChat,
-        ...prev.filter(c => c.id !== currentChatId)
-      ];
-      localStorage.setItem('conversationHistory', JSON.stringify(newHistory));
-
-      return newHistory;
-    });
+    try {
+      await conversationStateManager.updateConversation(
+        currentChatId,
+        updatedMessages,
+        setConversationHistory
+      );
+    } catch (error) {
+      console.error('❌ Error updating conversation:', error);
+    }
   };
 
   const handleSubmit = async () => {
@@ -369,17 +350,11 @@ export const createChatHandlers = (
     }
   };
 
-  const handleNewChat = () => {
+  const handleNewChat = async () => {
     try {
       // Save current chat before creating new one
       if (messages.length > 0 && currentChatId) {
-        const updatedHistory = conversationHistory.map(chat =>
-          chat.id === currentChatId
-            ? { ...chat, messages: messages }
-            : chat
-        );
-        localStorage.setItem('conversationHistory', JSON.stringify(updatedHistory));
-        setConversationHistory(updatedHistory);
+        await updateConversationHistory(messages);
       }
 
       const newChatId = Date.now().toString();
@@ -387,13 +362,16 @@ export const createChatHandlers = (
         id: newChatId,
         title: t('newConversation'),
         messages: [],
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
+        userId: user?.uid
       };
 
       setCurrentChatId(newChatId);
       localStorage.setItem('currentChatId', newChatId);
 
-      setConversationHistory(prev => [newChat, ...prev]);
+      // Use conversation state manager to create new conversation
+      await conversationStateManager.createConversation(newChat, setConversationHistory);
+
       setMessages([]);
       setInputValue('');
       setMobileOpen(false);
@@ -445,86 +423,44 @@ export const createChatHandlers = (
     }
   };
 
-  const handleDeleteChat = (chatId, e) => {
-    e.stopPropagation();
+  const handleDeleteChat = async (chatId, e) => {
+    e?.stopPropagation();
+
     try {
-      const updatedHistory = conversationHistory.filter(c => c.id !== chatId);
-      localStorage.setItem('conversationHistory', JSON.stringify(updatedHistory));
-      setConversationHistory(updatedHistory);
+      console.log('🗑️ Deleting conversation with Firebase sync:', chatId);
 
-      if (currentChatId === chatId) {
-        if (updatedHistory.length > 0) {
-          // Load the first available chat
-          const firstChat = updatedHistory[0];
-          setCurrentChatId(firstChat.id);
-          localStorage.setItem('currentChatId', firstChat.id);
-          setMessages(firstChat.messages);
-        } else {
-          // No conversations left - create a fresh new chat
-          console.log('🗑️ Last conversation deleted, creating fresh chat');
+      // Use conversation state manager for persistent deletion
+      await conversationStateManager.deleteConversation(
+        chatId,
+        setConversationHistory,
+        setCurrentChatId,
+        setMessages
+      );
 
-          // Clear current state
-          setCurrentChatId(null);
-          localStorage.removeItem('currentChatId');
-          setMessages([]);
-          setInputValue('');
-          setEditingMessageId(null);
-          setEditedMessageContent('');
+      // Close mobile menu if open
+      setMobileOpen(false);
+      setEditingMessageId(null);
+      setEditedMessageContent('');
 
-          // Create a new chat immediately
-          const newChatId = Date.now().toString();
-          const newChat = {
-            id: newChatId,
-            title: t('newConversation'),
-            messages: [],
-            lastUpdated: new Date().toISOString()
-          };
+      // Refresh static suggestions
+      staticSuggestionsService.forceRefresh();
+      console.log('🔄 Static suggestions refreshed after conversation deletion');
 
-          // Set the new chat as current
-          setCurrentChatId(newChatId);
-          localStorage.setItem('currentChatId', newChatId);
-
-          // Add to conversation history
-          setConversationHistory([newChat]);
-          localStorage.setItem('conversationHistory', JSON.stringify([newChat]));
-
-          // Close mobile menu if open
-          setMobileOpen(false);
-
-          // Refresh static suggestions for new conversation
-          staticSuggestionsService.forceRefresh();
-          console.log('🔄 Static suggestions refreshed for new conversation after delete');
-
-          // Trigger UI refresh for suggestion cards
-          if (setSuggestionsRefreshTrigger) {
-            setSuggestionsRefreshTrigger(prev => prev + 1);
-          }
-
-          // Focus input after a short delay
-          setTimeout(() => {
-            document.querySelector('.chat-input input')?.focus();
-          }, 100);
-        }
+      // Trigger UI refresh for suggestion cards
+      if (setSuggestionsRefreshTrigger) {
+        setSuggestionsRefreshTrigger(prev => prev + 1);
       }
+
+      // Focus input after a short delay
+      setTimeout(() => {
+        document.querySelector('.chat-input input')?.focus();
+      }, 100);
+
+      console.log('✅ Conversation deleted successfully with Firebase sync');
+
     } catch (error) {
-      console.error('❌ Error deleting chat:', error);
-
-      // Fallback: ensure we have at least one conversation
-      if (conversationHistory.length === 0) {
-        console.log('🔄 Fallback: Creating emergency conversation');
-        const emergencyChat = {
-          id: Date.now().toString(),
-          title: t('newConversation'),
-          messages: [],
-          lastUpdated: new Date().toISOString()
-        };
-
-        setConversationHistory([emergencyChat]);
-        setCurrentChatId(emergencyChat.id);
-        setMessages([]);
-        localStorage.setItem('conversationHistory', JSON.stringify([emergencyChat]));
-        localStorage.setItem('currentChatId', emergencyChat.id);
-      }
+      console.error('❌ Error deleting conversation:', error);
+      // Error handling is done in the conversation state manager
     }
   };
 
@@ -554,15 +490,18 @@ export const createChatHandlers = (
     setRenameDialogOpen(true);
   };
 
-  const handleRenameSubmit = (newTitle) => {
+  const handleRenameSubmit = async (newTitle) => {
     if (newTitle.trim()) {
-      const updatedHistory = conversationHistory.map(chat =>
-        chat.id === chatState.renameChatId
-          ? { ...chat, title: newTitle.trim() }
-          : chat
-      );
-      setConversationHistory(updatedHistory);
-      localStorage.setItem('conversationHistory', JSON.stringify(updatedHistory));
+      try {
+        await conversationStateManager.renameConversation(
+          chatState.renameChatId,
+          newTitle.trim(),
+          setConversationHistory
+        );
+        console.log('✅ Conversation renamed with Firebase sync');
+      } catch (error) {
+        console.error('❌ Error renaming conversation:', error);
+      }
     }
     setRenameDialogOpen(false);
     setRenameChatId(null);
