@@ -169,15 +169,22 @@ class FirebaseStorageService {
   }
 
   /**
-   * Delete conversation
+   * Delete conversation from Firebase and local storage
    */
-  async deleteConversation(conversationId) {
-    if (!db || !conversationId) return false;
+  async deleteConversation(userId, conversationId) {
+    if (!db || !userId || !conversationId) return false;
 
     try {
+      // Delete from Firebase
       const conversationRef = doc(db, this.conversationsCollection, conversationId);
       await deleteDoc(conversationRef);
-      console.log('✅ Conversation deleted:', conversationId);
+
+      // Update local storage immediately
+      const localConversations = JSON.parse(localStorage.getItem('conversationHistory') || '[]');
+      const updatedConversations = localConversations.filter(conv => conv.id !== conversationId);
+      localStorage.setItem('conversationHistory', JSON.stringify(updatedConversations));
+
+      console.log('✅ Conversation deleted from Firebase and local storage:', conversationId);
       return true;
     } catch (error) {
       console.error('❌ Error deleting conversation:', error);
@@ -186,36 +193,119 @@ class FirebaseStorageService {
   }
 
   /**
-   * Sync local conversations with Firebase
+   * Rename conversation in Firebase and local storage
    */
-  async syncConversations(userId, localConversations) {
-    if (!db || !userId || !Array.isArray(localConversations)) return [];
+  async renameConversation(userId, conversationId, newTitle) {
+    if (!db || !userId || !conversationId || !newTitle) return false;
 
     try {
-      console.log('🔄 Syncing conversations with Firebase...');
-      
-      // Get existing conversations from Firebase
-      const firebaseConversations = await this.getUserConversations(userId);
-      const firebaseConversationIds = new Set(firebaseConversations.map(c => c.id));
-
-      // Save local conversations that don't exist in Firebase
-      const syncPromises = localConversations.map(async (conversation) => {
-        if (!firebaseConversationIds.has(conversation.id)) {
-          return this.saveConversation(userId, conversation);
-        }
-        return null;
+      // Update in Firebase
+      const conversationRef = doc(db, this.conversationsCollection, conversationId);
+      await updateDoc(conversationRef, {
+        title: newTitle,
+        updatedAt: serverTimestamp()
       });
 
-      await Promise.all(syncPromises);
+      // Update local storage immediately
+      const localConversations = JSON.parse(localStorage.getItem('conversationHistory') || '[]');
+      const updatedConversations = localConversations.map(conv =>
+        conv.id === conversationId
+          ? { ...conv, title: newTitle, updatedAt: new Date().toISOString() }
+          : conv
+      );
+      localStorage.setItem('conversationHistory', JSON.stringify(updatedConversations));
 
-      // Return all conversations (Firebase + newly synced)
-      const allConversations = await this.getUserConversations(userId);
-      console.log(`✅ Sync completed: ${allConversations.length} total conversations`);
-      
-      return allConversations;
+      console.log('✅ Conversation renamed in Firebase and local storage:', conversationId);
+      return true;
+    } catch (error) {
+      console.error('❌ Error renaming conversation:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Sync conversations with Firebase (Firebase is the source of truth)
+   */
+  async syncConversations(userId, localConversations = []) {
+    if (!db || !userId) return [];
+
+    try {
+      console.log('🔄 Syncing conversations with Firebase (Firebase as source of truth)...');
+
+      // Get all conversations from Firebase (this is the authoritative source)
+      const firebaseConversations = await this.getUserConversations(userId);
+
+      // If we have local conversations that don't exist in Firebase, save them
+      if (Array.isArray(localConversations) && localConversations.length > 0) {
+        const firebaseConversationIds = new Set(firebaseConversations.map(c => c.id));
+
+        const newLocalConversations = localConversations.filter(conv =>
+          !firebaseConversationIds.has(conv.id) && conv.userId === userId
+        );
+
+        if (newLocalConversations.length > 0) {
+          console.log(`📤 Uploading ${newLocalConversations.length} new local conversations to Firebase...`);
+          const uploadPromises = newLocalConversations.map(conversation =>
+            this.saveConversation(userId, conversation)
+          );
+          await Promise.all(uploadPromises);
+
+          // Get updated conversations from Firebase
+          const updatedFirebaseConversations = await this.getUserConversations(userId);
+
+          // Update local storage with Firebase data
+          localStorage.setItem('conversationHistory', JSON.stringify(updatedFirebaseConversations));
+
+          console.log(`✅ Sync completed: ${updatedFirebaseConversations.length} total conversations`);
+          return updatedFirebaseConversations;
+        }
+      }
+
+      // Update local storage with Firebase data (Firebase is source of truth)
+      localStorage.setItem('conversationHistory', JSON.stringify(firebaseConversations));
+
+      console.log(`✅ Sync completed: ${firebaseConversations.length} conversations loaded from Firebase`);
+      return firebaseConversations;
+
     } catch (error) {
       console.error('❌ Error syncing conversations:', error);
-      return localConversations; // Return local conversations as fallback
+      // On error, return local conversations as fallback but don't update Firebase
+      return Array.isArray(localConversations) ? localConversations : [];
+    }
+  }
+
+  /**
+   * Real-time conversation state synchronization
+   */
+  async performRealTimeSync(userId, action, conversationData) {
+    if (!db || !userId) return false;
+
+    try {
+      switch (action) {
+        case 'create':
+        case 'update':
+          await this.saveConversation(userId, conversationData);
+          break;
+
+        case 'delete':
+          await this.deleteConversation(userId, conversationData.id);
+          break;
+
+        case 'rename':
+          await this.renameConversation(userId, conversationData.id, conversationData.title);
+          break;
+
+        default:
+          console.warn('Unknown sync action:', action);
+          return false;
+      }
+
+      console.log(`✅ Real-time sync completed: ${action} for conversation ${conversationData.id}`);
+      return true;
+
+    } catch (error) {
+      console.error(`❌ Real-time sync failed for ${action}:`, error);
+      throw error;
     }
   }
 

@@ -24,6 +24,7 @@ import { createChatHandlers } from './utils/chatHandlers';
 import { useTranslation } from './utils/translations';
 import { auth } from './firebase';
 import staticSuggestionsService from './services/staticSuggestionsService';
+import conversationStateManager from './services/conversationStateManager';
 import ApiConnectionTest from './components/Debug/ApiConnectionTest';
 
 function App() {
@@ -96,68 +97,57 @@ function App() {
 
   // Load saved conversations on mount and user changes
   useEffect(() => {
-    try {
-      // Initialize static suggestions on app load
-      staticSuggestionsService.forceRefresh();
-      setSuggestionsRefreshTrigger(prev => prev + 1);
-      console.log('🔄 Static suggestions initialized on app load');
+    const loadConversations = async () => {
+      try {
+        // Initialize static suggestions on app load
+        staticSuggestionsService.forceRefresh();
+        setSuggestionsRefreshTrigger(prev => prev + 1);
+        console.log('🔄 Static suggestions initialized on app load');
 
-      // Only load conversations if user is logged in
-      if (user) {
-        console.log('👤 User logged in, loading conversations...');
-        const savedHistory = localStorage.getItem('conversationHistory');
+        // Set current user in conversation state manager
+        conversationStateManager.setCurrentUser(user);
+
+        // Load conversations using the state manager
+        const conversations = await conversationStateManager.loadConversations(
+          chatState.setConversationHistory
+        );
+
+        // Handle current chat selection
         const savedCurrentChatId = localStorage.getItem('currentChatId');
 
-        if (savedHistory) {
-          const parsedHistory = JSON.parse(savedHistory);
-
-          // Filter conversations for current user (if userId exists)
-          const userConversations = parsedHistory.filter(chat =>
-            !chat.userId || chat.userId === user.uid
-          );
-
-          // Ensure we have valid conversation history
-          if (userConversations && Array.isArray(userConversations) && userConversations.length > 0) {
-            chatState.setConversationHistory(userConversations);
-
-            if (savedCurrentChatId) {
-              const currentChat = userConversations.find(chat => chat.id === savedCurrentChatId);
-              if (currentChat) {
-                chatState.setCurrentChatId(savedCurrentChatId);
-                chatState.setMessages(currentChat.messages);
-              } else {
-                // Current chat ID not found, load first available chat
-                const firstChat = userConversations[0];
-                chatState.setCurrentChatId(firstChat.id);
-                chatState.setMessages(firstChat.messages);
-                localStorage.setItem('currentChatId', firstChat.id);
-              }
+        if (conversations.length > 0) {
+          if (savedCurrentChatId) {
+            const currentChat = conversations.find(chat => chat.id === savedCurrentChatId);
+            if (currentChat) {
+              chatState.setCurrentChatId(savedCurrentChatId);
+              chatState.setMessages(currentChat.messages || []);
             } else {
-              // No current chat ID, load first available chat
-              const firstChat = userConversations[0];
+              // Current chat ID not found, load first available chat
+              const firstChat = conversations[0];
               chatState.setCurrentChatId(firstChat.id);
-              chatState.setMessages(firstChat.messages);
+              chatState.setMessages(firstChat.messages || []);
               localStorage.setItem('currentChatId', firstChat.id);
             }
           } else {
-            // No user conversations, create new chat
-            console.log('📝 No user conversations found, creating new chat');
-            chatHandlers.handleNewChat();
+            // No current chat ID, load first available chat
+            const firstChat = conversations[0];
+            chatState.setCurrentChatId(firstChat.id);
+            chatState.setMessages(firstChat.messages || []);
+            localStorage.setItem('currentChatId', firstChat.id);
           }
         } else {
-          // No saved history, create new chat
-          console.log('📝 No conversation history found, creating new chat');
-          chatHandlers.handleNewChat();
+          // No conversations found, create new chat
+          console.log('📝 No conversations found, creating new chat');
+          await chatHandlers.handleNewChat();
         }
-      } else {
-        // User not logged in, create anonymous chat
-        console.log('👤 No user logged in, creating anonymous chat');
-        chatHandlers.handleNewChat();
+
+      } catch (error) {
+        console.error('Error loading conversations:', error);
+        await chatHandlers.handleNewChat();
       }
-    } catch (error) {
-      console.error('Error loading saved conversations:', error);
-      chatHandlers.handleNewChat();
-    }
+    };
+
+    loadConversations();
   }, [user]); // Depend on user to reload conversations when login state changes
 
   // Handle transcript changes
@@ -274,21 +264,27 @@ function App() {
   };
 
   // Auth handler
-  const handleAuthAction = () => {
+  const handleAuthAction = async () => {
     if (user) {
-      // Clear user-specific data on logout
-      chatState.setConversationHistory([]);
-      chatState.setMessages([]);
-      chatState.setCurrentChatId(null);
-      localStorage.removeItem('conversationHistory');
-      localStorage.removeItem('currentChatId');
+      try {
+        // Use conversation state manager to clear all data
+        await conversationStateManager.clearConversations(
+          chatState.setConversationHistory,
+          chatState.setMessages,
+          chatState.setCurrentChatId
+        );
 
-      // Sign out
-      auth.signOut().then(() => {
+        // Sign out
+        await auth.signOut();
         console.log('✅ User logged out and data cleared');
+
         // Create a fresh new chat after logout
-        chatHandlers.handleNewChat();
-      });
+        await chatHandlers.handleNewChat();
+      } catch (error) {
+        console.error('❌ Error during logout:', error);
+        // Force logout even if there's an error
+        auth.signOut();
+      }
     } else {
       navigate('/login');
     }
