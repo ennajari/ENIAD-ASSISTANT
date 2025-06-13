@@ -1,0 +1,430 @@
+[
+    {
+        "question": "Quel est le nom officiel complet de l'établissement ?",
+        "answer": "École Nationale de l'Intelligence Artificielle et du Digital de Berkane (ENIAD)"
+    },
+    {
+        "question": "À quelle université l'ENIAD est-elle rattachée ?",
+        "answer": "Université Mohammed Premier (UMP)"
+    },
+    {
+        "question": "Quelle est l'adresse postale complète du campus ENIAD ?",
+        "answer": "Route Aklim, 63255, Berkane, Maroc"
+    },
+    {
+        "question": "Quel est le numéro de téléphone principal de l'ENIAD ?",
+        "answer": "+212 5 36 50 29 79"
+    },
+    {
+        "question": "Quel est le numéro de fax de l'ENIAD ?",
+        "answer": "+212 5 36 50 06 09"
+    },
+    {
+        "question": "Quelle adresse email de contact est fournie pour l'ENIAD ?",
+        "answer": "eniad@ump.ac.ma"
+    },
+    {
+        "question": "Quel est l'URL du site web officiel de l'ENIAD ?",
+        "answer": "http://eniad.ump.ma"
+    },
+    {
+        "question": "Qui est le directeur de l'ENIAD et quelle est son adresse email ?",
+        "answer": "Jaafar Khalid (sminairelc@yahoo.fr)"
+    },
+    {
+        "question": "Quelles filières d'ingénieur propose l'ENIAD et leurs quotas ?",
+        "answer": "IA 60 places, ROC 50 places, IRSI 50 places, GINF 60 places"
+    },
+    {
+        "question": "Quelles spécialités DUT sont acceptées pour l'admission ?",
+        "answer": "Informatique, Réseaux, Systèmes embarqués, IA, Sciences des données"
+    },
+    {
+        "question": "Quelles conditions s'appliquent aux titulaires de DEUG/DEUST/DEUP ?",
+        "answer": "Mathématiques Appliquées, Physique, mention ≥ 2"
+    },
+    {
+        "question": "Quelles conditions doivent remplir les titulaires de licence scientifique ?",
+        "answer": "Mathématiques, Physique, mention ≥ 3"
+    },
+    {
+        "question": "Quand ouvre la période de préinscription à l'ENIAD ?",
+        "answer": "mi-juin"
+    },
+    {
+        "question": "Quand se termine la période de préinscription ?",
+        "answer": "fin juillet"
+    },
+    {
+        "question": "Quand a lieu le concours écrit de l'ENIAD ?",
+        "answer": "mi-septembre"
+    },
+    {
+        "question": "Quand se tient le concours oral ?",
+        "answer": "fin septembre"
+    },
+    {
+        "question": "Quand débute l'inscription administrative ?",
+        "answer": "début octobre"
+    },
+    {
+        "question": "Quelles sont les étapes de la procédure d'inscription ?",
+        "answer": "Préinscription en ligne, étude de dossier, concours écrit, entretien oral, inscription administrative"
+    },
+    {
+        "question": "Quelles thématiques couvre le Lab IA et Deep Learning ?",
+        "answer": "Machine Learning, Vision, NLP"
+    },
+    {
+        "question": "Quelles thématiques couvre le Lab Robotique & IoT ?",
+        "answer": "Robotique mobile, Systèmes embarqués"
+    },
+    {
+        "question": "Quelles thématiques couvre le Lab Réseaux et Sécurité ?",
+        "answer": "Cybersécurité, Blockchain"
+    },
+    {
+        "question": "Quelles thématiques couvre le Lab Systèmes d'Information ?",
+        "answer": "Big Data, Cloud"
+    },
+    {
+        "question": "Quels partenariats académiques l'ENIAD entretient-elle ?",
+        "answer": "UMP"
+    },
+    {
+        "question": "Quelles bourses sont disponibles via le CNOUS ?",
+        "answer": "Disponibles selon critères académiques et sociaux"
+    },
+    {
+        "question": "L'ENIAD est-il présent sur Facebook ?",
+        "answer": "https://www.facebook.com/ENIADBERKANE"
+    },
+    {
+        "question": "L'ENIAD est-il présent sur Linkedin ?",
+        "answer": "https://www.linkedin.com/school/eniadberkane/"
+    },
+    {
+        "question": "L'ENIAD est-il présent sur Instagram ?",
+        "answer": "https://www.instagram.com/eniadbmedia/"
+    },
+    {
+        "question": "Quelle est la langue principale d'enseignement ?",
+        "answer": "Français"
+    },
+    {
+        "question": "Quelle langue technique est utilisée ?",
+        "answer": "Anglais"
+    },
+    {
+        "question": "Quelle est la durée du cycle ingénieur ?",
+        "answer": "3 ans (cycle ingénieur)"
+    },
+    {
+        "question": "Quel diplôme est délivré à l'issue du cycle ?",
+        "answer": "Ingénieur d'État (Bac+5)"
+    },
+    {
+        "question": "Quels sont les frais de scolarité ?",
+        "answer": "Gratuit (droits universitaires UMP)"
+    },
+    {
+        "question": "Par quelle autorité l'ENIAD est-elle accréditée ?",
+        "answer": "Ministère de l'Enseignement Supérieur"
+    },
+    {
+        "question": "Quelle est la mission de l'ENIAD ?",
+        "answer": "Former des ingénieurs hautement qualifiés en intelligence artificielle et en digital"
+    },
+    {
+        "question": "Quelle est la vision de l'ENIAD ?",
+        "answer": "Devenir un pôle d'excellence technologique et académique dans la région de l'Oriental"
+    },
+    {
+        "question": "Quel est l'historique de création de l'ENIAD ?",
+        "answer": "Créée en 2023 dans le cadre de l'élargissement de l'offre de formation de l'UMP"
+    },
+    {
+        "question": "Qu'est-ce que l'intelligence artificielle ?",
+        "answer": "L'IA est une technologie qui permet aux machines d'apprendre, de raisonner et de prendre des décisions comme les humains"
+    },
+    {
+        "question": "Quels sont les domaines d'application de l'IA ?",
+        "answer": "Santé, transport, finance, éducation, robotique, vision par ordinateur, traitement du langage naturel"
+    },
+    {
+        "question": "Qu'est-ce que le machine learning ?",
+        "answer": "Une branche de l'IA qui permet aux systèmes d'apprendre automatiquement à partir de données"
+    },
+    {
+        "question": "Qu'est-ce que le deep learning ?",
+        "answer": "Une technique d'apprentissage automatique basée sur les réseaux de neurones artificiels"
+    },
+    {
+        "question": "Quels langages de programmation sont utilisés en IA ?",
+        "answer": "Python, R, Java, C++, JavaScript, Julia, Scala"
+    },
+    {
+        "question": "Qu'est-ce que TensorFlow ?",
+        "answer": "Une bibliothèque open-source de Google pour l'apprentissage automatique et les réseaux de neurones"
+    },
+    {
+        "question": "Qu'est-ce que PyTorch ?",
+        "answer": "Un framework d'apprentissage automatique développé par Facebook pour la recherche en IA"
+    },
+    {
+        "question": "Comment s'inscrire à l'ENIAD ?",
+        "answer": "Via la plateforme en ligne, dépôt de dossier, concours écrit et entretien oral"
+    },
+    {
+        "question": "Quelles sont les conditions d'admission ?",
+        "answer": "Bac+2 minimum en sciences, mathématiques ou informatique avec mention"
+    },
+    {
+        "question": "Y a-t-il des bourses d'études disponibles ?",
+        "answer": "Oui, bourses CNOUS selon critères sociaux et bourses d'excellence académique"
+    },
+    {
+        "question": "Combien coûte la formation à l'ENIAD ?",
+        "answer": "Formation gratuite, seuls les droits universitaires UMP sont à payer"
+    },
+    {
+        "question": "Quelle est la durée des études ?",
+        "answer": "3 ans pour le cycle ingénieur après un Bac+2"
+    },
+    {
+        "question": "Y a-t-il des stages obligatoires ?",
+        "answer": "Oui, stages en entreprise chaque année et projet de fin d'études"
+    },
+    {
+        "question": "Comment accéder au campus ?",
+        "answer": "Transport public, navettes universitaires ou véhicule personnel"
+    },
+    {
+        "question": "Y a-t-il une résidence étudiante ?",
+        "answer": "Pas sur le campus, mais logements étudiants disponibles en ville"
+    },
+    {
+        "question": "Quels sont les horaires des cours ?",
+        "answer": "8h30-17h30 du lundi au vendredi, avec pauses déjeuner"
+    },
+    {
+        "question": "Y a-t-il une bibliothèque ?",
+        "answer": "Oui, bibliothèque moderne avec ressources numériques et espaces d'étude"
+    },
+    {
+        "question": "Comment accéder au WiFi campus ?",
+        "answer": "Avec vos identifiants étudiants fournis lors de l'inscription"
+    },
+    {
+        "question": "Y a-t-il des clubs étudiants ?",
+        "answer": "Oui, club robotique, IA, cybersécurité, et activités culturelles"
+    },
+    {
+        "question": "Peut-on faire un double diplôme ?",
+        "answer": "Oui, partenariats avec universités internationales pour doubles diplômes"
+    },
+    {
+        "question": "Y a-t-il des cours en ligne ?",
+        "answer": "Oui, plateforme e-learning avec cours hybrides et MOOCs"
+    },
+    {
+        "question": "Comment contacter les professeurs ?",
+        "answer": "Email, heures de permanence, plateforme pédagogique en ligne"
+    },
+    {
+        "question": "Y a-t-il des projets étudiants ?",
+        "answer": "Oui, projets individuels et en équipe avec entreprises partenaires"
+    },
+    {
+        "question": "Qu'est-ce que la vision par ordinateur ?",
+        "answer": "Domaine de l'IA qui permet aux machines d'interpréter et analyser les images"
+    },
+    {
+        "question": "Qu'est-ce que le NLP ?",
+        "answer": "Natural Language Processing - traitement automatique du langage naturel"
+    },
+    {
+        "question": "Qu'est-ce qu'un algorithme ?",
+        "answer": "Séquence d'instructions pour résoudre un problème ou effectuer une tâche"
+    },
+    {
+        "question": "Qu'est-ce que les Big Data ?",
+        "answer": "Ensemble de données volumineuses nécessitant des outils spécialisés pour l'analyse"
+    },
+    {
+        "question": "Qu'est-ce que le cloud computing ?",
+        "answer": "Fourniture de services informatiques via Internet (stockage, calcul, logiciels)"
+    },
+    {
+        "question": "Comment se déroulent les examens ?",
+        "answer": "Contrôles continus, examens semestriels et soutenances de projets"
+    },
+    {
+        "question": "Y a-t-il des cours du soir ?",
+        "answer": "Non, formation en présentiel de jour uniquement"
+    },
+    {
+        "question": "Peut-on étudier à l'étranger ?",
+        "answer": "Oui, programmes d'échange avec universités partenaires internationales"
+    },
+    {
+        "question": "Y a-t-il une cafétéria ?",
+        "answer": "Oui, cafétéria sur le campus avec menus variés"
+    },
+    {
+        "question": "Comment obtenir un certificat ?",
+        "answer": "Validation des modules, stages et soutenance du projet de fin d'études"
+    },
+    {
+        "question": "Qu'est-ce qu'un réseau de neurones ?",
+        "answer": "Modèle informatique inspiré du cerveau humain pour l'apprentissage automatique"
+    },
+    {
+        "question": "Comment fonctionne un chatbot ?",
+        "answer": "Utilise le NLP et l'IA pour comprendre et répondre aux questions des utilisateurs"
+    },
+    {
+        "question": "Qu'est-ce que l'apprentissage supervisé ?",
+        "answer": "Type d'apprentissage automatique utilisant des données étiquetées pour l'entraînement"
+    },
+    {
+        "question": "Qu'est-ce que l'apprentissage non supervisé ?",
+        "answer": "Apprentissage automatique sans données étiquetées, découvre des patterns cachés"
+    },
+    {
+        "question": "Qu'est-ce que l'apprentissage par renforcement ?",
+        "answer": "L'agent apprend par essais-erreurs en recevant des récompenses ou pénalités"
+    },
+    {
+        "question": "Qu'est-ce que la robotique ?",
+        "answer": "Science qui conçoit et construit des robots pour automatiser des tâches"
+    },
+    {
+        "question": "Qu'est-ce que l'IoT ?",
+        "answer": "Internet des Objets - réseau d'objets connectés échangeant des données"
+    },
+    {
+        "question": "Qu'est-ce que la cybersécurité ?",
+        "answer": "Protection des systèmes informatiques contre les menaces et attaques"
+    },
+    {
+        "question": "Qu'est-ce que la blockchain ?",
+        "answer": "Technologie de stockage et transmission d'informations sécurisée et décentralisée"
+    },
+    {
+        "question": "Comment s'inscrire aux cours ?",
+        "answer": "Via la plateforme étudiante en ligne au début de chaque semestre"
+    },
+    {
+        "question": "Comment consulter mes notes ?",
+        "answer": "Sur la plateforme pédagogique avec vos identifiants étudiants"
+    },
+    {
+        "question": "Comment réserver une salle ?",
+        "answer": "Via l'application mobile ENIAD ou le portail étudiant"
+    },
+    {
+        "question": "Comment rejoindre un projet ?",
+        "answer": "Candidature via la plateforme projets ou contact direct avec les professeurs"
+    },
+    {
+        "question": "Comment accéder aux laboratoires ?",
+        "answer": "Inscription aux créneaux via la plateforme, badge étudiant requis"
+    },
+    {
+        "question": "Où trouver les supports de cours ?",
+        "answer": "Sur la plateforme e-learning, section ressources pédagogiques"
+    },
+    {
+        "question": "Comment signaler un problème technique ?",
+        "answer": "Service informatique via email support@eniad.ump.ma ou guichet d'accueil"
+    },
+    {
+        "question": "Comment participer aux concours ?",
+        "answer": "Inscription via les annonces sur le portail étudiant et réseaux sociaux"
+    },
+    {
+        "question": "Comment obtenir une attestation ?",
+        "answer": "Demande en ligne via le portail administratif étudiant"
+    },
+    {
+        "question": "Comment changer de spécialité ?",
+        "answer": "Dossier de demande avant la fin du premier semestre, sous conditions"
+    },
+    {
+        "question": "Admission à l'ENIAD ?",
+        "answer": "Concours d'admission avec dossier, écrit et oral"
+    },
+    {
+        "question": "Adresse de l'ENIAD ?",
+        "answer": "Route Aklim, 63255, Berkane, Maroc"
+    },
+    {
+        "question": "Algorithmes d'IA ?",
+        "answer": "Réseaux de neurones, arbres de décision, SVM, clustering"
+    },
+    {
+        "question": "Applications mobiles ?",
+        "answer": "Développement Android, iOS, React Native, Flutter"
+    },
+    {
+        "question": "Apprentissage automatique ?",
+        "answer": "Machine Learning avec Python, scikit-learn, pandas"
+    },
+    {
+        "question": "Bourses d'études ?",
+        "answer": "CNOUS, bourses d'excellence, aides sociales"
+    },
+    {
+        "question": "Bibliothèque ENIAD ?",
+        "answer": "Ouverte 8h-20h, ressources numériques, espaces d'étude"
+    },
+    {
+        "question": "Campus ENIAD ?",
+        "answer": "Moderne, laboratoires équipés, WiFi, cafétéria"
+    },
+    {
+        "question": "Cours en ligne ?",
+        "answer": "Plateforme e-learning, MOOCs, classes virtuelles"
+    },
+    {
+        "question": "Cybersécurité formation ?",
+        "answer": "Sécurité réseaux, cryptographie, ethical hacking"
+    },
+    {
+        "question": "Data Science ?",
+        "answer": "Analyse de données, visualisation, statistiques"
+    },
+    {
+        "question": "Diplôme ENIAD ?",
+        "answer": "Ingénieur d'État Bac+5 reconnu par l'État"
+    },
+    {
+        "question": "Emploi après ENIAD ?",
+        "answer": "Ingénieur IA, développeur, consultant, chercheur"
+    },
+    {
+        "question": "Examens ENIAD ?",
+        "answer": "Contrôle continu, examens semestriels, projets"
+    },
+    {
+        "question": "Frais de scolarité ?",
+        "answer": "Gratuit, seulement droits universitaires UMP"
+    },
+    {
+        "question": "Horaires des cours ?",
+        "answer": "8h30-17h30, lundi à vendredi"
+    },
+    {
+        "question": "Intelligence artificielle ?",
+        "answer": "IA, ML, DL, NLP, vision par ordinateur"
+    },
+    {
+        "question": "Inscription ENIAD ?",
+        "answer": "En ligne, dossier, concours, entretien"
+    },
+    {
+        "question": "Laboratoires ENIAD ?",
+        "answer": "IA, Robotique, Réseaux, Systèmes d'information"
+    }
+]

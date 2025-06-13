@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Box,
   Container,
@@ -16,6 +16,7 @@ import {
 } from '@mui/icons-material';
 import { translations } from '../constants/config';
 import ResearchButton from './ResearchButton';
+import QuestionAutocomplete from './QuestionAutocomplete';
 
 const ChatInput = ({
   inputValue = '',
@@ -33,6 +34,55 @@ const ChatInput = ({
   isResearchMode = false
 }) => {
   const t = (key) => translations[currentLanguage]?.[key] || translations.en[key] || key;
+
+  // Autocomplete state
+  const [showAutocomplete, setShowAutocomplete] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const [isHoveringAutocomplete, setIsHoveringAutocomplete] = useState(false);
+  const inputRef = useRef(null);
+
+  // Handle question selection from autocomplete
+  const handleQuestionSelect = (question) => {
+    // Create a synthetic event to match the expected format
+    const syntheticEvent = {
+      target: {
+        value: question
+      }
+    };
+    onInputChange(syntheticEvent);
+    setShowAutocomplete(false);
+
+    // Focus back to input
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
+
+  // Handle input focus
+  const handleInputFocus = () => {
+    console.log('🎯 Input focused, showing autocomplete');
+    setIsFocused(true);
+    setShowAutocomplete(true);
+  };
+
+  // Handle input blur (with delay to allow autocomplete clicks)
+  const handleInputBlur = () => {
+    console.log('🔍 Input blur, hovering:', isHoveringAutocomplete);
+    setIsFocused(false);
+    setTimeout(() => {
+      if (!isHoveringAutocomplete) {
+        setShowAutocomplete(false);
+      }
+    }, 200);
+  };
+
+  // Handle input change
+  const handleInputChange = (e) => {
+    console.log('📝 Input changed:', e.target.value);
+    onInputChange(e);
+    // Always show autocomplete when typing
+    setShowAutocomplete(true);
+  };
 
   return (
     <Box
@@ -58,17 +108,21 @@ const ChatInput = ({
           mx: 'auto'
         }}
       >
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder={t('writeMessage')}
-          value={inputValue}
-          onChange={onInputChange}
-          onKeyPress={onKeyPress}
-          disabled={isLoading}
-          multiline
-          maxRows={6}
-          className="chat-input"
+        <Box sx={{ position: 'relative' }}>
+          <TextField
+            ref={inputRef}
+            fullWidth
+            variant="outlined"
+            placeholder={t('writeMessage')}
+            value={inputValue}
+            onChange={handleInputChange}
+            onKeyPress={onKeyPress}
+            onFocus={handleInputFocus}
+            onBlur={handleInputBlur}
+            disabled={isLoading}
+            multiline
+            maxRows={6}
+            className="chat-input"
           sx={{
             '& .MuiOutlinedInput-root': {
               borderRadius: '28px',
@@ -211,6 +265,24 @@ const ChatInput = ({
             )
           }}
         />
+
+        {/* Question Autocomplete */}
+        <QuestionAutocomplete
+          inputValue={inputValue}
+          onQuestionSelect={handleQuestionSelect}
+          onClose={() => {
+            setShowAutocomplete(false);
+            setIsHoveringAutocomplete(false);
+          }}
+          onMouseEnter={() => setIsHoveringAutocomplete(true)}
+          onMouseLeave={() => setIsHoveringAutocomplete(false)}
+          isVisible={showAutocomplete && (isFocused || isHoveringAutocomplete)}
+          maxSuggestions={5}
+          currentLanguage={currentLanguage}
+          darkMode={darkMode}
+        />
+        </Box>
+
         <Typography variant="caption" sx={{
           display: 'block',
           textAlign: 'center',

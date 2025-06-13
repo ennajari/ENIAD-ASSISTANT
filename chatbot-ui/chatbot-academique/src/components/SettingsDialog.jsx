@@ -21,9 +21,11 @@ import {
   Palette as PaletteIcon,
   VolumeUp as VolumeUpIcon,
   Language as LanguageIcon,
-  Info as InfoIcon
+  Info as InfoIcon,
+  Psychology as BrainIcon
 } from '@mui/icons-material';
 import { LANGUAGES, translations } from '../constants/config';
+import RagStatus from './RagStatus';
 
 const SettingsDialog = ({
   open = false,
@@ -322,6 +324,49 @@ const SettingsDialog = ({
                   }
                 }}
               />
+            </CardContent>
+          </Card>
+
+          {/* RAG System Status Section */}
+          <Card sx={{
+            bgcolor: darkMode
+              ? 'rgba(255,255,255,0.03)'
+              : 'rgba(255,255,255,0.7)',
+            border: `1px solid ${darkMode
+              ? 'rgba(255,255,255,0.08)'
+              : 'rgba(0,0,0,0.05)'}`,
+            borderRadius: '16px',
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              transform: 'translateY(-2px)',
+              boxShadow: darkMode
+                ? '0 8px 25px rgba(0,0,0,0.3)'
+                : '0 8px 25px rgba(0,0,0,0.1)',
+            }
+          }}>
+            <CardContent sx={{ p: 3 }}>
+              <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+                mb: 2,
+                flexDirection: currentLanguage === 'ar' ? 'row-reverse' : 'row',
+                textAlign: currentLanguage === 'ar' ? 'right' : 'left'
+              }}>
+                <Avatar sx={{
+                  bgcolor: darkMode ? 'rgba(16,163,127,0.2)' : 'rgba(16,163,127,0.1)',
+                  color: '#10a37f',
+                  width: 32,
+                  height: 32
+                }}>
+                  <BrainIcon fontSize="small" />
+                </Avatar>
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  {t('ragSystem') || 'RAG System'}
+                </Typography>
+              </Box>
+
+              <RagStatus darkMode={darkMode} />
             </CardContent>
           </Card>
 

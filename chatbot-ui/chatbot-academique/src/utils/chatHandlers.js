@@ -1,11 +1,17 @@
 import axios from 'axios';
 import { API_URL } from '../constants/config';
+import staticSuggestionsService from '../services/staticSuggestionsService';
+import ragApiService from '../services/ragApiService';
+import speechService from '../services/speechService';
 
 export const createChatHandlers = (
   chatState,
   currentLanguage,
   t,
-  messagesEndRef
+  messagesEndRef,
+  setSuggestionsRefreshTrigger,
+  user = null,
+  options = {}
 ) => {
   const {
     messages,
@@ -57,12 +63,19 @@ export const createChatHandlers = (
   const handleSubmit = async () => {
     if (!inputValue.trim()) return;
 
+    const {
+      useRAG = true,
+      autoSpeak = false,
+      speechQuality = 'high'
+    } = options;
+
     const userMessage = {
       role: 'user',
       content: inputValue,
       chatId: currentChatId,
       timestamp: new Date().toISOString(),
-      id: Date.now().toString()
+      id: Date.now().toString(),
+      userId: user?.uid
     };
 
     setMessages(prev => [...prev, userMessage]);
@@ -70,24 +83,83 @@ export const createChatHandlers = (
     setIsLoading(true);
 
     try {
-      const response = await axios.post(API_URL, {
-        messages: [...messages, userMessage].map(({ role, content }) => ({ role, content })),
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': 'true'
-        }
-      });
+      let botMessage;
 
-      const botMessage = {
-        role: 'assistant',
-        content: response.data.reply || response.data.response || response.data,
-        id: Date.now().toString(),
-        chatId: currentChatId,
-        timestamp: new Date().toISOString()
-      };
+      if (useRAG) {
+        // Use RAG API for intelligent responses
+        console.log('🤖 Using RAG API for response generation');
+
+        // Prepare context from recent messages
+        const context = messages.slice(-10).map(msg => ({
+          role: msg.role,
+          content: msg.content,
+          timestamp: msg.timestamp
+        }));
+
+        // Query your RAG system
+        const ragResponse = await ragApiService.query({
+          query: userMessage.content,
+          language: currentLanguage,
+          userId: user?.uid,
+          context,
+          options: {
+            limit: 5, // Number of documents to retrieve
+            projectId: 'eniad-assistant' // Your project ID
+          }
+        });
+
+        botMessage = {
+          role: 'assistant',
+          content: ragResponse.content,
+          id: ragResponse.id,
+          chatId: currentChatId,
+          timestamp: new Date().toISOString(),
+          sources: ragResponse.sources,
+          confidence: ragResponse.confidence,
+          metadata: ragResponse.metadata
+        };
+
+        console.log('✅ RAG response generated:', {
+          confidence: ragResponse.confidence,
+          sourcesCount: ragResponse.sources?.length || 0,
+          tokensUsed: ragResponse.tokens_used
+        });
+
+      } else {
+        // Fallback to original API
+        console.log('📡 Using fallback API');
+        const response = await axios.post(API_URL, {
+          messages: [...messages, userMessage].map(({ role, content }) => ({ role, content })),
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': 'true'
+          }
+        });
+
+        botMessage = {
+          role: 'assistant',
+          content: response.data.reply || response.data.response || response.data,
+          id: Date.now().toString(),
+          chatId: currentChatId,
+          timestamp: new Date().toISOString()
+        };
+      }
 
       setMessages(prev => [...prev, botMessage]);
+
+      // Auto-speak response if enabled
+      if (autoSpeak && botMessage.content) {
+        try {
+          await speechService.textToSpeech(
+            botMessage.content,
+            currentLanguage,
+            { quality: speechQuality }
+          );
+        } catch (speechError) {
+          console.warn('⚠️ Auto-speak failed:', speechError.message);
+        }
+      }
 
       // Set context-based title if this is the first message
       if (messages.length === 0) {
@@ -102,15 +174,46 @@ export const createChatHandlers = (
       } else {
         updateConversationHistory([...messages, userMessage, botMessage]);
       }
+
+      // Save conversation to RAG system if available
+      if (useRAG && currentChatId) {
+        try {
+          await ragApiService.saveConversation({
+            id: currentChatId,
+            messages: [userMessage, botMessage],
+            userId: user?.uid,
+            language: currentLanguage,
+            timestamp: new Date().toISOString()
+          });
+        } catch (saveError) {
+          console.warn('⚠️ Failed to save conversation to RAG:', saveError.message);
+        }
+      }
+
     } catch (error) {
-      console.error('Error:', error);
+      console.error('❌ Error in handleSubmit:', error);
+
+      // Generate appropriate error message
+      let errorContent = t('errorMessage');
+
+      if (error.message.includes('Network') || error.message.includes('connection')) {
+        errorContent = t('networkError') || 'Network error. Please check your connection and try again.';
+      } else if (error.message.includes('Authentication') || error.message.includes('401')) {
+        errorContent = t('authError') || 'Authentication error. Please sign in again.';
+      } else if (error.message.includes('Rate limit') || error.message.includes('429')) {
+        errorContent = t('rateLimitError') || 'Too many requests. Please wait a moment before trying again.';
+      }
+
       const errorMessage = {
         role: 'assistant',
-        content: t('errorMessage'),
+        content: errorContent,
         id: Date.now().toString(),
         chatId: currentChatId,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        isError: true,
+        errorType: error.message
       };
+
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
@@ -147,6 +250,15 @@ export const createChatHandlers = (
       setMobileOpen(false);
       setEditingMessageId(null);
       setEditedMessageContent('');
+
+      // Refresh static suggestions for new conversation
+      staticSuggestionsService.forceRefresh();
+      console.log('🔄 Static suggestions refreshed for new conversation');
+
+      // Trigger UI refresh for suggestion cards
+      if (setSuggestionsRefreshTrigger) {
+        setSuggestionsRefreshTrigger(prev => prev + 1);
+      }
 
       setTimeout(() => {
         document.querySelector('.chat-input input')?.focus();

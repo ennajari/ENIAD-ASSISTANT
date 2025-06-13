@@ -10,7 +10,6 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Divider,
   Tooltip,
   Collapse,
   Avatar,
@@ -314,13 +313,19 @@ const ChatSidebar = ({
                 flex: 1,
                 justifyContent: currentLanguage === 'ar' ? 'flex-end' : 'flex-start',
                 direction: currentLanguage === 'ar' ? 'rtl' : 'ltr',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                fontSize: '0.85rem',
                 '& .MuiButton-startIcon': {
                   marginLeft: currentLanguage === 'ar' ? 8 : 0,
                   marginRight: currentLanguage === 'ar' ? 0 : 8,
+                  flexShrink: 0,
                 },
                 '& .MuiButton-endIcon': {
                   marginLeft: currentLanguage === 'ar' ? 0 : 8,
                   marginRight: currentLanguage === 'ar' ? 8 : 0,
+                  flexShrink: 0,
                 },
                 '&:hover': {
                   bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',

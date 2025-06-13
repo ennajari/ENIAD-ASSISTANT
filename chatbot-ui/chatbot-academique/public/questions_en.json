@@ -1,0 +1,430 @@
+[
+    {
+        "question": "What is the full official name of the institution?",
+        "answer": "National School of Artificial Intelligence and Digital of Berkane (ENIAD)"
+    },
+    {
+        "question": "Which university is ENIAD affiliated with?",
+        "answer": "Mohammed Premier University (UMP)"
+    },
+    {
+        "question": "What is the complete postal address of the ENIAD campus?",
+        "answer": "Route Aklim, 63255, Berkane, Morocco"
+    },
+    {
+        "question": "What is the main phone number of ENIAD?",
+        "answer": "+212 5 36 50 29 79"
+    },
+    {
+        "question": "What is the fax number of ENIAD?",
+        "answer": "+212 5 36 50 06 09"
+    },
+    {
+        "question": "What contact email address is provided for ENIAD?",
+        "answer": "eniad@ump.ac.ma"
+    },
+    {
+        "question": "What is the URL of the official ENIAD website?",
+        "answer": "http://eniad.ump.ma"
+    },
+    {
+        "question": "Who is the director of ENIAD and what is his email address?",
+        "answer": "Jaafar Khalid (sminairelc@yahoo.fr)"
+    },
+    {
+        "question": "What engineering programs does ENIAD offer and their quotas?",
+        "answer": "AI 60 places, ROC 50 places, IRSI 50 places, GINF 60 places"
+    },
+    {
+        "question": "What DUT specialties are accepted for admission?",
+        "answer": "Computer Science, Networks, Embedded Systems, AI, Data Science"
+    },
+    {
+        "question": "What conditions apply to DEUG/DEUST/DEUP holders?",
+        "answer": "Applied Mathematics, Physics, grade ≥ 2"
+    },
+    {
+        "question": "What conditions must scientific degree holders meet?",
+        "answer": "Mathematics, Physics, grade ≥ 3"
+    },
+    {
+        "question": "When does the pre-registration period open at ENIAD?",
+        "answer": "mid-June"
+    },
+    {
+        "question": "When does the pre-registration period end?",
+        "answer": "end of July"
+    },
+    {
+        "question": "When does the written exam take place at ENIAD?",
+        "answer": "mid-September"
+    },
+    {
+        "question": "When is the oral exam held?",
+        "answer": "end of September"
+    },
+    {
+        "question": "When does administrative registration begin?",
+        "answer": "early October"
+    },
+    {
+        "question": "What are the steps of the registration procedure?",
+        "answer": "Online pre-registration, file review, written exam, oral interview, administrative registration"
+    },
+    {
+        "question": "What topics does the AI and Deep Learning Lab cover?",
+        "answer": "Machine Learning, Vision, NLP"
+    },
+    {
+        "question": "What topics does the Robotics & IoT Lab cover?",
+        "answer": "Mobile Robotics, Embedded Systems"
+    },
+    {
+        "question": "What topics does the Networks and Security Lab cover?",
+        "answer": "Cybersecurity, Blockchain"
+    },
+    {
+        "question": "What topics does the Information Systems Lab cover?",
+        "answer": "Big Data, Cloud"
+    },
+    {
+        "question": "What academic partnerships does ENIAD maintain?",
+        "answer": "UMP"
+    },
+    {
+        "question": "What scholarships are available through CNOUS?",
+        "answer": "Available according to academic and social criteria"
+    },
+    {
+        "question": "Is ENIAD present on Facebook?",
+        "answer": "https://www.facebook.com/ENIADBERKANE"
+    },
+    {
+        "question": "Is ENIAD present on LinkedIn?",
+        "answer": "https://www.linkedin.com/school/eniadberkane/"
+    },
+    {
+        "question": "Is ENIAD present on Instagram?",
+        "answer": "https://www.instagram.com/eniadbmedia/"
+    },
+    {
+        "question": "What is the main language of instruction?",
+        "answer": "French"
+    },
+    {
+        "question": "What technical language is used?",
+        "answer": "English"
+    },
+    {
+        "question": "What is the duration of the engineering cycle?",
+        "answer": "3 years (engineering cycle)"
+    },
+    {
+        "question": "What degree is awarded upon completion of the cycle?",
+        "answer": "State Engineer (Bac+5)"
+    },
+    {
+        "question": "What are the tuition fees?",
+        "answer": "Free (UMP university fees)"
+    },
+    {
+        "question": "By which authority is ENIAD accredited?",
+        "answer": "Ministry of Higher Education"
+    },
+    {
+        "question": "What is ENIAD's mission?",
+        "answer": "To train highly qualified engineers in artificial intelligence and digital technology"
+    },
+    {
+        "question": "What is ENIAD's vision?",
+        "answer": "To become a center of technological and academic excellence in the Oriental region"
+    },
+    {
+        "question": "What is the history of ENIAD's creation?",
+        "answer": "Created in 2023 as part of expanding UMP's training offerings"
+    },
+    {
+        "question": "What is artificial intelligence?",
+        "answer": "AI is technology that enables machines to learn, reason, and make decisions like humans"
+    },
+    {
+        "question": "What are the application domains of AI?",
+        "answer": "Healthcare, transportation, finance, education, robotics, computer vision, natural language processing"
+    },
+    {
+        "question": "What is machine learning?",
+        "answer": "A branch of AI that enables systems to automatically learn from data"
+    },
+    {
+        "question": "What is deep learning?",
+        "answer": "A machine learning technique based on artificial neural networks"
+    },
+    {
+        "question": "What programming languages are used in AI?",
+        "answer": "Python, R, Java, C++, JavaScript, Julia, Scala"
+    },
+    {
+        "question": "What is TensorFlow?",
+        "answer": "An open-source library by Google for machine learning and neural networks"
+    },
+    {
+        "question": "What is PyTorch?",
+        "answer": "A machine learning framework developed by Facebook for AI research"
+    },
+    {
+        "question": "How to register at ENIAD?",
+        "answer": "Via online platform, file submission, written exam and oral interview"
+    },
+    {
+        "question": "What are the admission requirements?",
+        "answer": "Minimum Bac+2 in science, mathematics or computer science with good grades"
+    },
+    {
+        "question": "Are there scholarships available?",
+        "answer": "Yes, CNOUS scholarships based on social criteria and academic excellence scholarships"
+    },
+    {
+        "question": "How much does ENIAD education cost?",
+        "answer": "Free education, only UMP university fees to pay"
+    },
+    {
+        "question": "What is the duration of studies?",
+        "answer": "3 years for engineering cycle after Bac+2"
+    },
+    {
+        "question": "Are there mandatory internships?",
+        "answer": "Yes, company internships each year and final project"
+    },
+    {
+        "question": "How to access the campus?",
+        "answer": "Public transport, university shuttles or personal vehicle"
+    },
+    {
+        "question": "Is there student housing?",
+        "answer": "Not on campus, but student housing available in the city"
+    },
+    {
+        "question": "What are the class schedules?",
+        "answer": "8:30am-5:30pm Monday to Friday, with lunch breaks"
+    },
+    {
+        "question": "Is there a library?",
+        "answer": "Yes, modern library with digital resources and study spaces"
+    },
+    {
+        "question": "How to access campus WiFi?",
+        "answer": "With your student credentials provided during registration"
+    },
+    {
+        "question": "Are there student clubs?",
+        "answer": "Yes, robotics, AI, cybersecurity clubs, and cultural activities"
+    },
+    {
+        "question": "Can I do a double degree?",
+        "answer": "Yes, partnerships with international universities for double degrees"
+    },
+    {
+        "question": "Are there online courses?",
+        "answer": "Yes, e-learning platform with hybrid courses and MOOCs"
+    },
+    {
+        "question": "How to contact professors?",
+        "answer": "Email, office hours, online educational platform"
+    },
+    {
+        "question": "Are there student projects?",
+        "answer": "Yes, individual and team projects with partner companies"
+    },
+    {
+        "question": "What is computer vision?",
+        "answer": "AI field that enables machines to interpret and analyze images"
+    },
+    {
+        "question": "What is NLP?",
+        "answer": "Natural Language Processing - automatic processing of natural language"
+    },
+    {
+        "question": "What is an algorithm?",
+        "answer": "Sequence of instructions to solve a problem or perform a task"
+    },
+    {
+        "question": "What is Big Data?",
+        "answer": "Large datasets requiring specialized tools for analysis"
+    },
+    {
+        "question": "What is cloud computing?",
+        "answer": "Delivery of computing services via Internet (storage, computing, software)"
+    },
+    {
+        "question": "How are exams conducted?",
+        "answer": "Continuous assessment, semester exams and project presentations"
+    },
+    {
+        "question": "Are there evening classes?",
+        "answer": "No, daytime face-to-face training only"
+    },
+    {
+        "question": "Can I study abroad?",
+        "answer": "Yes, exchange programs with international partner universities"
+    },
+    {
+        "question": "Is there a cafeteria?",
+        "answer": "Yes, campus cafeteria with varied menus"
+    },
+    {
+        "question": "How to obtain a certificate?",
+        "answer": "Module validation, internships and final project defense"
+    },
+    {
+        "question": "What is a neural network?",
+        "answer": "Computer model inspired by the human brain for machine learning"
+    },
+    {
+        "question": "How does a chatbot work?",
+        "answer": "Uses NLP and AI to understand and respond to user questions"
+    },
+    {
+        "question": "What is supervised learning?",
+        "answer": "Type of machine learning using labeled data for training"
+    },
+    {
+        "question": "What is unsupervised learning?",
+        "answer": "Machine learning without labeled data, discovers hidden patterns"
+    },
+    {
+        "question": "What is reinforcement learning?",
+        "answer": "Agent learns through trial-and-error by receiving rewards or penalties"
+    },
+    {
+        "question": "What is robotics?",
+        "answer": "Science that designs and builds robots to automate tasks"
+    },
+    {
+        "question": "What is IoT?",
+        "answer": "Internet of Things - network of connected objects exchanging data"
+    },
+    {
+        "question": "What is cybersecurity?",
+        "answer": "Protection of computer systems against threats and attacks"
+    },
+    {
+        "question": "What is blockchain?",
+        "answer": "Secure and decentralized technology for storing and transmitting information"
+    },
+    {
+        "question": "How to register for courses?",
+        "answer": "Via the online student platform at the beginning of each semester"
+    },
+    {
+        "question": "How to check my grades?",
+        "answer": "On the educational platform with your student credentials"
+    },
+    {
+        "question": "How to book a room?",
+        "answer": "Via ENIAD mobile app or student portal"
+    },
+    {
+        "question": "How to join a project?",
+        "answer": "Application via project platform or direct contact with professors"
+    },
+    {
+        "question": "How to access laboratories?",
+        "answer": "Registration for time slots via platform, student badge required"
+    },
+    {
+        "question": "Where to find course materials?",
+        "answer": "On the e-learning platform, educational resources section"
+    },
+    {
+        "question": "How to report a technical problem?",
+        "answer": "IT service via email support@eniad.ump.ma or reception desk"
+    },
+    {
+        "question": "How to participate in competitions?",
+        "answer": "Registration via announcements on student portal and social media"
+    },
+    {
+        "question": "How to get a certificate?",
+        "answer": "Online request via student administrative portal"
+    },
+    {
+        "question": "How to change specialization?",
+        "answer": "Application file before end of first semester, subject to conditions"
+    },
+    {
+        "question": "Admission to ENIAD?",
+        "answer": "Admission exam with file, written and oral tests"
+    },
+    {
+        "question": "Address of ENIAD?",
+        "answer": "Route Aklim, 63255, Berkane, Morocco"
+    },
+    {
+        "question": "AI algorithms?",
+        "answer": "Neural networks, decision trees, SVM, clustering"
+    },
+    {
+        "question": "Mobile applications?",
+        "answer": "Android, iOS, React Native, Flutter development"
+    },
+    {
+        "question": "Machine learning?",
+        "answer": "ML with Python, scikit-learn, pandas"
+    },
+    {
+        "question": "Scholarships available?",
+        "answer": "CNOUS, excellence scholarships, social aid"
+    },
+    {
+        "question": "ENIAD library?",
+        "answer": "Open 8am-8pm, digital resources, study spaces"
+    },
+    {
+        "question": "ENIAD campus?",
+        "answer": "Modern, equipped labs, WiFi, cafeteria"
+    },
+    {
+        "question": "Online courses?",
+        "answer": "E-learning platform, MOOCs, virtual classes"
+    },
+    {
+        "question": "Cybersecurity training?",
+        "answer": "Network security, cryptography, ethical hacking"
+    },
+    {
+        "question": "Data Science?",
+        "answer": "Data analysis, visualization, statistics"
+    },
+    {
+        "question": "ENIAD degree?",
+        "answer": "State Engineer Bac+5 recognized by the state"
+    },
+    {
+        "question": "Employment after ENIAD?",
+        "answer": "AI engineer, developer, consultant, researcher"
+    },
+    {
+        "question": "ENIAD exams?",
+        "answer": "Continuous assessment, semester exams, projects"
+    },
+    {
+        "question": "Tuition fees?",
+        "answer": "Free, only UMP university fees"
+    },
+    {
+        "question": "Class schedules?",
+        "answer": "8:30am-5:30pm, Monday to Friday"
+    },
+    {
+        "question": "Artificial intelligence?",
+        "answer": "AI, ML, DL, NLP, computer vision"
+    },
+    {
+        "question": "ENIAD registration?",
+        "answer": "Online, file, exam, interview"
+    },
+    {
+        "question": "ENIAD laboratories?",
+        "answer": "AI, Robotics, Networks, Information Systems"
+    }
+]
