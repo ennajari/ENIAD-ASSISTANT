@@ -450,26 +450,42 @@ export default function Login() {
             dir={direction}
             lang={lang}
           >
-            {/* ENIAD Logo */}
+            {/* ENIAD Logo - Clickable */}
             <Box
-              component="img"
-              src="/logo.png"
-              alt="ENIAD Logo"
+              component="a"
+              href="https://eniad.ump.ma/fr"
+              target="_blank"
+              rel="noopener noreferrer"
               sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 width: 80,
                 height: 80,
                 mb: 3,
                 borderRadius: '50%',
-                objectFit: 'contain',
                 bgcolor: 'rgba(16, 163, 127, 0.1)',
                 p: 1,
                 transition: 'all 0.3s ease',
+                textDecoration: 'none',
                 '&:hover': {
                   transform: 'scale(1.05)',
                   boxShadow: '0 8px 25px rgba(16, 163, 127, 0.3)',
                 }
               }}
-            />
+            >
+              <Box
+                component="img"
+                src="/logo.png"
+                alt="ENIAD Logo - Visit Website"
+                sx={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain',
+                  cursor: 'pointer'
+                }}
+              />
+            </Box>
 
             <Typography
               variant="h4"

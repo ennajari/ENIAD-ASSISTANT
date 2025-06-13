@@ -135,23 +135,39 @@ const ChatSidebar = ({
         {!sidebarCollapsed && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Box
-              component="img"
-              src="/logo.png"
-              alt="ENIAD Logo"
+              component="a"
+              href="https://eniad.ump.ma/fr"
+              target="_blank"
+              rel="noopener noreferrer"
               sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 width: 32,
                 height: 32,
                 borderRadius: '50%',
-                objectFit: 'contain',
                 bgcolor: 'rgba(16, 163, 127, 0.1)',
                 p: 0.5,
                 boxShadow: '0 2px 8px rgba(16,163,127,0.3)',
                 transition: 'all 0.2s ease',
+                textDecoration: 'none',
                 '&:hover': {
                   transform: 'scale(1.05)',
                 }
               }}
-            />
+            >
+              <Box
+                component="img"
+                src="/logo.png"
+                alt="ENIAD Logo - Visit Website"
+                sx={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain',
+                  cursor: 'pointer'
+                }}
+              />
+            </Box>
             <Typography variant="h6" sx={{
               fontWeight: 700,
               color: darkMode ? '#fff' : 'text.primary',
