@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -9,7 +9,6 @@ import {
   CircularProgress
 } from '@mui/material';
 import {
-  School as SchoolIcon,
   Person as PersonIcon
 } from '@mui/icons-material';
 import { translations } from '../constants/config';

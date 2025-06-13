@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Box,
   Typography,
@@ -12,7 +12,6 @@ import {
   ListItemText,
   Tooltip,
   Collapse,
-  Avatar,
   Chip
 } from '@mui/material';
 import {
@@ -25,8 +24,7 @@ import {
   MoreHoriz as MoreHorizIcon,
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
-  History as HistoryIcon,
-  School as SchoolIcon
+  History as HistoryIcon
 } from '@mui/icons-material';
 import { DRAWER_WIDTH, translations } from '../constants/config';
 

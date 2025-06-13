@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from '@mui/material/styles';
@@ -18,7 +18,7 @@ import SettingsDialog from './components/SettingsDialog';
 import RenameDialog from './components/RenameDialog';
 import ChatMenu from './components/ChatMenu';
 import ErrorBoundary from './components/ErrorBoundary';
-import QuestionAutocomplete from './components/QuestionAutocomplete';
+
 import { DRAWER_WIDTH } from './constants/config';
 import { createChatHandlers } from './utils/chatHandlers';
 import { useTranslation } from './utils/translations';
@@ -36,8 +36,7 @@ function App() {
   const { speak, speaking, supported } = useSpeechSynthesis();
   const { t } = useTranslation(currentLanguage);
 
-  // Research mode and SMA state
-  const [isResearchMode, setIsResearchMode] = useState(false);
+  // SMA (Smart Multi-Agent) state - using research button
   const [isSMAActive, setIsSMAActive] = useState(false);
 
   // Suggestions refresh trigger
@@ -262,50 +261,23 @@ function App() {
 
 
 
-  // Research handler
+  // SMA Research handler (using research button for SMA)
   const handleResearch = () => {
-    setIsResearchMode(prev => !prev);
-    console.log('Research mode toggled:', !isResearchMode);
-
-    // TODO: Wire up to CrewIA or LangChain
-    // This is where you'll integrate with your research AI system
-    if (!isResearchMode) {
-      console.log('🔬 Activating research mode - enhanced AI with web search capabilities');
-      // Future integration point for CrewIA/LangChain
-      // You can modify the chat behavior here for research mode
-    } else {
-      console.log('💬 Deactivating research mode - returning to standard chat');
-    }
-  };
-
-  // SMA toggle handler
-  const handleToggleSMA = () => {
     setIsSMAActive(prev => !prev);
     console.log('🧠 SMA toggled:', !isSMAActive);
 
     if (!isSMAActive) {
       console.log('🧠 Activating SMA - Smart Multi-Agent web intelligence');
+      console.log('🔍 SMA will scan ENIAD and UMP websites for real-time information');
       // SMA is now active and will enhance responses with real-time web data
     } else {
       console.log('💬 Deactivating SMA - returning to standard RAG responses');
     }
   };
 
-  // Search handler
-  const handleSearch = () => {
-    console.log('Search button clicked');
-    console.log('Current input value:', chatState.inputValue);
 
-    // TODO: Implement search functionality
-    // This is where you'll integrate with your search API
-    if (chatState.inputValue.trim()) {
-      console.log('🔍 Performing search for:', chatState.inputValue.trim());
-      // Future integration point for web search API
-      // You can call your search API here and append results to the chat
-    } else {
-      console.log('No search query provided');
-    }
-  };
+
+
 
   if (authLoading) {
     return (
@@ -443,11 +415,8 @@ function App() {
                     isRecording={chatState.isRecording}
                     onToggleRecording={toggleRecording}
                     browserSupportsSpeechRecognition={browserSupportsSpeechRecognition}
-                    onSearch={handleSearch}
                     onResearch={handleResearch}
-                    isResearchMode={isResearchMode}
-                    onToggleSMA={handleToggleSMA}
-                    isSMAActive={isSMAActive}
+                    isResearchMode={isSMAActive}
                   />
                 </Box>
               </Box>

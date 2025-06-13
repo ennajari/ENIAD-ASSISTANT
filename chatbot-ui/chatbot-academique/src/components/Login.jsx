@@ -103,11 +103,6 @@ export default function Login() {
   const t = translations[lang] || translations['en'];
   const direction = lang === 'ar' ? 'rtl' : 'ltr';
 
-  // Redirect if already logged in
-  if (user) {
-    return <Navigate to="/" />;
-  }
-
   // Check Firebase configuration on component mount
   useEffect(() => {
     const firebaseError = getFirebaseError();
@@ -141,6 +136,11 @@ export default function Login() {
     setError('');
     setValidationErrors({});
   }, [tabValue]);
+
+  // Redirect if already logged in
+  if (user) {
+    return <Navigate to="/" />;
+  }
 
   // Validation function
   const validateForm = () => {
@@ -547,7 +547,7 @@ export default function Login() {
             {/* Tabs for Sign In / Sign Up */}
             <Tabs
               value={tabValue}
-              onChange={(e, newValue) => setTabValue(newValue)}
+              onChange={(_, newValue) => setTabValue(newValue)}
               sx={{
                 mb: 3,
                 width: '100%',
