@@ -1,2 +1,481 @@
-chatbot-ui/node_modules/
-chatbot-ui/chatbot-academique/node_modules/
+# ========================================
+# ENIAD Academic Assistant - .gitignore
+# ========================================
+
+# ========================================
+# 🗂️ Operating System Files
+# ========================================
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ========================================
+# 🐍 Python Files
+# ========================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# poetry
+poetry.lock
+
+# pdm
+.pdm.toml
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# ========================================
+# 📦 Node.js / JavaScript Files
+# ========================================
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Grunt intermediate storage
+.grunt
+
+# Bower dependency directory
+bower_components
+
+# node-waf configuration
+.lock-wscript
+
+# Compiled binary addons
+build/Release
+
+# Dependency directories
+jspm_packages/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# parcel-bundler cache
+.cache
+.parcel-cache
+
+# Next.js build output
+.next
+out
+
+# Nuxt.js build / generate output
+.nuxt
+dist
+
+# Gatsby files
+.cache/
+public
+
+# Storybook build outputs
+.out
+.storybook-out
+storybook-static
+
+# Temporary folders
+tmp/
+temp/
+
+# ========================================
+# 🚀 Frontend Build Files
+# ========================================
+
+# Vite
+dist/
+dist-ssr/
+*.local
+
+# Build outputs
+build/
+out/
+
+# Static files (except essential ones)
+# Keep logo files and essential assets
+!chatbot-ui/chatbot-academique/public/logo.png
+!chatbot-ui/chatbot-academique/public/logo.webp
+!chatbot-ui/chatbot-academique/public/vite.svg
+!chatbot-ui/chatbot-academique/public/*.json
+
+# ========================================
+# 🔧 Development Tools
+# ========================================
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ========================================
+# 📊 Data & Logs
+# ========================================
+
+# Log files
+*.log
+logs/
+*.log.*
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary data files
+*.tmp
+*.temp
+
+# CSV and data files (except essential ones)
+*.csv
+!data/*.json  # Keep JSON data files
+
+# ========================================
+# 🧠 SMA Service Specific
+# ========================================
+
+# SMA Service virtual environment
+SMA_Service/venv/
+SMA_Service/env/
+SMA_Service/.env
+SMA_Service/logs/
+SMA_Service/temp/
+SMA_Service/data/cache/
+SMA_Service/__pycache__/
+
+# ========================================
+# 🤖 RAG Project (Submodule)
+# ========================================
+
+# RAG Project virtual environment
+RAG_Project/venv/
+RAG_Project/env/
+RAG_Project/.env
+RAG_Project/logs/
+RAG_Project/__pycache__/
+
+# ========================================
+# 🔐 Security & Credentials
+# ========================================
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# API keys and secrets
+*.key
+*.pem
+*.p12
+*.pfx
+secrets.json
+credentials.json
+
+# Firebase config (keep template, ignore actual)
+firebase-config.js
+!firebase-config.example.js
+
+# ========================================
+# 📱 Mobile & PWA
+# ========================================
+
+# Capacitor
+.capacitor/
+android/
+ios/
+
+# ========================================
+# 🐳 Docker & Deployment
+# ========================================
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Deployment
+.vercel
+.netlify
+
+# ========================================
+# 📈 Analytics & Monitoring
+# ========================================
+
+# Sentry
+.sentryclirc
+
+# ========================================
+# 🧪 Testing
+# ========================================
+
+# Test results
+test-results/
+playwright-report/
+test-results.xml
+
+# ========================================
+# 📦 Package Managers
+# ========================================
+
+# Yarn
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# pnpm
+.pnpm-store/
+
+# ========================================
+# 🔄 Backup & Temporary Files
+# ========================================
+
+# Backup files
+*.bak
+*.backup
+*.old
+*.orig
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# Archive files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# ========================================
+# 📝 Documentation Build
+# ========================================
+
+# Sphinx
+docs/_build/
+docs/build/
+
+# MkDocs
+site/
+
+# ========================================
+# 🎯 Project Specific Ignores
+# ========================================
+
+# ENIAD specific temporary files
+eniad_assistant.log
+*.ipynb_checkpoints/
+
+# Jupyter notebooks (keep essential ones)
+# *.ipynb
+!Chatbot.ipynb
+!eniad.ipynb
+!FastAPI_modele.ipynb
+
+# Keep essential documentation
+!README.md
+!SETUP.md
+!CONTRIBUTING.md
+!CODE_OF_CONDUCT.md
+!SECURITY.md
+!LICENSE

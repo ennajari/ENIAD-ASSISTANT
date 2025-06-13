@@ -1,0 +1,204 @@
+# ========================================
+# ENIAD Academic Assistant - Git Attributes
+# ========================================
+
+# ========================================
+# 🔤 Text Files - Normalize Line Endings
+# ========================================
+
+# Source code
+*.py text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Configuration files
+*.ini text eol=lf
+*.cfg text eol=lf
+*.conf text eol=lf
+*.config text eol=lf
+.env* text eol=lf
+.gitignore text eol=lf
+.gitmodules text eol=lf
+.gitattributes text eol=lf
+
+# Web files
+*.html text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.sass text eol=lf
+*.less text eol=lf
+*.xml text eol=lf
+*.svg text eol=lf
+
+# Documentation
+*.rst text eol=lf
+*.tex text eol=lf
+
+# Shell scripts
+*.sh text eol=lf
+*.bash text eol=lf
+*.zsh text eol=lf
+
+# Windows batch files
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# ========================================
+# 🖼️ Binary Files - No Text Processing
+# ========================================
+
+# Images
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.svg binary
+*.bmp binary
+*.tiff binary
+
+# Fonts
+*.woff binary
+*.woff2 binary
+*.eot binary
+*.ttf binary
+*.otf binary
+
+# Audio/Video
+*.mp3 binary
+*.mp4 binary
+*.avi binary
+*.mov binary
+*.wav binary
+*.ogg binary
+
+# Archives
+*.zip binary
+*.tar binary
+*.gz binary
+*.7z binary
+*.rar binary
+
+# Documents
+*.pdf binary
+*.doc binary
+*.docx binary
+*.xls binary
+*.xlsx binary
+*.ppt binary
+*.pptx binary
+
+# Executables
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary
+
+# ========================================
+# 📊 Language Detection & Statistics
+# ========================================
+
+# Python files
+*.py linguist-language=Python
+
+# JavaScript/TypeScript files
+*.js linguist-language=JavaScript
+*.jsx linguist-language=JavaScript
+*.ts linguist-language=TypeScript
+*.tsx linguist-language=TypeScript
+
+# Jupyter Notebooks
+*.ipynb linguist-language=Jupyter-Notebook
+
+# Configuration files
+*.json linguist-language=JSON
+*.yml linguist-language=YAML
+*.yaml linguist-language=YAML
+
+# Exclude from language statistics
+node_modules/** linguist-vendored
+chatbot-ui/chatbot-academique/node_modules/** linguist-vendored
+SMA_Service/venv/** linguist-vendored
+RAG_Project/venv/** linguist-vendored
+*.min.js linguist-vendored
+*.min.css linguist-vendored
+
+# ========================================
+# 🔍 Diff and Merge Settings
+# ========================================
+
+# Jupyter Notebooks - use nbdiff if available
+*.ipynb diff=jupyternotebook
+*.ipynb merge=jupyternotebook
+
+# Package files - show meaningful diffs
+package.json diff=json
+package-lock.json diff=json
+requirements.txt diff=text
+*.yml diff=yaml
+*.yaml diff=yaml
+
+# ========================================
+# 🔐 Security Sensitive Files
+# ========================================
+
+# Environment files - mark as sensitive
+.env filter=git-crypt diff=git-crypt
+.env.* filter=git-crypt diff=git-crypt
+**/secrets.json filter=git-crypt diff=git-crypt
+**/credentials.json filter=git-crypt diff=git-crypt
+
+# ========================================
+# 📝 Documentation Files
+# ========================================
+
+# Markdown files
+*.md text eol=lf linguist-documentation
+
+# License files
+LICENSE text eol=lf linguist-documentation
+COPYING text eol=lf linguist-documentation
+
+# Changelog files
+CHANGELOG* text eol=lf linguist-documentation
+HISTORY* text eol=lf linguist-documentation
+
+# ========================================
+# 🎯 Project Specific Settings
+# ========================================
+
+# ENIAD data files
+data/*.json text eol=lf
+public/*.json text eol=lf
+
+# SMA Service files
+SMA_Service/*.py text eol=lf
+SMA_Service/**/*.py text eol=lf
+
+# Frontend files
+chatbot-ui/**/*.js text eol=lf
+chatbot-ui/**/*.jsx text eol=lf
+chatbot-ui/**/*.css text eol=lf
+chatbot-ui/**/*.json text eol=lf
+
+# ========================================
+# 🔄 Export Settings
+# ========================================
+
+# Files to exclude from exports/archives
+.git* export-ignore
+node_modules/ export-ignore
+venv/ export-ignore
+__pycache__/ export-ignore
+*.pyc export-ignore
+.DS_Store export-ignore
+Thumbs.db export-ignore
