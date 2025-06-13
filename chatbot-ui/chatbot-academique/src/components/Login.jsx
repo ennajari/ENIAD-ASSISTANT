@@ -450,6 +450,27 @@ export default function Login() {
             dir={direction}
             lang={lang}
           >
+            {/* ENIAD Logo */}
+            <Box
+              component="img"
+              src="/logo.png"
+              alt="ENIAD Logo"
+              sx={{
+                width: 80,
+                height: 80,
+                mb: 3,
+                borderRadius: '50%',
+                objectFit: 'contain',
+                bgcolor: 'rgba(16, 163, 127, 0.1)',
+                p: 1,
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'scale(1.05)',
+                  boxShadow: '0 8px 25px rgba(16, 163, 127, 0.3)',
+                }
+              }}
+            />
+
             <Typography
               variant="h4"
               component="h1"
