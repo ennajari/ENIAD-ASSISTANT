@@ -70,22 +70,39 @@ class FirebaseStorageService {
    * Save conversation to Firebase
    */
   async saveConversation(userId, conversation) {
-    if (!db || !userId || !conversation) return null;
+    if (!db || !userId || !conversation) {
+      console.log('❌ Cannot save conversation: missing db, userId, or conversation');
+      return null;
+    }
 
     try {
+      console.log('💾 Saving conversation to Firebase:', {
+        id: conversation.id,
+        title: conversation.title,
+        messageCount: conversation.messages?.length || 0,
+        userId: userId
+      });
+
       const conversationRef = doc(db, this.conversationsCollection, conversation.id);
       const conversationData = {
         ...conversation,
         userId: userId,
-        updatedAt: serverTimestamp(),
+        lastUpdated: new Date().toISOString(), // Use consistent field name
+        updatedAt: serverTimestamp(), // Keep for Firebase ordering
         createdAt: conversation.createdAt || serverTimestamp()
       };
 
       await setDoc(conversationRef, conversationData, { merge: true });
-      console.log('✅ Conversation saved:', conversation.id);
+      console.log('✅ Conversation saved to Firebase:', conversation.id);
       return conversationData;
     } catch (error) {
       console.error('❌ Error saving conversation:', error);
+      console.error('Error details:', {
+        code: error.code,
+        message: error.message,
+        conversationId: conversation.id,
+        userId: userId
+      });
       throw error;
     }
   }
@@ -94,9 +111,13 @@ class FirebaseStorageService {
    * Get all conversations for a user
    */
   async getUserConversations(userId) {
-    if (!db || !userId) return [];
+    if (!db || !userId) {
+      console.log('❌ Cannot get conversations: missing db or userId');
+      return [];
+    }
 
     try {
+      console.log('📥 Getting conversations for user:', userId);
       const conversationsRef = collection(db, this.conversationsCollection);
       const q = query(
         conversationsRef,
@@ -107,18 +128,30 @@ class FirebaseStorageService {
 
       const querySnapshot = await getDocs(q);
       const conversations = [];
-      
+
       querySnapshot.forEach((doc) => {
+        const data = doc.data();
         conversations.push({
           id: doc.id,
-          ...doc.data()
+          ...data
+        });
+        console.log('📄 Found conversation:', {
+          id: doc.id,
+          title: data.title,
+          messageCount: data.messages?.length || 0,
+          userId: data.userId
         });
       });
 
-      console.log(`✅ Retrieved ${conversations.length} conversations for user`);
+      console.log(`✅ Retrieved ${conversations.length} conversations for user:`, userId);
       return conversations;
     } catch (error) {
       console.error('❌ Error getting user conversations:', error);
+      console.error('Error details:', {
+        code: error.code,
+        message: error.message,
+        userId: userId
+      });
       return [];
     }
   }
