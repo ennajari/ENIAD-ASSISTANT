@@ -286,37 +286,8 @@ export const createChatHandlers = (
         }
       }
 
-      // Set context-based title if this is the first message
-      if (messages.length === 0) {
-        const contextTitle = userMessage.content.slice(0, 50) + (userMessage.content.length > 50 ? '...' : '');
-        const updatedChat = {
-          id: currentChatId,
-          title: contextTitle,
-          messages: [...messages, userMessage, botMessage],
-          lastUpdated: new Date().toISOString(),
-          userId: user?.uid
-        };
-
-        const updatedHistory = conversationHistory.map(chat =>
-          chat.id === currentChatId ? updatedChat : chat
-        );
-
-        setConversationHistory(updatedHistory);
-        localStorage.setItem('conversationHistory', JSON.stringify(updatedHistory));
-
-        // Save to Firebase if user is logged in
-        if (user?.uid) {
-          firebaseStorageService.saveConversation(user.uid, updatedChat)
-            .then(() => {
-              console.log('✅ New conversation saved to Firebase:', currentChatId);
-            })
-            .catch(error => {
-              console.warn('⚠️ Failed to save new conversation to Firebase:', error);
-            });
-        }
-      } else {
-        await updateConversationHistory([...messages, userMessage, botMessage]);
-      }
+      // Always update conversation history using the state manager
+      await updateConversationHistory([...messages, userMessage, botMessage]);
 
       console.log('💾 Conversation saved locally and to Firebase (if logged in)');
 
@@ -395,24 +366,18 @@ export const createChatHandlers = (
     }
   };
 
-  const handleLoadChat = (chatId) => {
+  const handleLoadChat = async (chatId) => {
     try {
       // Save current chat before switching
       if (currentChatId && messages.length > 0) {
-        const updatedHistory = conversationHistory.map(chat =>
-          chat.id === currentChatId
-            ? { ...chat, messages: messages }
-            : chat
-        );
-        localStorage.setItem('conversationHistory', JSON.stringify(updatedHistory));
-        setConversationHistory(updatedHistory);
+        await updateConversationHistory(messages);
       }
 
       const conversation = conversationHistory.find(c => c.id === chatId);
       if (conversation) {
         setCurrentChatId(chatId);
         localStorage.setItem('currentChatId', chatId);
-        setMessages(conversation.messages);
+        setMessages(conversation.messages || []);
       }
 
       setMobileOpen(false);
