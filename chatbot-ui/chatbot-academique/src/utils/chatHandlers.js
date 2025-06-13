@@ -6,6 +6,7 @@ import speechService from '../services/speechService';
 import smaService from '../services/smaService';
 import translationService from '../services/translationService';
 import autoCorrectionService from '../services/autoCorrectionService';
+import firebaseStorageService from '../services/firebaseStorageService';
 
 export const createChatHandlers = (
   chatState,
@@ -42,7 +43,7 @@ export const createChatHandlers = (
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const updateConversationHistory = (updatedMessages) => {
+  const updateConversationHistory = async (updatedMessages) => {
     if (!currentChatId) return;
 
     setConversationHistory(prev => {
@@ -53,13 +54,29 @@ export const createChatHandlers = (
         id: currentChatId,
         title: title.length > 30 ? title.substring(0, 30) + '...' : title,
         messages: updatedMessages,
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
+        userId: user?.uid
       };
 
-      return [
+      // Save to Firebase if user is logged in
+      if (user?.uid) {
+        firebaseStorageService.saveConversation(user.uid, updatedChat)
+          .then(() => {
+            console.log('✅ Conversation saved to Firebase:', currentChatId);
+          })
+          .catch(error => {
+            console.warn('⚠️ Failed to save conversation to Firebase:', error);
+          });
+      }
+
+      // Update local storage
+      const newHistory = [
         updatedChat,
         ...prev.filter(c => c.id !== currentChatId)
       ];
+      localStorage.setItem('conversationHistory', JSON.stringify(newHistory));
+
+      return newHistory;
     });
   };
 
@@ -291,19 +308,36 @@ export const createChatHandlers = (
       // Set context-based title if this is the first message
       if (messages.length === 0) {
         const contextTitle = userMessage.content.slice(0, 50) + (userMessage.content.length > 50 ? '...' : '');
+        const updatedChat = {
+          id: currentChatId,
+          title: contextTitle,
+          messages: [...messages, userMessage, botMessage],
+          lastUpdated: new Date().toISOString(),
+          userId: user?.uid
+        };
+
         const updatedHistory = conversationHistory.map(chat =>
-          chat.id === currentChatId
-            ? { ...chat, title: contextTitle, messages: [...messages, userMessage, botMessage] }
-            : chat
+          chat.id === currentChatId ? updatedChat : chat
         );
+
         setConversationHistory(updatedHistory);
         localStorage.setItem('conversationHistory', JSON.stringify(updatedHistory));
+
+        // Save to Firebase if user is logged in
+        if (user?.uid) {
+          firebaseStorageService.saveConversation(user.uid, updatedChat)
+            .then(() => {
+              console.log('✅ New conversation saved to Firebase:', currentChatId);
+            })
+            .catch(error => {
+              console.warn('⚠️ Failed to save new conversation to Firebase:', error);
+            });
+        }
       } else {
-        updateConversationHistory([...messages, userMessage, botMessage]);
+        await updateConversationHistory([...messages, userMessage, botMessage]);
       }
 
-      // Note: Conversation is automatically saved by your custom model API
-      console.log('💾 Conversation handled by custom model API');
+      console.log('💾 Conversation saved locally and to Firebase (if logged in)');
 
     } catch (error) {
       console.error('❌ Error in handleSubmit:', error);
