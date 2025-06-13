@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -12,8 +12,6 @@ import {
   School as SchoolIcon,
   Person as PersonIcon
 } from '@mui/icons-material';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { translations } from '../constants/config';
 import FloatingIcons from './FloatingIcons';
 import MessageBubble from './MessageBubble';
@@ -33,9 +31,114 @@ const ChatContent = ({
   onSpeakText,
   isSpeaking,
   supported,
-  messagesEndRef
+  messagesEndRef,
+  refreshTrigger // New prop to trigger suggestions refresh
 }) => {
   const t = (key) => translations[currentLanguage]?.[key] || translations.en[key];
+
+  // State for dynamic suggestions
+  const [dynamicSuggestions, setDynamicSuggestions] = useState([]);
+
+  // Dynamic suggestions with larger pool
+  const getSimpleSuggestions = (lang) => {
+    const suggestions = {
+      fr: [
+        "Quels sont les programmes de formation disponibles à l'ENIAD ?",
+        "Comment puis-je m'inscrire à l'ENIAD ?",
+        "Quelles sont les conditions d'admission à l'ENIAD ?",
+        "Qu'est-ce que l'intelligence artificielle ?",
+        "Quels sont les frais de scolarité ?",
+        "Y a-t-il des bourses d'études disponibles ?",
+        "Quelle est la durée des études à l'ENIAD ?",
+        "Comment accéder au campus ENIAD ?",
+        "Y a-t-il une bibliothèque sur le campus ?",
+        "Quels sont les horaires des cours ?",
+        "Comment contacter les professeurs ?",
+        "Y a-t-il des stages obligatoires ?",
+        "Qu'est-ce que le machine learning ?",
+        "Quels langages de programmation sont enseignés ?",
+        "Y a-t-il des clubs étudiants ?",
+        "Comment s'inscrire aux cours ?",
+        "Où trouver les supports de cours ?",
+        "Comment réserver une salle d'étude ?",
+        "Y a-t-il des cours en ligne ?",
+        "Quels sont les débouchés professionnels ?"
+      ],
+      en: [
+        "What training programs are available at ENIAD?",
+        "How can I enroll at ENIAD?",
+        "What are the admission requirements for ENIAD?",
+        "What is artificial intelligence?",
+        "What are the tuition fees?",
+        "Are there scholarships available?",
+        "What is the duration of studies at ENIAD?",
+        "How to access the ENIAD campus?",
+        "Is there a library on campus?",
+        "What are the class schedules?",
+        "How to contact professors?",
+        "Are there mandatory internships?",
+        "What is machine learning?",
+        "What programming languages are taught?",
+        "Are there student clubs?",
+        "How to register for courses?",
+        "Where to find course materials?",
+        "How to book a study room?",
+        "Are there online courses?",
+        "What are the career opportunities?"
+      ],
+      ar: [
+        "ما هي البرامج التدريبية المتاحة في ENIAD؟",
+        "كيف يمكنني التسجيل في ENIAD؟",
+        "ما هي شروط القبول في ENIAD؟",
+        "ما هو الذكاء الاصطناعي؟",
+        "ما هي الرسوم الدراسية؟",
+        "هل توجد منح دراسية متاحة؟",
+        "ما هي مدة الدراسة في ENIAD؟",
+        "كيف أصل إلى حرم ENIAD؟",
+        "هل توجد مكتبة في الحرم؟",
+        "ما هي مواعيد الفصول؟",
+        "كيف أتواصل مع الأساتذة؟",
+        "هل هناك تدريبات إجبارية؟",
+        "ما هو التعلم الآلي؟",
+        "ما هي لغات البرمجة التي يتم تدريسها؟",
+        "هل توجد نوادي طلابية؟",
+        "كيف أسجل في المقررات؟",
+        "أين أجد مواد الدورة؟",
+        "كيف أحجز غرفة دراسة؟",
+        "هل توجد دورات عبر الإنترنت؟",
+        "ما هي الفرص المهنية؟"
+      ]
+    };
+
+    const allSuggestions = suggestions[lang] || suggestions.en;
+    // Shuffle and return 3 random ones
+    const shuffled = [...allSuggestions].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, 3);
+  };
+
+  // Load dynamic suggestions when component mounts, language changes, or refresh is triggered
+  useEffect(() => {
+    const loadSuggestions = () => {
+      console.log('🔄 Loading suggestions for language:', currentLanguage);
+
+      try {
+        // Use simple suggestions for now
+        const suggestions = getSimpleSuggestions(currentLanguage);
+        setDynamicSuggestions(suggestions);
+        console.log('🎯 Loaded simple suggestions:', suggestions);
+      } catch (error) {
+        console.error('❌ Error loading suggestions:', error);
+        setDynamicSuggestions([]);
+      }
+    };
+
+    loadSuggestions();
+
+    // Set up interval to refresh suggestions every 30 seconds
+    const interval = setInterval(loadSuggestions, 30000);
+
+    return () => clearInterval(interval);
+  }, [currentLanguage, refreshTrigger]);
 
 
 
@@ -97,37 +200,58 @@ const ChatContent = ({
 
             <Box sx={{ width: '100%', maxWidth: 'md' }}>
               <Grid container spacing={2} justifyContent="center">
-                {translations[currentLanguage].suggestions.map((question, index) => (
-                  <Grid item xs={12} sm={6} md={4} key={index}>
-                    <Paper
-                      elevation={0}
-                      onClick={() => onQuestionClick(question)}
-                      sx={{
-                        p: 2,
-                        borderRadius: '12px',
-                        border: `1px solid ${darkMode ? '#2d3748' : '#e2e8f0'}`,
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
-                        height: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        '&:hover': {
-                          borderColor: darkMode ? '#4a5568' : '#cbd5e0',
-                          transform: 'translateY(-2px)',
-                          boxShadow: '0 4px 6px rgba(0,0,0,0.05)'
-                        }
-                      }}
-                    >
-                      <Typography sx={{
-                        fontSize: '0.95rem',
-                        lineHeight: 1.4,
-                        textAlign: currentLanguage === 'ar' ? 'right' : 'left'
-                      }}>
-                        {question}
-                      </Typography>
-                    </Paper>
-                  </Grid>
-                ))}
+                {(() => {
+                  // Determine which suggestions to use
+                  let suggestionsToShow = [];
+
+                  if (dynamicSuggestions && dynamicSuggestions.length > 0) {
+                    suggestionsToShow = dynamicSuggestions;
+                    console.log('📋 Using dynamic suggestions:', suggestionsToShow);
+                  } else if (translations[currentLanguage] && translations[currentLanguage].suggestions) {
+                    suggestionsToShow = translations[currentLanguage].suggestions;
+                    console.log('📋 Using fallback suggestions:', suggestionsToShow);
+                  } else {
+                    // Ultimate fallback
+                    suggestionsToShow = [
+                      "What training programs are available at ENIAD?",
+                      "How can I enroll at ENIAD?",
+                      "What are the admission requirements for ENIAD?"
+                    ];
+                    console.log('📋 Using ultimate fallback suggestions');
+                  }
+
+                  return suggestionsToShow.map((question, index) => (
+                    <Grid item xs={12} sm={6} md={4} key={index}>
+                      <Paper
+                        elevation={0}
+                        onClick={() => onQuestionClick(question)}
+                        sx={{
+                          p: 2,
+                          borderRadius: '12px',
+                          border: `1px solid ${darkMode ? '#2d3748' : '#e2e8f0'}`,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s',
+                          height: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          '&:hover': {
+                            borderColor: darkMode ? '#4a5568' : '#cbd5e0',
+                            transform: 'translateY(-2px)',
+                            boxShadow: '0 4px 6px rgba(0,0,0,0.05)'
+                          }
+                        }}
+                      >
+                        <Typography sx={{
+                          fontSize: '0.95rem',
+                          lineHeight: 1.4,
+                          textAlign: currentLanguage === 'ar' ? 'right' : 'left'
+                        }}>
+                          {question || 'Loading...'}
+                        </Typography>
+                      </Paper>
+                    </Grid>
+                  ));
+                })()}
               </Grid>
             </Box>
           </Box>

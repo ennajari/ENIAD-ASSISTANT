@@ -18,10 +18,12 @@ import SettingsDialog from './components/SettingsDialog';
 import RenameDialog from './components/RenameDialog';
 import ChatMenu from './components/ChatMenu';
 import ErrorBoundary from './components/ErrorBoundary';
+import QuestionAutocomplete from './components/QuestionAutocomplete';
 import { DRAWER_WIDTH } from './constants/config';
 import { createChatHandlers } from './utils/chatHandlers';
 import { useTranslation } from './utils/translations';
 import { auth } from './firebase';
+import staticSuggestionsService from './services/staticSuggestionsService';
 
 function App() {
   const navigate = useNavigate();
@@ -36,6 +38,9 @@ function App() {
 
   // Research mode state
   const [isResearchMode, setIsResearchMode] = useState(false);
+
+  // Suggestions refresh trigger
+  const [suggestionsRefreshTrigger, setSuggestionsRefreshTrigger] = useState(0);
 
   // Sidebar state
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -64,11 +69,16 @@ function App() {
   const theme = createAppTheme(darkMode, currentLanguage, drawerOpen);
 
   // Chat handlers
-  const chatHandlers = createChatHandlers(chatState, currentLanguage, t, messagesEndRef);
+  const chatHandlers = createChatHandlers(chatState, currentLanguage, t, messagesEndRef, setSuggestionsRefreshTrigger);
 
   // Load saved conversations on mount
   useEffect(() => {
     try {
+      // Initialize static suggestions on app load
+      staticSuggestionsService.forceRefresh();
+      setSuggestionsRefreshTrigger(prev => prev + 1);
+      console.log('🔄 Static suggestions initialized on app load');
+
       const savedHistory = localStorage.getItem('conversationHistory');
       const savedCurrentChatId = localStorage.getItem('currentChatId');
 
@@ -372,6 +382,7 @@ function App() {
                     isSpeaking={chatState.isSpeaking}
                     supported={supported}
                     messagesEndRef={messagesEndRef}
+                    refreshTrigger={suggestionsRefreshTrigger}
                   />
 
                   <ChatInput
