@@ -95,7 +95,7 @@ SMA_API_BASE_URL=http://localhost:8001
 SMA_ENABLED=true
 
 # Llama3 Model (Modal)
-LLAMA3_BASE_URL=https://gorafrenk--llama3-openai-compatible-serve.modal.run/v1
+LLAMA3_BASE_URL=https://abdellah-ennajari-23--llama3-openai-compatible-serve.modal.run/v1
 LLAMA3_API_KEY=super-secret-key
 LLAMA3_MODEL=ahmed-ouka/llama3-8b-eniad-merged-32bit
 ```

@@ -1,4 +1,4 @@
-export const API_URL = "https://27bb-35-199-163-41.ngrok-free.app/generate";
+export const API_URL = "https://abdellah-ennajari-23--llama3-openai-compatible-serve.modal.run";
 
 export const LANGUAGES = [
   { code: 'fr', label: 'Français', flag: '🇫🇷' },
