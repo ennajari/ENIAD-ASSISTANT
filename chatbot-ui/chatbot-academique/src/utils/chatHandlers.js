@@ -251,13 +251,22 @@ export const createChatHandlers = (
         });
 
       } else {
-        // Fallback to direct API (OpenAI-compatible format)
-        console.log('📡 Using direct API fallback with OpenAI format');
+        // Fallback to direct API (OpenAI-compatible format) - BUDGET OPTIMIZED
+        console.log('💰 Using budget-optimized direct API call');
+
+        // Budget optimization: Limit context and tokens
+        const budgetOptimizedMessages = [...messages.slice(-3), userMessage].map(({ role, content }) => ({
+          role,
+          content: content.length > 200 ? content.substring(0, 200) + '...' : content
+        }));
+
         const response = await axios.post(`${API_URL}/v1/chat/completions`, {
           model: 'ahmed-ouka/llama3-8b-eniad-merged-32bit',
-          messages: [...messages, userMessage].map(({ role, content }) => ({ role, content })),
+          messages: budgetOptimizedMessages,
           temperature: 0.7,
-          max_tokens: 1000
+          max_tokens: 400, // Reduced from 1000 to save costs
+          top_p: 0.9,
+          frequency_penalty: 0.1
         }, {
           headers: {
             'Content-Type': 'application/json',
