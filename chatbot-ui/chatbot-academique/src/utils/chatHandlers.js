@@ -3,6 +3,7 @@ import { API_URL } from '../constants/config';
 import staticSuggestionsService from '../services/staticSuggestionsService';
 import ragApiService from '../services/ragApiService';
 import speechService from '../services/speechService';
+import smaService from '../services/smaService';
 
 export const createChatHandlers = (
   chatState,
@@ -66,7 +67,8 @@ export const createChatHandlers = (
     const {
       useRAG = true,
       autoSpeak = false,
-      speechQuality = 'high'
+      speechQuality = 'high',
+      isSMAActive = false
     } = options;
 
     const userMessage = {
@@ -84,6 +86,34 @@ export const createChatHandlers = (
 
     try {
       let botMessage;
+      let smaResults = null;
+
+      // If SMA is active, perform web intelligence search first
+      if (isSMAActive) {
+        try {
+          console.log('🧠 SMA activated - performing web intelligence search');
+
+          smaResults = await smaService.activateSearch({
+            query: userMessage.content,
+            language: currentLanguage,
+            categories: ['news', 'documents', 'announcements', 'events', 'photos'],
+            realTime: true,
+            maxResults: 10
+          });
+
+          console.log('✅ SMA search completed:', {
+            totalFound: smaResults.total_found,
+            searchTime: smaResults.search_time,
+            websitesScanned: smaResults.metadata?.websites_scanned
+          });
+
+          // Add SMA results to user message metadata
+          userMessage.smaResults = smaResults;
+
+        } catch (smaError) {
+          console.warn('⚠️ SMA search failed, continuing with normal flow:', smaError.message);
+        }
+      }
 
       if (useRAG) {
         // Use RAG API for intelligent responses
@@ -96,9 +126,20 @@ export const createChatHandlers = (
           timestamp: msg.timestamp
         }));
 
+        // Enhance query with SMA results if available
+        let enhancedQuery = userMessage.content;
+        if (smaResults && smaResults.results?.length > 0) {
+          const smaContext = smaResults.results.slice(0, 3).map(result =>
+            `${result.title}: ${result.content || result.summary || ''}`
+          ).join('\n');
+
+          enhancedQuery = `${userMessage.content}\n\nRecent information from ENIAD/UMP websites:\n${smaContext}`;
+          console.log('🔍 Enhanced query with SMA context');
+        }
+
         // Query your RAG system
         const ragResponse = await ragApiService.query({
-          query: userMessage.content,
+          query: enhancedQuery,
           language: currentLanguage,
           userId: user?.uid,
           context,
@@ -108,15 +149,26 @@ export const createChatHandlers = (
           }
         });
 
+        // Combine RAG sources with SMA sources
+        const combinedSources = [
+          ...(ragResponse.sources || []),
+          ...(smaResults?.sources || [])
+        ];
+
         botMessage = {
           role: 'assistant',
           content: ragResponse.content,
           id: ragResponse.id,
           chatId: currentChatId,
           timestamp: new Date().toISOString(),
-          sources: ragResponse.sources,
+          sources: combinedSources,
           confidence: ragResponse.confidence,
-          metadata: ragResponse.metadata
+          metadata: {
+            ...ragResponse.metadata,
+            smaEnhanced: !!smaResults,
+            smaResultsCount: smaResults?.total_found || 0
+          },
+          smaResults: smaResults // Include SMA results for display
         };
 
         console.log('✅ RAG response generated:', {
