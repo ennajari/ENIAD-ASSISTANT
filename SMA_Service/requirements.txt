@@ -1,0 +1,60 @@
+# ========================================
+# SMA Service Requirements
+# Smart Multi-Agent system for web intelligence
+# ========================================
+
+# Core Web Framework
+fastapi==0.115.12
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+
+# CrewAI and LangChain
+crewai==0.86.0
+langchain==0.3.23
+langchain-community==0.3.21
+langchain-core==0.3.21
+
+# Web Scraping
+beautifulsoup4==4.12.3
+aiohttp==3.10.11
+requests==2.32.3
+selenium==4.27.1
+playwright==1.49.1
+
+# Data Processing
+pandas==2.2.3
+numpy==2.2.4
+
+# Configuration
+pydantic==2.10.4
+pydantic-settings==2.8.1
+python-dotenv==1.1.0
+
+# Async Support
+asyncio-throttle==1.0.2
+aiofiles==24.1.0
+
+# Text Processing
+nltk==3.9.1
+spacy==3.8.2
+textblob==0.18.0
+
+# Utilities
+python-dateutil==2.9.0
+pytz==2024.2
+hashlib-compat==1.0.1
+
+# Logging
+python-json-logger==2.0.7
+colorama==0.4.6
+
+# Optional AI Services
+# openai==1.78.1
+# anthropic==0.39.0
+# cohere==5.15.0
+
+# Development
+pytest==8.2.2
+pytest-asyncio==0.23.7
+black==24.4.2
+flake8==7.1.0
