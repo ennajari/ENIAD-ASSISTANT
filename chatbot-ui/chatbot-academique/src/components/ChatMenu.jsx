@@ -24,7 +24,7 @@ const ChatMenu = ({
   onEditTitle,
   onDeleteChat
 }) => {
-  const t = (key) => translations[currentLanguage]?.[key] || translations.en[key];
+  const t = (key) => translations[currentLanguage]?.[key] || translations.fr[key];
 
   const handleEdit = () => {
     const chat = conversationHistory.find(c => c.id === chatId);

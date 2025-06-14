@@ -1,0 +1,152 @@
+[
+  {
+    "id": 1,
+    "question": "Quels sont les programmes de formation disponibles à l'ENIAD ?",
+    "category": "formation",
+    "keywords": ["programmes", "formation", "spécialités", "cursus"]
+  },
+  {
+    "id": 2,
+    "question": "Comment puis-je m'inscrire à l'ENIAD ?",
+    "category": "admission",
+    "keywords": ["inscription", "admission", "candidature", "dossier"]
+  },
+  {
+    "id": 3,
+    "question": "Quelles sont les conditions d'admission à l'ENIAD ?",
+    "category": "admission",
+    "keywords": ["conditions", "admission", "prérequis", "critères"]
+  },
+  {
+    "id": 4,
+    "question": "Quels sont les frais de scolarité à l'ENIAD ?",
+    "category": "finance",
+    "keywords": ["frais", "scolarité", "coût", "prix", "tarif"]
+  },
+  {
+    "id": 5,
+    "question": "Où se trouve le campus de l'ENIAD ?",
+    "category": "campus",
+    "keywords": ["localisation", "adresse", "campus", "Berkane"]
+  },
+  {
+    "id": 6,
+    "question": "Y a-t-il des bourses d'études disponibles ?",
+    "category": "finance",
+    "keywords": ["bourses", "aide", "financement", "subvention"]
+  },
+  {
+    "id": 7,
+    "question": "Quels sont les horaires des cours ?",
+    "category": "organisation",
+    "keywords": ["horaires", "emploi du temps", "planning", "cours"]
+  },
+  {
+    "id": 8,
+    "question": "Y a-t-il une bibliothèque sur le campus ?",
+    "category": "services",
+    "keywords": ["bibliothèque", "livres", "ressources", "documentation"]
+  },
+  {
+    "id": 9,
+    "question": "Comment contacter l'administration de l'ENIAD ?",
+    "category": "contact",
+    "keywords": ["contact", "administration", "téléphone", "email"]
+  },
+  {
+    "id": 10,
+    "question": "Quelles sont les spécialisations en intelligence artificielle ?",
+    "category": "formation",
+    "keywords": ["IA", "intelligence artificielle", "spécialisation", "machine learning"]
+  },
+  {
+    "id": 11,
+    "question": "Y a-t-il des stages obligatoires dans le cursus ?",
+    "category": "formation",
+    "keywords": ["stages", "entreprise", "pratique", "expérience"]
+  },
+  {
+    "id": 12,
+    "question": "Quels sont les débouchés professionnels après l'ENIAD ?",
+    "category": "carrière",
+    "keywords": ["emploi", "carrière", "débouchés", "métiers"]
+  },
+  {
+    "id": 13,
+    "question": "Comment accéder au campus ENIAD ?",
+    "category": "transport",
+    "keywords": ["transport", "accès", "bus", "voiture"]
+  },
+  {
+    "id": 14,
+    "question": "Y a-t-il des activités étudiantes à l'ENIAD ?",
+    "category": "vie étudiante",
+    "keywords": ["activités", "clubs", "associations", "sport"]
+  },
+  {
+    "id": 15,
+    "question": "Quels sont les laboratoires disponibles ?",
+    "category": "infrastructure",
+    "keywords": ["laboratoires", "équipements", "matériel", "recherche"]
+  },
+  {
+    "id": 16,
+    "question": "Comment obtenir un certificat de scolarité ?",
+    "category": "administration",
+    "keywords": ["certificat", "scolarité", "attestation", "document"]
+  },
+  {
+    "id": 17,
+    "question": "Y a-t-il un restaurant universitaire ?",
+    "category": "services",
+    "keywords": ["restaurant", "cantine", "repas", "nourriture"]
+  },
+  {
+    "id": 18,
+    "question": "Quels sont les partenariats internationaux de l'ENIAD ?",
+    "category": "international",
+    "keywords": ["partenariats", "international", "échange", "mobilité"]
+  },
+  {
+    "id": 19,
+    "question": "Comment s'inscrire aux examens ?",
+    "category": "examens",
+    "keywords": ["examens", "inscription", "évaluation", "tests"]
+  },
+  {
+    "id": 20,
+    "question": "Y a-t-il un service d'orientation ?",
+    "category": "services",
+    "keywords": ["orientation", "conseil", "aide", "guidance"]
+  },
+  {
+    "id": 21,
+    "question": "Quels sont les prérequis en mathématiques ?",
+    "category": "admission",
+    "keywords": ["mathématiques", "prérequis", "niveau", "compétences"]
+  },
+  {
+    "id": 22,
+    "question": "Comment récupérer mon diplôme ?",
+    "category": "administration",
+    "keywords": ["diplôme", "récupération", "remise", "cérémonie"]
+  },
+  {
+    "id": 23,
+    "question": "Y a-t-il des cours en ligne disponibles ?",
+    "category": "formation",
+    "keywords": ["en ligne", "distance", "e-learning", "numérique"]
+  },
+  {
+    "id": 24,
+    "question": "Quels sont les projets de fin d'études ?",
+    "category": "formation",
+    "keywords": ["projet", "fin d'études", "PFE", "mémoire"]
+  },
+  {
+    "id": 25,
+    "question": "Comment rejoindre l'équipe de recherche ?",
+    "category": "recherche",
+    "keywords": ["recherche", "équipe", "laboratoire", "doctorat"]
+  }
+]

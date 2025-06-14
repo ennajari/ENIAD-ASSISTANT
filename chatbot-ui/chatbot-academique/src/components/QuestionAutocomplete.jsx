@@ -53,16 +53,7 @@ const QuestionAutocomplete = ({
       helpText: "Essayez de poser des questions sur les programmes, installations ou admissions ENIAD",
       refreshed: "Actualisé"
     },
-    en: {
-      staticSuggestions: "Featured Questions",
-      suggestions: "Suggestions",
-      noSuggestions: "No suggestions found",
-      loading: "Searching...",
-      selectQuestion: "Select this question",
-      startTyping: "Start typing to see suggestions...",
-      helpText: "Try asking about ENIAD programs, facilities, or admissions",
-      refreshed: "Refreshed"
-    },
+
     ar: {
       staticSuggestions: "أسئلة مميزة",
       suggestions: "اقتراحات",

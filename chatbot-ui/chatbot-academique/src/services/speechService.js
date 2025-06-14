@@ -21,12 +21,7 @@ class SpeechService {
         google: 'fr-FR-Wavenet-C',
         fallback: 'fr-FR'
       },
-      en: {
-        elevenlabs: 'EXAVITQu4vr4xnSDxMaL', // English voice ID
-        azure: 'en-US-AriaNeural',
-        google: 'en-US-Wavenet-F',
-        fallback: 'en-US'
-      },
+
       ar: {
         elevenlabs: null, // ElevenLabs doesn't support Arabic well
         azure: 'ar-SA-ZariyahNeural',
