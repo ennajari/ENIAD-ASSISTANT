@@ -13,29 +13,29 @@ class TranslationService {
     this.languagePatterns = {
       ar: /[\u0600-\u06FF]/,
       fr: /\b(le|la|les|de|du|des|et|est|dans|pour|avec|sur|par|une|un|ce|cette|qui|que|où|comment|pourquoi|formation|école|université|étudiant|module|cours|programme)\b/i,
-      en: /\b(the|and|is|in|for|with|on|by|a|an|this|that|which|what|where|how|why|school|university|student|module|course|program|training)\b/i
+
     };
 
     // Simple translation dictionaries for common ENIAD/UMP terms
     this.translations = {
-      'fr_to_en': {
-        'École Nationale de l\'Intelligence Artificielle et Digitale': 'National School of Artificial Intelligence and Digital',
-        'ENIAD': 'ENIAD',
-        'Université Mohammed Premier': 'Mohammed First University',
-        'UMP': 'UMP',
-        'formation': 'training',
-        'formations': 'programs',
-        'module': 'module',
-        'modules': 'modules',
-        'cours': 'course',
-        'programme': 'program',
-        'étudiant': 'student',
-        'étudiants': 'students',
-        'intelligence artificielle': 'artificial intelligence',
-        'apprentissage automatique': 'machine learning',
-        'réseaux de neurones': 'neural networks',
-        'traitement du langage naturel': 'natural language processing',
-        'vision par ordinateur': 'computer vision',
+      'fr_to_ar': {
+        'École Nationale de l\'Intelligence Artificielle et Digitale': 'المدرسة الوطنية للذكاء الاصطناعي والرقمي',
+        'ENIAD': 'إنياد',
+        'Université Mohammed Premier': 'جامعة محمد الأول',
+        'UMP': 'جامعة محمد الأول',
+        'formation': 'تكوين',
+        'formations': 'تكوينات',
+        'module': 'وحدة',
+        'modules': 'وحدات',
+        'cours': 'درس',
+        'programme': 'برنامج',
+        'étudiant': 'طالب',
+        'étudiants': 'طلاب',
+        'intelligence artificielle': 'الذكاء الاصطناعي',
+        'apprentissage automatique': 'التعلم الآلي',
+        'réseaux de neurones': 'الشبكات العصبية',
+        'traitement du langage naturel': 'معالجة اللغة الطبيعية',
+        'vision par ordinateur': 'الرؤية الحاسوبية',
         'science des données': 'data science',
         'sécurité informatique': 'cybersecurity',
         'développement web': 'web development',
@@ -162,28 +162,23 @@ class TranslationService {
   /**
    * Detect the language of a text
    * @param {string} text - Text to analyze
-   * @returns {string} Language code (ar, fr, en)
+   * @returns {string} Language code (ar, fr)
    */
   detectLanguage(text) {
     if (!text || typeof text !== 'string') return 'fr';
-    
+
     const cleanText = text.toLowerCase().trim();
-    
+
     // Check for Arabic characters
     if (this.languagePatterns.ar.test(text)) {
       return 'ar';
     }
-    
-    // Count French and English indicators
-    const frenchMatches = (cleanText.match(this.languagePatterns.fr) || []).length;
-    const englishMatches = (cleanText.match(this.languagePatterns.en) || []).length;
-    
-    if (frenchMatches > englishMatches) {
+
+    // Check for French indicators
+    if (this.languagePatterns.fr.test(cleanText)) {
       return 'fr';
-    } else if (englishMatches > frenchMatches) {
-      return 'en';
     }
-    
+
     // Default to French for ENIAD context
     return 'fr';
   }

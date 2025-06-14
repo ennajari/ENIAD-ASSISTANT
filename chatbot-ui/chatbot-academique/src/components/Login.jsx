@@ -24,18 +24,7 @@ export default function Login() {
 
   // Language adaptation
   const { language: lang } = useLanguage();
-  const translations = {
-    en: {
-      title: 'ENIAD Academic Portal',
-      subtitle: 'Welcome! Please sign in with your Google Academic account.',
-      signin: 'Sign in with Google Academic',
-      signing: 'Signing in...',
-      cancelled: 'Login was cancelled',
-      error: 'Failed to login. Please try again.',
-      copyright: 'All rights reserved.',
-      academicOnly: 'Academic emails only (ump.ma domain)',
-      syncingData: 'Syncing your conversations...'
-    },
+
     fr: {
       title: 'Portail Académique ENIAD',
       subtitle: 'Bienvenue ! Veuillez vous connecter avec votre compte Google académique.',
@@ -59,7 +48,7 @@ export default function Login() {
       syncingData: 'مزامنة محادثاتك...'
     }
   };
-  const t = translations[lang] || translations['en'];
+  const t = translations[lang] || translations['fr'];
   const direction = lang === 'ar' ? 'rtl' : 'ltr';
 
   // Check Firebase configuration on component mount

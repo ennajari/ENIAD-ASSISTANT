@@ -236,9 +236,9 @@ const ChatContent = ({
                   } else {
                     // Ultimate fallback
                     suggestionsToShow = [
-                      "What training programs are available at ENIAD?",
-                      "How can I enroll at ENIAD?",
-                      "What are the admission requirements for ENIAD?"
+                      "Quels sont les programmes de formation disponibles à l'ENIAD ?",
+                      "Comment puis-je m'inscrire à l'ENIAD ?",
+                      "Quelles sont les conditions d'admission à l'ENIAD ?"
                     ];
                     console.log('📋 Using ultimate fallback suggestions');
                   }
