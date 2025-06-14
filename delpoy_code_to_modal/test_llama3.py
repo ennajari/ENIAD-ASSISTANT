@@ -1,8 +1,7 @@
 import requests
 
 API_URL = "https://abdellah-ennajari-23--llama3-openai-compatible-serve.modal.run/v1/chat/completions"
-API_KEY = "super-secret-key"  # Doit correspondre à celui dans serve_llama.py
-
+API_KEY = "super-secret-key"
 headers = {
     "Authorization": f"Bearer {API_KEY}",
     "Content-Type": "application/json"
