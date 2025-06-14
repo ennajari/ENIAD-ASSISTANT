@@ -7,9 +7,8 @@ import React, { useState, useEffect } from 'react'
 import toast from 'react-hot-toast';
 import VoiceModal from './VoiceModal';
 
-const PromptBox = ({setIsLoading, isLoading}) => {
+const PromptBox = ({setIsLoading, isLoading, prompt, setPrompt}) => {
 
-    const [prompt, setPrompt] = useState('');
     const [isRecording, setIsRecording] = useState(false);
     const [showVoiceModal, setShowVoiceModal] = useState(false);
     const [recognitionLang, setRecognitionLang] = useState('ar-SA');
@@ -73,14 +72,16 @@ const PromptBox = ({setIsLoading, isLoading}) => {
 
     const handleApiResponse = async (data, promptCopy) => {
         if(data.success){
+            const fullMessage = data.data;
+            
             setChats((prevChats)=>prevChats.map((chat)=>
                 chat._id === selectedChat._id 
-                    ? {...chat, messages: [...(chat.messages || []), data.data]} 
+                    ? {...chat, messages: [...(chat.messages || []), fullMessage]} 
                     : chat
             ));
 
-            const message = data.data.content;
-            const messageTokens = message.split(" ");
+            const messageContent = fullMessage.content;
+            const messageTokens = messageContent.split(" ");
             let assistantMessage = {
                 role: 'assistant',
                 content: "",
@@ -93,17 +94,28 @@ const PromptBox = ({setIsLoading, isLoading}) => {
             }));
 
             for (let i = 0; i < messageTokens.length; i++) {
-               setTimeout(()=>{
-                assistantMessage.content = messageTokens.slice(0, i + 1).join(" ");
-                setSelectedChat((prev)=>{
-                    const updatedMessages = [
-                            ...(prev.messages || []).slice(0, -1),
-                            {...assistantMessage}
-                        ];
-                        return {...prev, messages: updatedMessages};
-                    });
-                }, i * 100);
+               await new Promise(resolve => setTimeout(resolve, 50));
+               assistantMessage.content = messageTokens.slice(0, i + 1).join(" ");
+               setSelectedChat((prev)=>{
+                   if (!prev) return prev;
+                   const updatedMessages = [
+                           ...(prev.messages || []).slice(0, -1),
+                           {...assistantMessage}
+                       ];
+                       return {...prev, messages: updatedMessages};
+                   });
             }
+
+            // After typing, replace with the full message to include audio data
+            setSelectedChat((prev) => {
+                if (!prev) return prev;
+                const finalMessages = [
+                    ...(prev.messages || []).slice(0, -1),
+                    fullMessage
+                ];
+                return {...prev, messages: finalMessages };
+            });
+
         } else {
             toast.error(data.message);
             setPrompt(promptCopy);
