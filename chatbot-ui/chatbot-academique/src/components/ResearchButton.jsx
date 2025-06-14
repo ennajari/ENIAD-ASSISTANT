@@ -278,17 +278,19 @@ const ResearchButton = ({
         placement="top"
         arrow
       >
-        <AnimatedIconButton
-          onClick={handleClick}
-          disabled={disabled || isLoading}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          isActive={isActive || isLoading || isCompleted}
-          darkMode={darkMode}
-          size={size}
-        >
-          {getIcon()}
-        </AnimatedIconButton>
+        <span>
+          <AnimatedIconButton
+            onClick={handleClick}
+            disabled={disabled || isLoading}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            isActive={isActive || isLoading || isCompleted}
+            darkMode={darkMode}
+            size={size}
+          >
+            {getIcon()}
+          </AnimatedIconButton>
+        </span>
       </Tooltip>
 
       {(isLoading || isCompleted || isActive) && (

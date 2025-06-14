@@ -6,16 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint .",
     "preview": "vite preview",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist",
-    "start:all": "cd ../.. && python start_all_services.py",
-    "start:frontend": "vite",
-    "start:rag": "cd ../../RAG_Project/src && python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload",
-    "start:sma": "cd ../../SMA_Service && python -m uvicorn main:app --host 0.0.0.0 --port 8001 --reload",
-    "start:api": "cd ../../eniad-api-server && node server.js",
-    "install:all": "npm install && cd ../../eniad-api-server && npm install && cd ../RAG_Project/src && pip install -r requirements.txt && cd ../../SMA_Service && pip install -r requirements.txt"
+    "lint": "eslint . --fix",
+    "clean": "rm -rf dist node_modules package-lock.json",
+    "fresh-install": "npm run clean && npm install"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
@@ -51,5 +45,10 @@
     "tailwindcss": "^3.4.3",
     "vite": "^5.2.11",
     "vite-plugin-pwa": "^0.20.0"
-  }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
 }

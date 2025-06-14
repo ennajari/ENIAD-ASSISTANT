@@ -187,7 +187,7 @@ export const createChatHandlers = (
         }
       }
 
-      if (useRAG) {
+      if (false) { // Disable RAG for budget mode - force direct Modal API
         // Step 4: RAG + Custom Model (cost-optimized)
         console.log('🤖 Using RAG API for response generation');
 
