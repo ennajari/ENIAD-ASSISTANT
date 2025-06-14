@@ -11,7 +11,10 @@
   "dependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "next": "15.3.3"
+    "next": "15.3.3",
+    "mongoose": "^8.0.0",
+    "openai": "^4.0.0",
+    "@clerk/nextjs": "^5.0.0"
   },
   "devDependencies": {
     "typescript": "^5",

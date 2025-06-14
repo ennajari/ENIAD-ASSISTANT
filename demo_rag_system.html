@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 Démonstration RAG - ENIAD Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .demo-section {
+            margin-bottom: 40px;
+            padding: 30px;
+            border: 2px solid #e5e7eb;
+            border-radius: 15px;
+            background: #f9fafb;
+        }
+
+        .demo-section h2 {
+            color: #3b82f6;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .query-interface {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .query-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            transition: border-color 0.3s ease;
+        }
+
+        .query-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .demo-button {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .demo-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59,130,246,0.3);
+        }
+
+        .rag-pipeline {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .pipeline-step {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-top: 4px solid #3b82f6;
+            position: relative;
+        }
+
+        .pipeline-step.active {
+            background: #dbeafe;
+            border-top-color: #1e40af;
+        }
+
+        .step-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #1f2937;
+        }
+
+        .step-description {
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .results-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .retrieved-docs {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .doc-item {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .doc-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+
+        .doc-snippet {
+            font-size: 0.9rem;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+
+        .doc-score {
+            background: #3b82f6;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            float: right;
+        }
+
+        .generated-response {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .response-text {
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 10px;
+            line-height: 1.6;
+            color: #1f2937;
+            border-left: 4px solid #10b981;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #3b82f6;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+
+        .knowledge-base {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .kb-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .kb-stat {
+            text-align: center;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .kb-stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3b82f6;
+        }
+
+        .kb-stat-label {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+
+        .sample-queries {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .sample-query {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #e5e7eb;
+        }
+
+        .sample-query:hover {
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59,130,246,0.2);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 Système RAG (Retrieval-Augmented Generation)</h1>
+            <p>Démonstration du système de génération augmentée par récupération - ENIAD</p>
+        </div>
+
+        <div class="content">
+            <!-- Interface de requête -->
+            <div class="demo-section">
+                <h2>💬 Interface de Requête RAG</h2>
+                <div class="query-interface">
+                    <input type="text" class="query-input" id="queryInput" 
+                           placeholder="Posez votre question sur l'ENIAD (ex: Quels sont les frais de scolarité ?)">
+                    <button class="demo-button" onclick="processQuery()">🔍 Rechercher avec RAG</button>
+                    <button class="demo-button" onclick="clearResults()">🗑️ Effacer</button>
+                </div>
+
+                <div class="sample-queries">
+                    <div class="sample-query" onclick="setQuery('Quels sont les frais de scolarité à l\'ENIAD ?')">
+                        <strong>💰 Frais de scolarité</strong>
+                        <p>Quels sont les frais de scolarité à l'ENIAD ?</p>
+                    </div>
+                    <div class="sample-query" onclick="setQuery('Comment s\'inscrire à l\'ENIAD ?')">
+                        <strong>📝 Procédure d'inscription</strong>
+                        <p>Comment s'inscrire à l'ENIAD ?</p>
+                    </div>
+                    <div class="sample-query" onclick="setQuery('Quelles sont les spécialités disponibles ?')">
+                        <strong>🎓 Spécialités</strong>
+                        <p>Quelles sont les spécialités disponibles ?</p>
+                    </div>
+                    <div class="sample-query" onclick="setQuery('Où se trouve le campus de l\'ENIAD ?')">
+                        <strong>📍 Localisation</strong>
+                        <p>Où se trouve le campus de l'ENIAD ?</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pipeline RAG -->
+            <div class="demo-section">
+                <h2>⚙️ Pipeline de Traitement RAG</h2>
+                <div class="rag-pipeline">
+                    <div class="pipeline-step" id="step1">
+                        <div class="step-icon">🔍</div>
+                        <div class="step-title">1. Analyse de la Requête</div>
+                        <div class="step-description">Traitement NLP et extraction des mots-clés</div>
+                    </div>
+                    <div class="pipeline-step" id="step2">
+                        <div class="step-icon">🧮</div>
+                        <div class="step-title">2. Vectorisation</div>
+                        <div class="step-description">Conversion en vecteurs d'embedding</div>
+                    </div>
+                    <div class="pipeline-step" id="step3">
+                        <div class="step-icon">📊</div>
+                        <div class="step-title">3. Recherche Sémantique</div>
+                        <div class="step-description">Recherche dans la base vectorielle</div>
+                    </div>
+                    <div class="pipeline-step" id="step4">
+                        <div class="step-icon">📄</div>
+                        <div class="step-title">4. Récupération</div>
+                        <div class="step-description">Sélection des documents pertinents</div>
+                    </div>
+                    <div class="pipeline-step" id="step5">
+                        <div class="step-icon">🤖</div>
+                        <div class="step-title">5. Génération</div>
+                        <div class="step-description">Génération de la réponse avec LLM</div>
+                    </div>
+                </div>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Traitement de votre requête...</p>
+                </div>
+            </div>
+
+            <!-- Résultats -->
+            <div class="demo-section" id="resultsSection" style="display: none;">
+                <h2>📊 Résultats de la Recherche RAG</h2>
+                <div class="results-container">
+                    <div class="retrieved-docs">
+                        <h3>📚 Documents Récupérés</h3>
+                        <div id="retrievedDocs">
+                            <!-- Les documents seront ajoutés ici -->
+                        </div>
+                    </div>
+                    <div class="generated-response">
+                        <h3>🤖 Réponse Générée</h3>
+                        <div class="response-text" id="generatedResponse">
+                            <!-- La réponse sera ajoutée ici -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" id="retrievalTime">0.3s</div>
+                        <div class="metric-label">Temps de récupération</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="relevanceScore">94%</div>
+                        <div class="metric-label">Score de pertinence</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="docsRetrieved">5</div>
+                        <div class="metric-label">Documents trouvés</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="generationTime">1.2s</div>
+                        <div class="metric-label">Temps de génération</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Base de connaissances -->
+            <div class="demo-section">
+                <h2>📚 Base de Connaissances</h2>
+                <div class="knowledge-base">
+                    <div class="kb-stats">
+                        <div class="kb-stat">
+                            <div class="kb-stat-number">1,247</div>
+                            <div class="kb-stat-label">Documents</div>
+                        </div>
+                        <div class="kb-stat">
+                            <div class="kb-stat-number">45,892</div>
+                            <div class="kb-stat-label">Chunks</div>
+                        </div>
+                        <div class="kb-stat">
+                            <div class="kb-stat-number">2.3M</div>
+                            <div class="kb-stat-label">Vecteurs</div>
+                        </div>
+                        <div class="kb-stat">
+                            <div class="kb-stat-number">FR/AR</div>
+                            <div class="kb-stat-label">Langues</div>
+                        </div>
+                        <div class="kb-stat">
+                            <div class="kb-stat-number">98.7%</div>
+                            <div class="kb-stat-label">Précision</div>
+                        </div>
+                    </div>
+                    <p><strong>Sources de données :</strong> Règlements ENIAD, Documentation académique, FAQ étudiants, Procédures administratives, Calendriers académiques</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const sampleResponses = {
+            "frais": {
+                docs: [
+                    { title: "Règlement des frais de scolarité 2025", snippet: "Les frais de scolarité pour l'année académique 2025 sont fixés à 15,000 DH pour les étudiants marocains...", score: "95%" },
+                    { title: "Guide financier étudiant", snippet: "Modalités de paiement et bourses disponibles pour les étudiants de l'ENIAD...", score: "87%" },
+                    { title: "Tarification des services", snippet: "Détail des frais additionnels : restauration, transport, activités...", score: "82%" }
+                ],
+                response: "Les frais de scolarité à l'ENIAD pour l'année académique 2025 sont de 15,000 DH pour les étudiants marocains. Des facilités de paiement sont disponibles, ainsi que des bourses d'excellence pour les étudiants méritants. Les frais incluent l'accès aux laboratoires, à la bibliothèque numérique et aux plateformes d'apprentissage en ligne."
+            },
+            "inscription": {
+                docs: [
+                    { title: "Procédure d'inscription 2025", snippet: "L'inscription à l'ENIAD se fait en ligne via la plateforme dédiée. Les candidats doivent...", score: "96%" },
+                    { title: "Conditions d'admission", snippet: "Baccalauréat scientifique ou technique avec mention, test d'aptitude...", score: "91%" },
+                    { title: "Calendrier des inscriptions", snippet: "Période d'inscription : du 15 juin au 30 juillet 2025...", score: "88%" }
+                ],
+                response: "Pour s'inscrire à l'ENIAD, vous devez avoir un baccalauréat scientifique ou technique avec mention. L'inscription se fait en ligne du 15 juin au 30 juillet 2025. Vous devrez passer un test d'aptitude et un entretien de motivation. Les dossiers complets doivent être soumis avec les pièces justificatives requises."
+            },
+            "spécialités": {
+                docs: [
+                    { title: "Catalogue des formations", snippet: "L'ENIAD propose 4 spécialités principales : Intelligence Artificielle, Cybersécurité...", score: "98%" },
+                    { title: "Programmes d'études", snippet: "Chaque spécialité comprend un tronc commun et des modules spécialisés...", score: "89%" },
+                    { title: "Débouchés professionnels", snippet: "Les diplômés trouvent des emplois dans les secteurs technologiques...", score: "85%" }
+                ],
+                response: "L'ENIAD propose 4 spécialités principales : Intelligence Artificielle, Cybersécurité, Science des Données, et Ingénierie Logicielle. Chaque programme dure 3 ans et combine formation théorique, projets pratiques et stages en entreprise. Les étudiants bénéficient d'un encadrement personnalisé et d'un accès aux dernières technologies."
+            },
+            "campus": {
+                docs: [
+                    { title: "Localisation du campus", snippet: "Le campus de l'ENIAD est situé à Berkane, dans la région de l'Oriental...", score: "97%" },
+                    { title: "Infrastructures", snippet: "Le campus s'étend sur 15 hectares avec des laboratoires modernes...", score: "90%" },
+                    { title: "Accès et transport", snippet: "Plusieurs lignes de transport desservent le campus...", score: "86%" }
+                ],
+                response: "Le campus de l'ENIAD est situé à Berkane, dans la région de l'Oriental au Maroc. Il s'étend sur 15 hectares et dispose d'infrastructures modernes : laboratoires d'IA, espaces de coworking, bibliothèque numérique, et résidences étudiantes. Le campus est accessible par plusieurs lignes de transport public et dispose d'un parking pour les étudiants."
+            }
+        };
+
+        function setQuery(query) {
+            document.getElementById('queryInput').value = query;
+        }
+
+        function processQuery() {
+            const query = document.getElementById('queryInput').value.toLowerCase();
+            if (!query.trim()) return;
+
+            // Afficher le loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('resultsSection').style.display = 'none';
+
+            // Simuler le pipeline
+            simulatePipeline();
+
+            // Déterminer le type de réponse
+            let responseKey = 'frais';
+            if (query.includes('inscription') || query.includes('inscrire')) responseKey = 'inscription';
+            else if (query.includes('spécialité') || query.includes('formation')) responseKey = 'spécialités';
+            else if (query.includes('campus') || query.includes('trouve') || query.includes('localisation')) responseKey = 'campus';
+
+            setTimeout(() => {
+                displayResults(sampleResponses[responseKey]);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('resultsSection').style.display = 'block';
+            }, 3000);
+        }
+
+        function simulatePipeline() {
+            const steps = ['step1', 'step2', 'step3', 'step4', 'step5'];
+            steps.forEach(step => {
+                document.getElementById(step).classList.remove('active');
+            });
+
+            steps.forEach((step, index) => {
+                setTimeout(() => {
+                    document.getElementById(step).classList.add('active');
+                }, (index + 1) * 500);
+            });
+        }
+
+        function displayResults(data) {
+            // Afficher les documents récupérés
+            const docsContainer = document.getElementById('retrievedDocs');
+            docsContainer.innerHTML = '';
+            data.docs.forEach(doc => {
+                const docElement = document.createElement('div');
+                docElement.className = 'doc-item';
+                docElement.innerHTML = `
+                    <div class="doc-title">${doc.title} <span class="doc-score">${doc.score}</span></div>
+                    <div class="doc-snippet">${doc.snippet}</div>
+                `;
+                docsContainer.appendChild(docElement);
+            });
+
+            // Afficher la réponse générée
+            document.getElementById('generatedResponse').textContent = data.response;
+
+            // Mettre à jour les métriques
+            document.getElementById('retrievalTime').textContent = (0.2 + Math.random() * 0.3).toFixed(1) + 's';
+            document.getElementById('relevanceScore').textContent = (90 + Math.random() * 8).toFixed(0) + '%';
+            document.getElementById('docsRetrieved').textContent = data.docs.length;
+            document.getElementById('generationTime').textContent = (1.0 + Math.random() * 0.5).toFixed(1) + 's';
+        }
+
+        function clearResults() {
+            document.getElementById('queryInput').value = '';
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('loading').style.display = 'none';
+            
+            // Réinitialiser le pipeline
+            const steps = ['step1', 'step2', 'step3', 'step4', 'step5'];
+            steps.forEach(step => {
+                document.getElementById(step).classList.remove('active');
+            });
+        }
+
+        // Simulation d'activité en arrière-plan
+        setInterval(() => {
+            const kbStats = document.querySelectorAll('.kb-stat-number');
+            kbStats[0].textContent = (1247 + Math.floor(Math.random() * 10)).toLocaleString();
+            kbStats[1].textContent = (45892 + Math.floor(Math.random() * 100)).toLocaleString();
+        }, 10000);
+    </script>
+</body>
+</html>

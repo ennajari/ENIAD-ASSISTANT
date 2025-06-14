@@ -2,8 +2,7 @@ export const API_URL = "https://abdellah-ennajari-23--llama3-openai-compatible-s
 
 export const LANGUAGES = [
   { code: 'fr', label: 'Français', flag: '🇫🇷' },
-  { code: 'ar', label: 'العربية', flag: '🇲🇦' },
-  { code: 'en', label: 'English', flag: '🇬🇧' }
+  { code: 'ar', label: 'العربية', flag: '🇲🇦' }
 ];
 
 export const DRAWER_WIDTH = 300;

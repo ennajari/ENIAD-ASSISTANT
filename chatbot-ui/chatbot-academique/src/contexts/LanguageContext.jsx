@@ -2,9 +2,25 @@ import { createContext, useContext, useState } from 'react';
 
 const LanguageContext = createContext();
 
+// Supported languages (removed English)
+const languages = {
+  fr: {
+    code: 'fr',
+    name: 'Français',
+    flag: '🇫🇷',
+    direction: 'ltr'
+  },
+  ar: {
+    code: 'ar',
+    name: 'العربية',
+    flag: '🇲🇦',
+    direction: 'rtl'
+  }
+};
+
 export function LanguageProvider({ children }) {
   const [language, setLanguage] = useState(
-    localStorage.getItem('language') || (navigator.language || 'en').split('-')[0]
+    localStorage.getItem('language') || 'fr' // Default to French instead of English
   );
 
   const changeLanguage = (lang) => {
@@ -22,3 +38,5 @@ export function LanguageProvider({ children }) {
 export function useLanguage() {
   return useContext(LanguageContext);
 }
+
+export { languages };
