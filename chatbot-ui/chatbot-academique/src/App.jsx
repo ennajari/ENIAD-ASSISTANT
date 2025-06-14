@@ -3,7 +3,7 @@ import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from '@mui/material/styles';
 import { Box, CircularProgress, CssBaseline, Toolbar, useMediaQuery } from '@mui/material';
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+// Speech recognition using native Web Speech API
 import Login from './components/Login';
 import { useLanguage } from './contexts/LanguageContext';
 import { createAppTheme } from './theme/theme';
@@ -53,13 +53,11 @@ function App() {
 
 
 
-  // Speech recognition
-  const {
-    transcript,
-    listening,
-    resetTranscript,
-    browserSupportsSpeechRecognition,
-  } = useSpeechRecognition();
+  // Speech recognition state
+  const [transcript, setTranscript] = useState('');
+  const [listening, setListening] = useState(false);
+  const [recognition, setRecognition] = useState(null);
+  const browserSupportsSpeechRecognition = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
 
   // Refs
   const messagesEndRef = useRef(null);
@@ -274,15 +272,52 @@ function App() {
 
   const toggleRecording = () => {
     if (listening) {
-      SpeechRecognition.stopListening();
+      if (recognition) {
+        recognition.stop();
+      }
+      setListening(false);
       chatState.setIsRecording(false);
     } else {
-      resetTranscript();
-      SpeechRecognition.startListening({
-        continuous: true,
-        language: currentLanguage === 'ar' ? 'ar-SA' : currentLanguage === 'en' ? 'en-US' : 'fr-FR'
-      });
-      chatState.setIsRecording(true);
+      if (browserSupportsSpeechRecognition) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const newRecognition = new SpeechRecognition();
+
+        newRecognition.continuous = true;
+        newRecognition.interimResults = true;
+        newRecognition.lang = currentLanguage === 'ar' ? 'ar-SA' : currentLanguage === 'en' ? 'en-US' : 'fr-FR';
+
+        newRecognition.onstart = () => {
+          setListening(true);
+          chatState.setIsRecording(true);
+        };
+
+        newRecognition.onresult = (event) => {
+          let finalTranscript = '';
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            if (event.results[i].isFinal) {
+              finalTranscript += event.results[i][0].transcript;
+            }
+          }
+          if (finalTranscript) {
+            setTranscript(finalTranscript);
+          }
+        };
+
+        newRecognition.onend = () => {
+          setListening(false);
+          chatState.setIsRecording(false);
+        };
+
+        newRecognition.onerror = (event) => {
+          console.error('Speech recognition error:', event.error);
+          setListening(false);
+          chatState.setIsRecording(false);
+        };
+
+        setRecognition(newRecognition);
+        setTranscript('');
+        newRecognition.start();
+      }
     }
   };
 
