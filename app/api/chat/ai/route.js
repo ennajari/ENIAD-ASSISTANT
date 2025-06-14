@@ -7,6 +7,7 @@ import OpenAI from "openai";
 
 
 // Initialize OpenAI client with Llama3 model configuration
+// Initialize OpenAI client with Llama3 model configuration
 const openai = new OpenAI({
     baseURL: 'https://abdellah-ennajari-23--llama3-openai-compatible-serve.modal.run/v1',
     apiKey: "super-secret-key"
@@ -136,6 +137,11 @@ export async function POST(req){
 
         // Call the Llama3 model API to get a chat completion
         const completion = await openai.chat.completions.create({
+            model: "ahmed-ouka/llama3-8b-eniad-merged-32bit",
+            messages: prompte_Task_messages,
+            temperature: 0.2,
+            max_tokens: 1024,
+            stream: false
             model: "ahmed-ouka/llama3-8b-eniad-merged-32bit",
             messages: prompte_Task_messages,
             temperature: 0.2,
