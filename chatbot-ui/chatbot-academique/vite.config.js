@@ -28,14 +28,20 @@ export default defineConfig({
       }
     })
   ],
-  server: {
-    proxy: {
-      '/generate': {
-        target: 'https://25ae-35-198-214-255.ngrok-free.app',
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/generate/, '')
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          mui: ['@mui/material', '@mui/icons-material'],
+          firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore']
+        }
       }
-    }
+    },
+    chunkSizeWarningLimit: 1000
+  },
+  server: {
+    port: 5173,
+    host: true
   }
 })
