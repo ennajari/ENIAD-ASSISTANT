@@ -68,24 +68,100 @@ class RealSmaService {
   }
 
   /**
-   * Execute workflow using SMA backend
+   * Execute workflow using enhanced SMA backend
    */
   async executeWithBackend(query, options) {
     try {
-      const response = await axios.post(`${this.smaApiUrl}/execute`, {
-        query,
-        ...options
-      }, { timeout: 30000 });
+      const {
+        language = 'fr',
+        searchDepth = 'medium',
+        includeDocuments = true,
+        includeImages = true,
+        includeNews = true,
+        maxResults = 20
+      } = options;
 
-      return {
-        success: true,
-        results: response.data.results || [],
-        agents: response.data.agents || {},
-        metadata: response.data.metadata || {}
-      };
+      console.log(`🧠 Using enhanced SMA backend for: "${query}"`);
+
+      // Use the new intelligent query endpoint
+      const response = await axios.post(`${this.smaApiUrl}/sma/intelligent-query`, {
+        query,
+        language,
+        search_depth: searchDepth,
+        include_documents: includeDocuments,
+        include_images: includeImages,
+        include_news: includeNews,
+        max_results: maxResults,
+        store_in_knowledge_base: true
+      }, { timeout: 60000 });
+
+      if (response.data) {
+        const data = response.data;
+
+        // Transform the response to match expected format
+        const transformedResults = this.transformEnhancedResults(data);
+
+        console.log(`✅ Enhanced SMA completed with confidence: ${(data.confidence * 100).toFixed(1)}%`);
+
+        return {
+          success: true,
+          results: transformedResults,
+          agents: {
+            webScraper: { status: 'completed', lastRun: new Date().toISOString() },
+            contentAnalyzer: { status: 'completed', lastRun: new Date().toISOString() },
+            imageProcessor: { status: includeImages ? 'completed' : 'skipped', lastRun: new Date().toISOString() },
+            newsSearcher: { status: includeNews ? 'completed' : 'skipped', lastRun: new Date().toISOString() }
+          },
+          metadata: {
+            query,
+            language,
+            confidence: data.confidence,
+            totalSources: data.sources?.length || 0,
+            processingSteps: data.processing_steps || [],
+            searchDepth,
+            timestamp: data.timestamp
+          },
+          enhancedData: {
+            finalAnswer: data.final_answer,
+            sources: data.sources || [],
+            comprehensiveSearch: data.comprehensive_search || {},
+            newsResults: data.news_results || {},
+            understanding: data.understanding || {}
+          }
+        };
+      }
+
+      throw new Error('No data received from enhanced SMA backend');
+
     } catch (error) {
-      console.error('❌ SMA backend execution failed:', error);
-      // Fallback to local simulation
+      console.error('❌ Enhanced SMA backend execution failed:', error);
+
+      // Try basic search as fallback
+      try {
+        console.log('🔄 Trying basic SMA search as fallback...');
+        const fallbackResponse = await axios.post(`${this.smaApiUrl}/sma/search`, {
+          query,
+          language: options.language || 'fr',
+          max_results: options.maxResults || 10
+        }, { timeout: 30000 });
+
+        if (fallbackResponse.data) {
+          return {
+            success: true,
+            results: fallbackResponse.data.results || [],
+            agents: { webScraper: { status: 'completed', lastRun: new Date().toISOString() } },
+            metadata: {
+              query,
+              fallbackMode: true,
+              totalResults: fallbackResponse.data.total_results || 0
+            }
+          };
+        }
+      } catch (fallbackError) {
+        console.error('❌ Fallback search also failed:', fallbackError);
+      }
+
+      // Final fallback to local simulation
       return await this.executeWithLocalSimulation(query, options);
     }
   }
@@ -403,6 +479,144 @@ Réponse:`;
     } catch (error) {
       console.error('❌ Error in RAG integration:', error);
       return translatedContent;
+    }
+  }
+
+  /**
+   * Transform enhanced SMA results to expected format
+   */
+  transformEnhancedResults(data) {
+    try {
+      const results = [];
+
+      // Add web content results
+      const webContent = data.comprehensive_search?.results?.web_content || [];
+      webContent.forEach((item, index) => {
+        results.push({
+          id: `web_${index}`,
+          url: item.url || '',
+          title: item.title || 'Contenu Web',
+          content: item.content || '',
+          timestamp: item.timestamp || new Date().toISOString(),
+          language: data.language || 'fr',
+          category: 'web',
+          analysis: {
+            summary: item.content?.substring(0, 150) + '...' || '',
+            keywords: this.extractKeywordsFromContent(item.content || ''),
+            relevanceScore: (item.relevance || 1) / 10, // Normalize to 0-1
+            category: 'web',
+            importance: Math.min(item.relevance || 1, 5)
+          },
+          source: 'enhanced_sma',
+          type: 'web_content'
+        });
+      });
+
+      // Add document results
+      const documents = data.comprehensive_search?.results?.documents || [];
+      documents.forEach((item, index) => {
+        results.push({
+          id: `doc_${index}`,
+          url: item.url || '',
+          title: item.title || 'Document',
+          content: item.text || '',
+          timestamp: item.processed_timestamp || new Date().toISOString(),
+          language: data.language || 'fr',
+          category: 'document',
+          analysis: {
+            summary: item.text?.substring(0, 150) + '...' || '',
+            keywords: this.extractKeywordsFromContent(item.text || ''),
+            relevanceScore: 0.8, // High relevance for documents
+            category: 'document',
+            importance: 4
+          },
+          source: 'enhanced_sma',
+          type: 'document'
+        });
+      });
+
+      // Add image results
+      const images = data.comprehensive_search?.results?.images || [];
+      images.forEach((item, index) => {
+        results.push({
+          id: `img_${index}`,
+          url: item.url || '',
+          title: item.alt_text || 'Image',
+          content: item.text || item.alt_text || '',
+          timestamp: item.processed_timestamp || new Date().toISOString(),
+          language: data.language || 'fr',
+          category: 'image',
+          analysis: {
+            summary: item.text?.substring(0, 100) + '...' || 'Contenu d\'image extrait',
+            keywords: this.extractKeywordsFromContent(item.text || ''),
+            relevanceScore: item.confidence || 0.6,
+            category: 'image',
+            importance: 3
+          },
+          source: 'enhanced_sma',
+          type: 'image_ocr'
+        });
+      });
+
+      // Add news results if available
+      const newsResults = data.news_results?.results || [];
+      newsResults.forEach((item, index) => {
+        results.push({
+          id: `news_${index}`,
+          url: item.link || '',
+          title: item.title || 'Actualité',
+          content: item.snippet || '',
+          timestamp: item.date || new Date().toISOString(),
+          language: data.language || 'fr',
+          category: 'news',
+          analysis: {
+            summary: item.snippet?.substring(0, 150) + '...' || '',
+            keywords: this.extractKeywordsFromContent(item.snippet || ''),
+            relevanceScore: item.relevance_score || 0.7,
+            category: 'news',
+            importance: 4
+          },
+          source: 'enhanced_sma',
+          type: 'news'
+        });
+      });
+
+      console.log(`🔄 Transformed ${results.length} enhanced SMA results`);
+      return results;
+
+    } catch (error) {
+      console.error('❌ Error transforming enhanced results:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Extract keywords from content
+   */
+  extractKeywordsFromContent(content) {
+    try {
+      if (!content) return [];
+
+      // Simple keyword extraction
+      const words = content.toLowerCase()
+        .replace(/[^\w\s]/g, ' ')
+        .split(/\s+/)
+        .filter(word => word.length > 3)
+        .filter(word => !['dans', 'avec', 'pour', 'cette', 'sont', 'plus', 'tout', 'tous', 'leur', 'leurs'].includes(word));
+
+      // Count frequency and return top 5
+      const wordCount = {};
+      words.forEach(word => {
+        wordCount[word] = (wordCount[word] || 0) + 1;
+      });
+
+      return Object.entries(wordCount)
+        .sort(([,a], [,b]) => b - a)
+        .slice(0, 5)
+        .map(([word]) => word);
+
+    } catch (error) {
+      return [];
     }
   }
 

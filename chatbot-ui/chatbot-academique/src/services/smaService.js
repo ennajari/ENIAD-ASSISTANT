@@ -79,45 +79,95 @@ class SMAService {
   }
 
   /**
-   * Activate SMA search for specific query
+   * Activate enhanced SMA search for specific query
    * @param {Object} params - Search parameters
    * @param {string} params.query - User's search query
    * @param {string} params.language - Language preference (fr, en, ar)
    * @param {Array} params.categories - Categories to search ['news', 'documents', 'photos', 'events']
    * @param {boolean} params.realTime - Whether to perform real-time scraping
-   * @returns {Promise<Object>} SMA search results
+   * @param {number} params.maxResults - Maximum number of results
+   * @returns {Promise<Object>} Enhanced SMA search results
    */
   async activateSearch({
     query,
     language = 'fr',
     categories = ['news', 'documents', 'announcements'],
-    realTime = true
+    realTime = true,
+    maxResults = 20
   }) {
     try {
-      const payload = {
+      // First try the enhanced intelligent query endpoint
+      try {
+        console.log('🧠 Activating enhanced SMA intelligent query:', {
+          query: query.substring(0, 50) + '...',
+          language,
+          categories,
+          realTime
+        });
+
+        const enhancedPayload = {
+          query: query.trim(),
+          language,
+          search_depth: realTime ? 'deep' : 'medium',
+          include_documents: categories.includes('documents'),
+          include_images: categories.includes('photos') || categories.includes('images'),
+          include_news: categories.includes('news') || categories.includes('announcements'),
+          max_results: maxResults,
+          store_in_knowledge_base: true
+        };
+
+        const enhancedResponse = await this.api.post('/sma/intelligent-query', enhancedPayload);
+
+        if (enhancedResponse.data) {
+          console.log('✅ Enhanced SMA query successful');
+          return this.formatEnhancedSearchResults(enhancedResponse.data, query);
+        }
+      } catch (enhancedError) {
+        console.warn('⚠️ Enhanced SMA failed, trying comprehensive search:', enhancedError.message);
+
+        // Fallback to comprehensive search
+        try {
+          const comprehensivePayload = {
+            query: query.trim(),
+            language,
+            search_depth: 'medium',
+            include_documents: categories.includes('documents'),
+            include_images: categories.includes('photos') || categories.includes('images'),
+            include_news: categories.includes('news'),
+            max_results: maxResults
+          };
+
+          const comprehensiveResponse = await this.api.post('/sma/comprehensive-search', comprehensivePayload);
+
+          if (comprehensiveResponse.data) {
+            console.log('✅ Comprehensive SMA search successful');
+            return this.formatComprehensiveSearchResults(comprehensiveResponse.data, query);
+          }
+        } catch (comprehensiveError) {
+          console.warn('⚠️ Comprehensive search failed, trying basic search:', comprehensiveError.message);
+        }
+      }
+
+      // Final fallback to basic search
+      const basicPayload = {
         query: query.trim(),
         language,
         categories,
         target_sites: this.targetSites,
         real_time: realTime,
-        max_results: 20,
+        max_results: maxResults,
         include_metadata: true,
         extract_images: true,
         extract_documents: true
       };
 
-      console.log('🔍 Activating SMA search:', {
-        query: query.substring(0, 50) + '...',
-        language,
-        categories,
-        realTime
-      });
+      console.log('🔍 Using basic SMA search as fallback');
+      const response = await this.api.post('/sma/search', basicPayload);
 
-      const response = await this.api.post('/sma/search', payload);
-      
       return this.formatSearchResults(response.data, query);
+
     } catch (error) {
-      console.error('❌ SMA search failed:', error);
+      console.error('❌ All SMA search methods failed:', error);
       throw this.handleError(error);
     }
   }
@@ -243,7 +293,147 @@ class SMAService {
   }
 
   /**
-   * Format search results for the interface
+   * Format enhanced search results from intelligent query
+   * @param {Object} data - Enhanced search results
+   * @param {string} query - Original query
+   * @returns {Object} Formatted results
+   */
+  formatEnhancedSearchResults(data, query) {
+    const results = [];
+
+    // Process web content
+    const webContent = data.comprehensive_search?.results?.web_content || [];
+    webContent.forEach((item, index) => {
+      results.push({
+        id: `enhanced_web_${index}`,
+        title: item.title || 'Contenu Web ENIAD',
+        content: item.content || '',
+        summary: item.content?.substring(0, 200) + '...' || '',
+        source_url: item.url || '',
+        category: 'web',
+        relevance: item.relevance || 1,
+        timestamp: item.timestamp || new Date().toISOString(),
+        type: 'enhanced_web'
+      });
+    });
+
+    // Process documents
+    const documents = data.comprehensive_search?.results?.documents || [];
+    documents.forEach((item, index) => {
+      results.push({
+        id: `enhanced_doc_${index}`,
+        title: item.title || 'Document ENIAD',
+        content: item.text || '',
+        summary: item.text?.substring(0, 200) + '...' || '',
+        source_url: item.url || '',
+        category: 'documents',
+        relevance: 5, // High relevance for documents
+        timestamp: item.processed_timestamp || new Date().toISOString(),
+        type: 'enhanced_document'
+      });
+    });
+
+    // Process images
+    const images = data.comprehensive_search?.results?.images || [];
+    images.forEach((item, index) => {
+      results.push({
+        id: `enhanced_img_${index}`,
+        title: item.alt_text || 'Image ENIAD',
+        content: item.text || item.alt_text || '',
+        summary: `Image: ${item.text || item.alt_text || 'Contenu visuel'}`,
+        source_url: item.url || '',
+        category: 'images',
+        relevance: item.confidence || 0.6,
+        timestamp: item.processed_timestamp || new Date().toISOString(),
+        type: 'enhanced_image'
+      });
+    });
+
+    // Process news
+    const news = data.news_results?.results || [];
+    news.forEach((item, index) => {
+      results.push({
+        id: `enhanced_news_${index}`,
+        title: item.title || 'Actualité',
+        content: item.snippet || '',
+        summary: item.snippet?.substring(0, 200) + '...' || '',
+        source_url: item.link || '',
+        category: 'news',
+        relevance: item.relevance_score || 0.7,
+        timestamp: item.date || new Date().toISOString(),
+        type: 'enhanced_news'
+      });
+    });
+
+    return {
+      id: Date.now().toString(),
+      query,
+      results,
+      total_found: results.length,
+      sources: this.extractEnhancedSources(data),
+      categories: this.categorizeResults(results),
+      metadata: {
+        search_time: 0,
+        agents_used: ['enhanced_sma', 'web_scraper', 'document_processor', 'image_ocr'],
+        timestamp: data.timestamp || new Date().toISOString(),
+        websites_scanned: 13, // Updated count with news pages
+        confidence: data.confidence || 0.8,
+        processing_steps: data.processing_steps || [],
+        enhanced: true
+      },
+      enhancedData: {
+        finalAnswer: data.final_answer,
+        understanding: data.understanding,
+        confidence: data.confidence
+      }
+    };
+  }
+
+  /**
+   * Format comprehensive search results
+   * @param {Object} data - Comprehensive search results
+   * @param {string} query - Original query
+   * @returns {Object} Formatted results
+   */
+  formatComprehensiveSearchResults(data, query) {
+    const results = [];
+
+    // Process web content
+    const webContent = data.results?.web_content || [];
+    webContent.forEach((item, index) => {
+      results.push({
+        id: `comp_web_${index}`,
+        title: item.title || 'Contenu Web',
+        content: item.content || '',
+        summary: item.content?.substring(0, 200) + '...' || '',
+        source_url: item.url || '',
+        category: 'web',
+        relevance: item.relevance || 1,
+        timestamp: item.timestamp || new Date().toISOString(),
+        type: 'comprehensive_web'
+      });
+    });
+
+    return {
+      id: Date.now().toString(),
+      query,
+      results,
+      total_found: data.total_items_found || results.length,
+      sources: this.extractSources(results),
+      categories: this.categorizeResults(results),
+      metadata: {
+        search_time: 0,
+        agents_used: ['comprehensive_sma', 'web_scraper'],
+        timestamp: data.timestamp || new Date().toISOString(),
+        websites_scanned: 13,
+        search_depth: data.search_depth || 'medium',
+        comprehensive: true
+      }
+    };
+  }
+
+  /**
+   * Format basic search results for the interface
    * @param {Object} data - Raw search results
    * @param {string} query - Original query
    * @returns {Object} Formatted results
@@ -260,7 +450,8 @@ class SMAService {
         search_time: data.search_time || 0,
         agents_used: data.agents_used || [],
         timestamp: new Date().toISOString(),
-        websites_scanned: data.websites_scanned || this.targetSites.length
+        websites_scanned: data.websites_scanned || this.targetSites.length,
+        basic: true
       }
     };
   }
@@ -302,6 +493,63 @@ class SMAService {
         timestamp: new Date().toISOString()
       }
     };
+  }
+
+  /**
+   * Extract sources from enhanced results
+   * @param {Object} data - Enhanced search data
+   * @returns {Array} Sources
+   */
+  extractEnhancedSources(data) {
+    const sources = [];
+
+    // Add sources from the enhanced data
+    if (data.sources && Array.isArray(data.sources)) {
+      data.sources.forEach(source => {
+        sources.push({
+          url: source.url || '',
+          title: source.title || '',
+          website: this.getWebsiteName(source.url || ''),
+          type: source.type || 'web',
+          relevance: source.relevance || 'medium'
+        });
+      });
+    }
+
+    // Add sources from comprehensive search results
+    const webContent = data.comprehensive_search?.results?.web_content || [];
+    webContent.forEach(item => {
+      if (item.url) {
+        sources.push({
+          url: item.url,
+          title: item.title || '',
+          website: this.getWebsiteName(item.url),
+          type: 'web_content',
+          relevance: 'high'
+        });
+      }
+    });
+
+    // Add document sources
+    const documents = data.comprehensive_search?.results?.documents || [];
+    documents.forEach(item => {
+      if (item.url) {
+        sources.push({
+          url: item.url,
+          title: item.title || 'Document',
+          website: this.getWebsiteName(item.url),
+          type: 'document',
+          relevance: 'high'
+        });
+      }
+    });
+
+    // Remove duplicates
+    const uniqueSources = sources.filter((source, index, self) =>
+      index === self.findIndex(s => s.url === source.url)
+    );
+
+    return uniqueSources;
   }
 
   /**

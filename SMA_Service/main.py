@@ -972,8 +972,22 @@ Question: {query}
 Veuillez fournir une réponse complète et utile en français."""
 
         # Generate response using Gemini
-        response = model.generate_content(prompt)
-        answer_text = response.text if response else ""
+        try:
+            import google.generativeai as genai
+
+            # Configure Gemini
+            genai.configure(api_key=GEMINI_API_KEY)
+            model = genai.GenerativeModel('gemini-1.5-flash')
+
+            response = model.generate_content(prompt)
+            answer_text = response.text if response else ""
+        except Exception as gemini_error:
+            logger.error(f"❌ Gemini API error in answer generation: {gemini_error}")
+            # Fallback answer
+            if language == "ar":
+                answer_text = f"تم البحث عن '{query}' وتم العثور على معلومات ذات صلة في موقع ENIAD."
+            else:
+                answer_text = f"Recherche effectuée pour '{query}' avec des informations pertinentes trouvées sur ENIAD."
 
         # Calculate confidence based on context quality
         confidence = 0.8 if context and len(context) > 200 else 0.5
@@ -1097,9 +1111,94 @@ async def start_background_monitoring(default_sites: List[Dict[str, Any]]):
         
         active_monitoring_tasks[monitoring_id] = task
         logger.info("✅ Default background monitoring started")
-        
+
     except Exception as e:
         logger.error(f"❌ Failed to start background monitoring: {e}")
+
+@app.post("/sma/chat-with-context")
+async def chat_with_sma_context(request: dict):
+    """
+    Chat endpoint that uses Gemini with SMA context to avoid CORS issues
+    """
+    try:
+        query = request.get("query", "")
+        language = request.get("language", "fr")
+        sma_results = request.get("sma_results", {})
+
+        logger.info(f"💬 Processing chat with SMA context: {query[:50]}...")
+
+        # Prepare context from SMA results
+        sma_context = ""
+        if sma_results and sma_results.get("results"):
+            sma_context = "\n\n".join([
+                f"**{result.get('title', 'Information ENIAD')}**\n{result.get('content', result.get('summary', ''))}\nSource: {result.get('source_url', 'ENIAD')}"
+                for result in sma_results["results"][:3]
+            ])
+
+        # Create prompt for Gemini
+        if language == "ar":
+            system_prompt = f"""أنت مساعد أكاديمي لمدرسة ENIAD، متخصص في الذكاء الاصطناعي والتعليم.
+أجب باللغة العربية بطريقة مهنية وتعليمية.
+
+معلومات حديثة من موقع ENIAD:
+{sma_context}
+
+استخدم هذه المعلومات لإثراء إجابتك إذا كانت ذات صلة بسؤال المستخدم."""
+        else:
+            system_prompt = f"""Tu es l'assistant académique ENIAD, spécialisé dans l'intelligence artificielle et l'éducation.
+Réponds en français de manière professionnelle et éducative.
+
+Informations récentes du site ENIAD:
+{sma_context}
+
+Utilise ces informations pour enrichir ta réponse si elles sont pertinentes à la question de l'utilisateur."""
+
+        # Call Gemini via our service
+        try:
+            import google.generativeai as genai
+
+            # Configure Gemini
+            genai.configure(api_key=GEMINI_API_KEY)
+            model = genai.GenerativeModel('gemini-1.5-flash')
+
+            # Generate response
+            response = model.generate_content(
+                f"{system_prompt}\n\nQuestion: {query}",
+                generation_config=genai.types.GenerationConfig(
+                    temperature=0.7,
+                    max_output_tokens=500
+                )
+            )
+
+            final_answer = response.text
+
+        except Exception as gemini_error:
+            logger.error(f"❌ Gemini API error: {gemini_error}")
+            # Fallback response
+            if language == "ar":
+                final_answer = f"بناءً على المعلومات من موقع ENIAD:\n\n{sma_context}\n\nهذه المعلومات مستخرجة مباشرة من الموقع الرسمي لـ ENIAD."
+            else:
+                final_answer = f"Basé sur les informations du site ENIAD:\n\n{sma_context}\n\nCes informations sont extraites directement du site officiel d'ENIAD."
+
+        # Prepare response
+        response_data = {
+            "query": query,
+            "language": language,
+            "final_answer": final_answer,
+            "sma_enhanced": bool(sma_context),
+            "sources": sma_results.get("sources", []),
+            "confidence": sma_results.get("metadata", {}).get("confidence", 0.8),
+            "timestamp": datetime.now().isoformat(),
+            "model": "gemini-1.5-flash",
+            "provider": "gemini-via-sma"
+        }
+
+        logger.info(f"✅ Chat response generated with SMA context")
+        return response_data
+
+    except Exception as e:
+        logger.error(f"❌ Chat with SMA context failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Chat failed: {str(e)}")
 
 if __name__ == "__main__":
     uvicorn.run(

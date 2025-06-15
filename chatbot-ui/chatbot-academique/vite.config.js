@@ -35,6 +35,22 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/rag/, ''),
         secure: false
+      },
+      '/api/sma': {
+        target: 'http://localhost:8001',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/sma/, ''),
+        secure: false
+      },
+      '/health': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        secure: false
+      },
+      '/sma': {
+        target: 'http://localhost:8001',
+        changeOrigin: true,
+        secure: false
       }
     }
   }

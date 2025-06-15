@@ -15,6 +15,7 @@ import ChatSidebar from './components/ChatSidebar';
 import ChatHeader from './components/ChatHeader';
 import ChatContent from './components/ChatContent';
 import ChatInput from './components/ChatInput';
+import ModelSelector from './components/ModelSelector';
 import SettingsDialog from './components/SettingsDialog';
 import RenameDialog from './components/RenameDialog';
 import ChatMenu from './components/ChatMenu';
@@ -47,6 +48,9 @@ function App() {
   const [isSMALoading, setIsSMALoading] = useState(false);
   const [isSMACompleted, setIsSMACompleted] = useState(false);
   const [smaStatusMessage, setSmaStatusMessage] = useState('');
+
+  // Model selection state
+  const [selectedModel, setSelectedModel] = useState('gemini'); // 'gemini' or 'llama'
 
   // Suggestions refresh trigger
   const [suggestionsRefreshTrigger, setSuggestionsRefreshTrigger] = useState(0);
@@ -89,6 +93,7 @@ function App() {
       speechQuality: 'high',
       isSMAActive: isSMAActive,
       autoCorrect: true,
+      selectedModel: selectedModel,
       smaStateHandlers: {
         setIsSMALoading,
         setIsSMACompleted,
@@ -408,6 +413,18 @@ function App() {
 
 
 
+  // Model selection handler
+  const handleModelChange = (newModel) => {
+    setSelectedModel(newModel);
+    console.log('🤖 Model changed to:', newModel);
+
+    if (newModel === 'llama') {
+      console.log('🦙 Using Llama model - Custom ENIAD project model');
+    } else {
+      console.log('✨ Using Gemini model - Google AI model');
+    }
+  };
+
   // SMA Research handler (using research button for SMA)
   const handleResearch = () => {
     const newSMAState = !isSMAActive;
@@ -566,6 +583,22 @@ function App() {
                     user={user}
                   />
 
+                  {/* Model Selector */}
+                  <Box sx={{
+                    px: { xs: 2, sm: 4, md: 6 },
+                    maxWidth: '1200px',
+                    mx: 'auto',
+                    width: '100%'
+                  }}>
+                    <ModelSelector
+                      selectedModel={selectedModel}
+                      onModelChange={handleModelChange}
+                      currentLanguage={currentLanguage}
+                      darkMode={darkMode}
+                      disabled={chatState.isLoading}
+                    />
+                  </Box>
+
                   <ChatInput
                     inputValue={chatState.inputValue}
                     onInputChange={handleInputChange}
@@ -582,6 +615,7 @@ function App() {
                     isSMALoading={isSMALoading}
                     isSMACompleted={isSMACompleted}
                     smaStatusMessage={smaStatusMessage}
+                    selectedModel={selectedModel}
                   />
                 </Box>
               </Box>
