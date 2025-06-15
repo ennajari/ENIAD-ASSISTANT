@@ -1,0 +1,17 @@
+const CHUNK_PUBLIC_PATH = "server/app/api/chat/rag/route.js";
+const runtime = require("../../../../chunks/[turbopack]_runtime.js");
+runtime.loadChunk("server/chunks/node_modules_e4bccc97._.js");
+runtime.loadChunk("server/chunks/node_modules_next_200c7223._.js");
+runtime.loadChunk("server/chunks/c3486_zod_dist_esm_v4_5997b61f._.js");
+runtime.loadChunk("server/chunks/node_modules_zod_dist_esm_8ba1e7d7._.js");
+runtime.loadChunk("server/chunks/node_modules_openai_5f8a0ff2._.js");
+runtime.loadChunk("server/chunks/925c4_tr46_dc0a0064._.js");
+runtime.loadChunk("server/chunks/node_modules_@langchain_core_08d467e7._.js");
+runtime.loadChunk("server/chunks/node_modules_langsmith_08ba6566._.js");
+runtime.loadChunk("server/chunks/node_modules_@langchain_openai_c592741b._.js");
+runtime.loadChunk("server/chunks/node_modules_@clerk_backend_dist_70b8de58._.js");
+runtime.loadChunk("server/chunks/node_modules_45ef2584._.js");
+runtime.loadChunk("server/chunks/[root-of-the-server]__a51c0512._.js");
+runtime.getOrInstantiateRuntimeModule("[project]/.next-internal/server/app/api/chat/rag/route/actions.js [app-rsc] (server actions loader, ecmascript)", CHUNK_PUBLIC_PATH);
+runtime.getOrInstantiateRuntimeModule("[project]/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/app/api/chat/rag/route.js [app-route] (ecmascript)\" } [app-route] (ecmascript)", CHUNK_PUBLIC_PATH);
+module.exports = runtime.getOrInstantiateRuntimeModule("[project]/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/app/api/chat/rag/route.js [app-route] (ecmascript)\" } [app-route] (ecmascript)", CHUNK_PUBLIC_PATH).exports;
