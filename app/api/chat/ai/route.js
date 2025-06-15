@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
 const openai = new OpenAI({
-    baseURL: 'https://abdellah-ennajari--llama3-openai-compatible-serve.modal.run/v1',
+    baseURL: 'https://abdellahennajari2018--llama3-openai-compatible-serve.modal.run/v1',
     apiKey: process.env.MODAL_API_KEY || "super-secret-key"
 });
 
