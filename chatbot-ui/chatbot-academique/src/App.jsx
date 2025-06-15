@@ -5,6 +5,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import { Box, CircularProgress, CssBaseline, Toolbar, useMediaQuery } from '@mui/material';
 // Speech recognition using native Web Speech API
 import Login from './components/Login';
+import GeminiTest from './components/GeminiTest';
 import { useLanguage } from './contexts/LanguageContext';
 import { createAppTheme } from './theme/theme';
 import { useChatState } from './hooks/useChatState';
@@ -25,7 +26,10 @@ import { useTranslation } from './utils/translations';
 import { auth } from './firebase';
 import staticSuggestionsService from './services/staticSuggestionsService';
 import conversationStateManager from './services/conversationStateManager';
+import speechService from './services/speechService';
 import ApiConnectionTest from './components/Debug/ApiConnectionTest';
+import InterfaceTest from './components/Debug/InterfaceTest';
+import FirebaseTest from './components/Debug/FirebaseTest';
 
 function App() {
   const navigate = useNavigate();
@@ -99,6 +103,16 @@ function App() {
       try {
         console.log('🔄 Loading conversations for user:', user ? user.email : 'anonymous');
 
+        // Save current conversation state before user change (login/logout)
+        if (chatState.currentChatId && chatState.messages.length > 0) {
+          console.log('💾 Saving conversation state before user change...');
+          await conversationStateManager.saveConversationStateBeforeCriticalOperation(
+            chatState.messages,
+            chatState.currentChatId,
+            chatState.setConversationHistory
+          );
+        }
+
         // Initialize static suggestions on app load
         staticSuggestionsService.forceRefresh();
         setSuggestionsRefreshTrigger(prev => prev + 1);
@@ -106,6 +120,13 @@ function App() {
 
         // Set current user in conversation state manager
         conversationStateManager.setCurrentUser(user);
+
+        // FORCE RELOAD FROM FIREBASE - Clear local storage first if user is logged in
+        if (user) {
+          console.log('🔥 User logged in - forcing fresh load from Firebase');
+          localStorage.removeItem('conversationHistory');
+          localStorage.removeItem('currentChatId');
+        }
 
         // Load conversations using the state manager
         const conversations = await conversationStateManager.loadConversations(
@@ -115,10 +136,17 @@ function App() {
         console.log(`📋 Loaded ${conversations.length} conversations from ${user ? 'Firebase' : 'local storage'}`);
 
         // Handle current chat selection
-        const savedCurrentChatId = localStorage.getItem('currentChatId');
+        let savedCurrentChatId = localStorage.getItem('currentChatId');
 
         if (conversations.length > 0) {
-          if (savedCurrentChatId) {
+          // For logged-in users, always start with the most recent conversation
+          if (user && conversations.length > 0) {
+            const mostRecentChat = conversations[0]; // Conversations are sorted by lastUpdated desc
+            chatState.setCurrentChatId(mostRecentChat.id);
+            chatState.setMessages(mostRecentChat.messages || []);
+            localStorage.setItem('currentChatId', mostRecentChat.id);
+            console.log('✅ Loaded most recent chat for logged-in user:', mostRecentChat.id, 'with', mostRecentChat.messages?.length || 0, 'messages');
+          } else if (savedCurrentChatId) {
             const currentChat = conversations.find(chat => chat.id === savedCurrentChatId);
             if (currentChat) {
               chatState.setCurrentChatId(savedCurrentChatId);
@@ -225,36 +253,57 @@ function App() {
     return () => window.removeEventListener('focus', handleWindowFocus);
   }, [user, authLoading]);
 
-  // Speech synthesis
-  const speakText = (text, id) => {
+  // Add beforeunload listener to save conversations before page refresh/close
+  useEffect(() => {
+    const handleBeforeUnload = async (event) => {
+      if (chatState.currentChatId && chatState.messages.length > 0) {
+        console.log('💾 Saving conversation before page unload...');
+        try {
+          await conversationStateManager.saveConversationStateBeforeCriticalOperation(
+            chatState.messages,
+            chatState.currentChatId,
+            chatState.setConversationHistory
+          );
+        } catch (error) {
+          console.error('❌ Failed to save conversation before unload:', error);
+        }
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [chatState.currentChatId, chatState.messages]);
+
+  // Speech synthesis using enhanced speech service
+  const speakText = async (text, id) => {
     if (chatState.isSpeaking[id]) {
-      window.speechSynthesis.cancel();
+      speechService.stopSpeech();
       chatState.setIsSpeaking(prev => ({ ...prev, [id]: false }));
       return;
     }
 
-    const langMap = {
-      'ar': 'ar-SA',
-      'en': 'en-US',
-      'fr': 'fr-FR'
-    };
-
     try {
-      const lang = langMap[currentLanguage];
-
-      speak({
-        text,
-        lang,
-        onEnd: () => chatState.setIsSpeaking(prev => ({ ...prev, [id]: false })),
-        onError: (event) => {
-          console.error('Speech synthesis error:', event);
-          chatState.setIsSpeaking(prev => ({ ...prev, [id]: false }));
-        }
-      });
+      console.log('🔊 Starting TTS for language:', currentLanguage);
       chatState.setIsSpeaking(prev => ({ ...prev, [id]: true }));
-    } catch (error) {
-      console.error('Speech synthesis error:', error);
+
+      await speechService.textToSpeech(text, currentLanguage, {
+        speed: 0.9,
+        pitch: 1.0,
+        volume: 1.0
+      });
+
+      console.log('✅ TTS completed successfully');
       chatState.setIsSpeaking(prev => ({ ...prev, [id]: false }));
+    } catch (error) {
+      console.error('❌ TTS error:', error);
+      chatState.setIsSpeaking(prev => ({ ...prev, [id]: false }));
+
+      // Show user-friendly error message
+      if (currentLanguage === 'ar') {
+        console.log('⚠️ خطأ في تشغيل الصوت - تأكد من دعم المتصفح للغة العربية');
+      } else {
+        console.log('⚠️ Erreur de synthèse vocale - vérifiez le support du navigateur');
+      }
     }
   };
 
@@ -284,7 +333,7 @@ function App() {
 
         newRecognition.continuous = true;
         newRecognition.interimResults = true;
-        newRecognition.lang = currentLanguage === 'ar' ? 'ar-SA' : currentLanguage === 'en' ? 'en-US' : 'fr-FR';
+        newRecognition.lang = currentLanguage === 'ar' ? 'ar-SA' : 'fr-FR';
 
         newRecognition.onstart = () => {
           setListening(true);
@@ -404,6 +453,9 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/debug" element={<ApiConnectionTest />} />
+        <Route path="/test" element={<InterfaceTest />} />
+        <Route path="/firebase" element={<FirebaseTest />} />
+        <Route path="/gemini" element={<GeminiTest />} />
         <Route
           path="/"
           element={
@@ -435,6 +487,7 @@ function App() {
                 onNewChat={chatHandlers.handleNewChat}
                 onLoadChat={chatHandlers.handleLoadChat}
                 onChatMenuOpen={chatHandlers.handleChatMenuOpen}
+                onClearAllConversations={chatHandlers.handleClearAllConversations}
                 onToggleDarkMode={toggleDarkMode}
                 onSettingsOpen={() => chatState.setSettingsOpen(true)}
                 isMobile={isMobile}
@@ -510,6 +563,7 @@ function App() {
                     supported={supported}
                     messagesEndRef={messagesEndRef}
                     refreshTrigger={suggestionsRefreshTrigger}
+                    user={user}
                   />
 
                   <ChatInput

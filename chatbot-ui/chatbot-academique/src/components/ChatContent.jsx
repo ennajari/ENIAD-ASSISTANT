@@ -31,9 +31,10 @@ const ChatContent = ({
   isSpeaking,
   supported,
   messagesEndRef,
-  refreshTrigger // New prop to trigger suggestions refresh
+  refreshTrigger, // New prop to trigger suggestions refresh
+  user // Add user prop for avatar
 }) => {
-  const t = (key) => translations[currentLanguage]?.[key] || translations.en[key];
+  const t = (key) => translations[currentLanguage]?.[key] || translations.fr[key];
 
   // State for dynamic suggestions
   const [dynamicSuggestions, setDynamicSuggestions] = useState([]);
@@ -351,42 +352,55 @@ const ChatContent = ({
                     width: 32,
                     height: 32,
                     bgcolor: msg.role === 'user'
-                      ? (darkMode ? '#10a37f' : '#10a37f')
-                      : (darkMode ? '#6366f1' : '#6366f1'),
+                      ? 'transparent'
+                      : 'rgba(16, 163, 127, 0.1)',
                     color: '#fff',
                     fontSize: '14px',
                     fontWeight: 600,
+                    border: msg.role === 'user' && user?.photoURL
+                      ? '2px solid rgba(16, 163, 127, 0.3)'
+                      : 'none',
                   }}
                 >
                   {msg.role === 'user' ? (
-                    <PersonIcon fontSize="small" />
+                    user?.photoURL ? (
+                      <Box
+                        component="img"
+                        src={user.photoURL}
+                        alt={user.displayName || user.email || 'User'}
+                        sx={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          borderRadius: '50%'
+                        }}
+                      />
+                    ) : (
+                      <PersonIcon fontSize="small" sx={{ color: '#10a37f' }} />
+                    )
                   ) : (
                     <Box
-                      component="a"
-                      href="https://eniad.ump.ma/fr"
-                      target="_blank"
-                      rel="noopener noreferrer"
                       sx={{
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        width: 20,
-                        height: 20,
-                        textDecoration: 'none',
-                        '&:hover': {
-                          transform: 'scale(1.1)',
-                        }
+                        width: 24,
+                        height: 24,
+                        p: 0.5
                       }}
                     >
                       <Box
                         component="img"
-                        src="/logo.png"
-                        alt="ENIAD - Visit Website"
+                        src="/logo_icon.png"
+                        alt="ENIAD Assistant"
+                        onError={(e) => {
+                          // Fallback to SVG if PNG fails
+                          e.target.src = "/logo_icon.svg";
+                        }}
                         sx={{
                           width: '100%',
                           height: '100%',
-                          objectFit: 'contain',
-                          cursor: 'pointer'
+                          objectFit: 'contain'
                         }}
                       />
                     </Box>
@@ -436,29 +450,23 @@ const ChatContent = ({
                 px: 1
               }}>
                 <Avatar
-                  component="a"
-                  href="https://eniad.ump.ma/fr"
-                  target="_blank"
-                  rel="noopener noreferrer"
                   sx={{
                     width: 32,
                     height: 32,
                     bgcolor: 'rgba(16, 163, 127, 0.1)',
                     color: '#fff',
                     p: 0.5,
-                    textDecoration: 'none',
-                    cursor: 'pointer',
                     transition: 'all 0.2s ease',
-                    '&:hover': {
-                      transform: 'scale(1.05)',
-                      boxShadow: '0 4px 12px rgba(16, 163, 127, 0.3)',
-                    }
                   }}
                 >
                   <Box
                     component="img"
-                    src="/logo.png"
-                    alt="ENIAD - Visit Website"
+                    src="/logo_icon.png"
+                    alt="ENIAD Assistant"
+                    onError={(e) => {
+                      // Fallback to SVG if PNG fails
+                      e.target.src = "/logo_icon.svg";
+                    }}
                     sx={{
                       width: 20,
                       height: 20,

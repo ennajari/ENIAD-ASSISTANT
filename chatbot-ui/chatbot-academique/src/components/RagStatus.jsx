@@ -36,7 +36,7 @@ const RagStatus = ({ darkMode = false }) => {
   const [expanded, setExpanded] = useState(false);
   const [lastCheck, setLastCheck] = useState(null);
 
-  const t = (key) => translations[currentLanguage]?.[key] || translations.en[key] || key;
+  const t = (key) => translations[currentLanguage]?.[key] || translations.fr[key] || key;
 
   const checkRagStatus = async () => {
     setLoading(true);
@@ -62,9 +62,9 @@ const RagStatus = ({ darkMode = false }) => {
 
   useEffect(() => {
     checkRagStatus();
-    
-    // Auto-refresh every 5 minutes
-    const interval = setInterval(checkRagStatus, 5 * 60 * 1000);
+
+    // Auto-refresh every 30 minutes (reduced frequency)
+    const interval = setInterval(checkRagStatus, 30 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 

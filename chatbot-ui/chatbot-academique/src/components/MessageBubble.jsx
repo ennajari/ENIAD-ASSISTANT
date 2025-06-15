@@ -25,7 +25,7 @@ import remarkGfm from 'remark-gfm';
 const MessageBubble = ({
   message,
   darkMode = false,
-  currentLanguage = 'en',
+  currentLanguage = 'fr',
   isEditing = false,
   editedContent = '',
   onEditStart = () => {},

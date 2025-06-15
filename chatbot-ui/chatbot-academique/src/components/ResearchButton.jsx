@@ -51,7 +51,9 @@ const shimmer = keyframes`
 `;
 
 // Styled IconButton with ChatGPT-like animations
-const AnimatedIconButton = styled(IconButton)(({ theme, isActive, darkMode }) => ({
+const AnimatedIconButton = styled(IconButton, {
+  shouldForwardProp: (prop) => !['isActive', 'darkMode'].includes(prop),
+})(({ theme, isActive, darkMode }) => ({
   width: 32,
   height: 32,
   borderRadius: '50%',
@@ -139,7 +141,7 @@ const AnimatedIconButton = styled(IconButton)(({ theme, isActive, darkMode }) =>
 const ResearchButton = ({
   onClick = () => {},
   disabled = false,
-  currentLanguage = 'en',
+  currentLanguage = 'fr',
   darkMode = false,
   isActive = false,
   isLoading = false,
@@ -150,19 +152,6 @@ const ResearchButton = ({
   const [isHovered, setIsHovered] = useState(false);
 
   const translations = {
-    en: {
-      research: 'SMA Intelligence',
-      tooltip: isLoading
-        ? 'SMA Loading - Scanning ENIAD & UMP websites...'
-        : isCompleted
-        ? 'SMA Completed - Web intelligence gathered successfully'
-        : isActive
-        ? 'SMA Active - Real-time Web Intelligence from ENIAD & UMP'
-        : 'Activate SMA - Smart Multi-Agent web monitoring and intelligence',
-      loading: 'Scanning...',
-      completed: 'Completed',
-      active: 'SMA Active'
-    },
     fr: {
       research: 'Intelligence SMA',
       tooltip: isLoading
@@ -191,7 +180,7 @@ const ResearchButton = ({
     }
   };
 
-  const t = translations[currentLanguage] || translations.en;
+  const t = translations[currentLanguage] || translations.fr;
 
   // Handle click with haptic feedback
   const handleClick = (e) => {

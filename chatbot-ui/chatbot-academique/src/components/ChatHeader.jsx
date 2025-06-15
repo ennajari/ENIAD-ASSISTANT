@@ -26,7 +26,7 @@ import { DRAWER_WIDTH, LANGUAGES, translations } from '../constants/config';
 const ChatHeader = ({
   drawerOpen = false,
   darkMode = false,
-  currentLanguage = 'en',
+  currentLanguage = 'fr',
   conversationHistory = [],
   currentChatId = null,
   user = null,
@@ -38,7 +38,7 @@ const ChatHeader = ({
   const [userMenuAnchor, setUserMenuAnchor] = React.useState(null);
   const userMenuOpen = Boolean(userMenuAnchor);
 
-  const t = (key) => translations[currentLanguage]?.[key] || translations.en[key] || key;
+  const t = (key) => translations[currentLanguage]?.[key] || translations.fr[key] || key;
 
   const handleUserMenuOpen = (event) => {
     setUserMenuAnchor(event.currentTarget);

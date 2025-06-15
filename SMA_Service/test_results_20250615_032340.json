@@ -1,0 +1,29 @@
+{
+  "timestamp": "2025-06-15T03:22:46.797368",
+  "system_health": {
+    "health": {
+      "error": "Cannot connect to host localhost:8001 ssl:default [Le système distant a refusé la connexion réseau]"
+    },
+    "sma_status": {
+      "error": "Cannot connect to host localhost:8001 ssl:default [Le système distant a refusé la connexion réseau]"
+    }
+  },
+  "intelligent_queries": [
+    {
+      "query": "Quelles sont les formations en intelligence artificielle disponibles à ENIAD?",
+      "language": "fr",
+      "result": {
+        "error": "Cannot connect to host localhost:8001 ssl:default [Le système distant a refusé la connexion réseau]"
+      },
+      "processing_time": 2.306062936782837
+    },
+    {
+      "query": "Comment s'inscrire aux concours de recrutement?",
+      "language": "fr",
+      "result": {
+        "error": "Cannot connect to host localhost:8001 ssl:default [Le système distant a refusé la connexion réseau]"
+      },
+      "processing_time": 2.2800118923187256
+    },
+    {
+      "query": 

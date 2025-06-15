@@ -18,7 +18,7 @@ const RenameDialog = ({
   onTitleChange,
   onSubmit
 }) => {
-  const t = (key) => translations[currentLanguage]?.[key] || translations.en[key];
+  const t = (key) => translations[currentLanguage]?.[key] || translations.fr[key];
 
   return (
     <Dialog

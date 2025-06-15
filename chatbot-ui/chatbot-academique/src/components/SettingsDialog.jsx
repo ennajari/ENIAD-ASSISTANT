@@ -34,11 +34,11 @@ const SettingsDialog = ({
   onToggleDarkMode = () => {},
   autoRead = false,
   onToggleAutoRead = () => {},
-  currentLanguage = 'en',
+  currentLanguage = 'fr',
   onChangeLanguage = () => {},
   supported = false
 }) => {
-  const t = (key) => translations[currentLanguage]?.[key] || translations.en[key] || key;
+  const t = (key) => translations[currentLanguage]?.[key] || translations.fr[key] || key;
 
   return (
     <Dialog
@@ -47,6 +47,8 @@ const SettingsDialog = ({
       fullWidth
       maxWidth="md"
       dir={currentLanguage === 'ar' ? 'rtl' : 'ltr'}
+      disableEnforceFocus={false}
+      disableAutoFocus={false}
       PaperProps={{
         sx: {
           bgcolor: darkMode

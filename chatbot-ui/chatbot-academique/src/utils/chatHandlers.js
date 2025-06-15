@@ -8,6 +8,7 @@ import translationService from '../services/translationService';
 import autoCorrectionService from '../services/autoCorrectionService';
 import firebaseStorageService from '../services/firebaseStorageService';
 import conversationStateManager from '../services/conversationStateManager';
+import geminiService from '../services/geminiService';
 
 export const createChatHandlers = (
   chatState,
@@ -251,40 +252,94 @@ export const createChatHandlers = (
         });
 
       } else {
-        // Fallback to direct API (OpenAI-compatible format) - BUDGET OPTIMIZED
-        console.log('💰 Using budget-optimized direct API call');
+        // Fallback to Gemini API - TEST MODE
+        console.log('🤖 Using Gemini API for testing (Modal API unavailable)');
 
-        // Budget optimization: Limit context and tokens
-        const budgetOptimizedMessages = [...messages.slice(-3), userMessage].map(({ role, content }) => ({
-          role,
-          content: content.length > 200 ? content.substring(0, 200) + '...' : content
-        }));
+        // Check if Gemini fallback is enabled
+        const useGeminiFallback = import.meta.env.VITE_USE_GEMINI_FALLBACK === 'true';
 
-        const response = await axios.post(`${API_URL}/v1/chat/completions`, {
-          model: 'ahmed-ouka/llama3-8b-eniad-merged-32bit',
-          messages: budgetOptimizedMessages,
-          temperature: 0.7,
-          max_tokens: 400, // Reduced from 1000 to save costs
-          top_p: 0.9,
-          frequency_penalty: 0.1
-        }, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer super-secret-key'
+        if (useGeminiFallback) {
+          // Budget optimization: Limit context and tokens
+          const budgetOptimizedMessages = [...messages.slice(-3), userMessage].map(({ role, content }) => ({
+            role,
+            content: content.length > 300 ? content.substring(0, 300) + '...' : content
+          }));
+
+          // Add system message for ENIAD context
+          const systemMessage = {
+            role: 'system',
+            content: `Tu es l'assistant académique ENIAD, spécialisé dans l'intelligence artificielle et l'éducation. Réponds en ${currentLanguage === 'ar' ? 'arabe' : 'français'} de manière professionnelle et éducative. Si tu reçois des informations SMA (Smart Multi-Agent), utilise-les pour enrichir ta réponse.`
+          };
+
+          const messagesWithSystem = [systemMessage, ...budgetOptimizedMessages];
+
+          // Enhance with SMA results if available
+          if (smaResults && smaResults.results && smaResults.results.length > 0) {
+            console.log('🧠 Enhancing Gemini query with SMA results');
+            const smaContext = smaResults.results.slice(0, 2).map(result =>
+              `Source: ${result.title}\nContenu: ${result.content || result.summary || ''}`
+            ).join('\n\n');
+
+            messagesWithSystem.push({
+              role: 'system',
+              content: `Informations récentes des sites ENIAD/UMP:\n${smaContext}\n\nUtilise ces informations pour enrichir ta réponse si elles sont pertinentes.`
+            });
           }
-        });
 
-        botMessage = {
-          role: 'assistant',
-          content: response.data.choices?.[0]?.message?.content || response.data.reply || response.data.response || 'Sorry, I could not generate a response.',
-          id: Date.now().toString(),
-          chatId: currentChatId,
-          timestamp: new Date().toISOString(),
-          metadata: {
+          const response = await geminiService.generateChatCompletion(messagesWithSystem, {
+            maxTokens: 400,
+            temperature: 0.7
+          });
+
+          botMessage = {
+            role: 'assistant',
+            content: response.choices?.[0]?.message?.content || 'Désolé, je n\'ai pas pu générer une réponse.',
+            id: Date.now().toString(),
+            chatId: currentChatId,
+            timestamp: new Date().toISOString(),
+            metadata: {
+              model: 'gemini-1.5-flash',
+              provider: 'gemini',
+              usage: response.usage,
+              smaEnhanced: !!smaResults
+            }
+          };
+        } else {
+          // Original Modal API fallback (when available)
+          console.log('💰 Using budget-optimized Modal API call');
+
+          const budgetOptimizedMessages = [...messages.slice(-3), userMessage].map(({ role, content }) => ({
+            role,
+            content: content.length > 200 ? content.substring(0, 200) + '...' : content
+          }));
+
+          const response = await axios.post(`${API_URL}/v1/chat/completions`, {
             model: 'ahmed-ouka/llama3-8b-eniad-merged-32bit',
-            usage: response.data.usage
-          }
-        };
+            messages: budgetOptimizedMessages,
+            temperature: 0.7,
+            max_tokens: 400,
+            top_p: 0.9,
+            frequency_penalty: 0.1
+          }, {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer super-secret-key'
+            }
+          });
+
+          botMessage = {
+            role: 'assistant',
+            content: response.data.choices?.[0]?.message?.content || response.data.reply || response.data.response || 'Sorry, I could not generate a response.',
+            id: Date.now().toString(),
+            chatId: currentChatId,
+            timestamp: new Date().toISOString(),
+            metadata: {
+              model: 'ahmed-ouka/llama3-8b-eniad-merged-32bit',
+              provider: 'modal',
+              usage: response.data.usage
+            }
+          };
+        }
       }
 
       setMessages(prev => [...prev, botMessage]);
@@ -445,6 +500,47 @@ export const createChatHandlers = (
     }
   };
 
+  const handleClearAllConversations = async () => {
+    try {
+      // Show confirmation dialog
+      const confirmed = window.confirm(
+        currentLanguage === 'ar'
+          ? 'هل أنت متأكد من أنك تريد حذف جميع المحادثات؟ لا يمكن التراجع عن هذا الإجراء.'
+          : currentLanguage === 'fr'
+          ? 'Êtes-vous sûr de vouloir supprimer toutes les conversations ? Cette action ne peut pas être annulée.'
+          : 'Are you sure you want to delete all conversations? This action cannot be undone.'
+      );
+
+      if (!confirmed) {
+        return;
+      }
+
+      console.log('🧹 Clearing all conversations with Firebase sync');
+
+      await conversationStateManager.clearAllUserConversations(
+        setConversationHistory,
+        setMessages,
+        setCurrentChatId
+      );
+
+      // Create a new chat after clearing all
+      await handleNewChat();
+
+      console.log('✅ All conversations cleared successfully');
+    } catch (error) {
+      console.error('❌ Error clearing all conversations:', error);
+
+      // Show error message
+      alert(
+        currentLanguage === 'ar'
+          ? 'حدث خطأ أثناء حذف المحادثات. يرجى المحاولة مرة أخرى.'
+          : currentLanguage === 'fr'
+          ? 'Une erreur est survenue lors de la suppression des conversations. Veuillez réessayer.'
+          : 'An error occurred while deleting conversations. Please try again.'
+      );
+    }
+  };
+
   const handleEditMessage = (messageId, currentContent) => {
     setEditingMessageId(messageId);
     setEditedMessageContent(currentContent);
@@ -511,6 +607,7 @@ export const createChatHandlers = (
     handleNewChat,
     handleLoadChat,
     handleDeleteChat,
+    handleClearAllConversations,
     handleEditMessage,
     handleSaveEdit,
     handleCancelEdit,

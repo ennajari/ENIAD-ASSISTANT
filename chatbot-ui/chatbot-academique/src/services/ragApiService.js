@@ -5,17 +5,21 @@
  */
 
 import axios from 'axios';
+import geminiService from './geminiService';
 
 class RAGApiService {
   constructor() {
     // Enhanced API Server Configuration (Custom Model + RAG + SMA)
-    this.baseURL = import.meta.env.VITE_RAG_API_BASE_URL || '';
+    this.baseURL = import.meta.env.VITE_RAG_API_BASE_URL || '/api/llama';
     this.apiKey = import.meta.env.VITE_RAG_API_KEY;
     this.projectId = import.meta.env.VITE_RAG_PROJECT_ID || 'eniad-assistant';
     this.timeout = 60000; // 60 seconds timeout for model inference
 
     // RAG System Configuration (for direct monitoring)
-    this.ragSystemURL = import.meta.env.VITE_RAG_SYSTEM_BASE_URL || 'http://localhost:8000';
+    this.ragSystemURL = import.meta.env.VITE_RAG_SYSTEM_BASE_URL || '/api/rag';
+
+    // Error logging throttling
+    this.lastErrorLogged = 0;
 
     // Debug configuration
     console.log('🔧 RAG API Service Configuration:', {
@@ -244,7 +248,7 @@ class RAGApiService {
       // Try to check RAG system health
       const response = await this.ragApi.get('/health');
 
-      if (response.status === 200) {
+      if (response.status === 200 && response.data) {
         // Also try to get collection info
         try {
           const infoResponse = await this.ragApi.get(`/api/v1/nlp/index/info/${this.projectId}`);
@@ -273,24 +277,31 @@ class RAGApiService {
         };
       }
     } catch (error) {
-      console.warn('⚠️ RAG system health check failed:', error.message);
+      // Only log RAG errors once every 5 minutes to avoid spam
+      if (!this.lastErrorLogged || Date.now() - this.lastErrorLogged > 300000) {
+        console.warn('⚠️ RAG system unavailable:', error.message);
+        this.lastErrorLogged = Date.now();
+      }
 
       // Provide more specific error messages
       let errorMessage = error.message;
-      let helpMessage = 'Cannot connect to RAG system.';
+      let helpMessage = 'RAG service is optional. The chatbot will work without it.';
 
       if (error.code === 'ECONNREFUSED' || error.message.includes('ECONNREFUSED')) {
         errorMessage = 'Connection refused - RAG service not running';
-        helpMessage = 'Make sure the RAG service is running on port 8000. Run: python simple_rag_system.py';
+        helpMessage = 'RAG service is optional. The chatbot will work without it.';
       } else if (error.code === 'ENOTFOUND' || error.message.includes('ENOTFOUND')) {
         errorMessage = 'Host not found - Check RAG system URL';
-        helpMessage = 'Verify VITE_RAG_SYSTEM_BASE_URL in your .env file';
+        helpMessage = 'RAG service is optional. The chatbot will work without it.';
       } else if (error.message.includes('timeout')) {
         errorMessage = 'Connection timeout - RAG service not responding';
-        helpMessage = 'RAG service may be overloaded or not responding';
+        helpMessage = 'RAG service is optional. The chatbot will work without it.';
       } else if (error.message.includes('Network Error')) {
         errorMessage = 'Network Error';
-        helpMessage = 'Check if RAG service is running: python simple_rag_system.py';
+        helpMessage = 'RAG service is optional. The chatbot will work without it.';
+      } else if (error.response?.status === 500) {
+        errorMessage = 'RAG service internal error';
+        helpMessage = 'RAG service is optional. The chatbot will work without it.';
       }
 
       return {

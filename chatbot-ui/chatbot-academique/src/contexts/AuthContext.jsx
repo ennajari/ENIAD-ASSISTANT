@@ -62,10 +62,8 @@ export function AuthProvider({ children }) {
       } else {
         setUser(null);
         setError(null);
-        // Clear local storage when user logs out
-        localStorage.removeItem('conversationHistory');
-        localStorage.removeItem('currentChatId');
-        console.log('🧹 User logged out, local data cleared');
+        // Don't clear localStorage on logout - conversations will be managed by conversation state manager
+        console.log('🧹 User logged out');
       }
 
       setLoading(false);
