@@ -1,0 +1,25 @@
+{
+  "pages": {
+    "/page": [
+      "static/chunks/[root-of-the-server]__46388150._.css",
+      "static/chunks/node_modules_@clerk_nextjs_dist_esm_app-router_1e0fd55e._.js",
+      "static/chunks/node_modules_f09fc219._.js",
+      "static/chunks/context_AppContext_jsx_c1b64b62._.js",
+      "static/chunks/app_layout_c0237562.js",
+      "static/chunks/[root-of-the-server]__43e3f700._.js",
+      "static/chunks/node_modules_next_889e0b0f._.js",
+      "static/chunks/node_modules_micromark-core-commonmark_dev_lib_36a4b45d._.js",
+      "static/chunks/node_modules_@fortawesome_free-solid-svg-icons_index_mjs_6d4e8d45._.js",
+      "static/chunks/node_modules_7f00772d._.js",
+      "static/chunks/[next]_internal_font_google_inter_6600e123_module_ce26129b.css",
+      "static/chunks/app_page_jsx_ea404e5c._.js",
+      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_fd44f5a4._.js",
+      "static/chunks/node_modules_next_dist_compiled_2ce9398a._.js",
+      "static/chunks/node_modules_next_dist_client_8f19e6fb._.js",
+      "static/chunks/node_modules_next_dist_2ecbf5fa._.js",
+      "static/chunks/node_modules_@swc_helpers_cjs_00636ac3._.js",
+      "static/chunks/_e69f0d32._.js",
+      "static/chunks/_93808211._.js"
+    ]
+  }
+}
