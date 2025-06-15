@@ -7,18 +7,14 @@ import {
   Search as SearchIcon
 } from '@mui/icons-material';
 
-const SearchButton = ({ 
-  onClick, 
-  disabled = false, 
-  currentLanguage = 'en',
+const SearchButton = ({
+  onClick,
+  disabled = false,
+  currentLanguage = 'fr',
   darkMode = false,
   size = 'medium'
 }) => {
   const translations = {
-    en: {
-      search: 'Search',
-      tooltip: 'Search the web for additional information'
-    },
     fr: {
       search: 'Rechercher',
       tooltip: 'Rechercher sur le web pour des informations supplémentaires'
@@ -29,7 +25,7 @@ const SearchButton = ({
     }
   };
 
-  const t = translations[currentLanguage] || translations.en;
+  const t = translations[currentLanguage] || translations.fr;
 
   return (
     <Tooltip title={t.tooltip} placement="top">

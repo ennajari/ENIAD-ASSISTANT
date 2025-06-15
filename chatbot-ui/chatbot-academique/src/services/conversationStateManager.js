@@ -273,8 +273,30 @@ class ConversationStateManager {
       if (this.currentUser?.uid && completeConversation) {
         try {
           console.log('🔥 Syncing conversation to Firebase immediately:', conversationId);
+          console.log('📊 Conversation data being saved:', {
+            id: completeConversation.id,
+            title: completeConversation.title,
+            messageCount: completeConversation.messages?.length || 0,
+            userId: completeConversation.userId,
+            lastUpdated: completeConversation.lastUpdated
+          });
+
           await firebaseStorageService.saveConversation(this.currentUser.uid, completeConversation);
           console.log('✅ Conversation synced to Firebase successfully:', conversationId);
+
+          // Verify the save by checking if it exists in Firebase
+          try {
+            const savedConversations = await firebaseStorageService.getUserConversations(this.currentUser.uid);
+            const savedConversation = savedConversations.find(c => c.id === conversationId);
+            if (savedConversation) {
+              console.log('✅ Verified: Conversation exists in Firebase with', savedConversation.messages?.length || 0, 'messages');
+            } else {
+              console.warn('⚠️ Warning: Conversation not found in Firebase after save');
+            }
+          } catch (verifyError) {
+            console.warn('⚠️ Could not verify Firebase save:', verifyError.message);
+          }
+
         } catch (firebaseError) {
           console.error('❌ Firebase sync failed:', firebaseError);
           console.error('Firebase error details:', {
@@ -389,20 +411,121 @@ class ConversationStateManager {
   async clearConversations(setConversationHistory, setMessages, setCurrentChatId) {
     try {
       console.log('🧹 Clearing all conversations (logout)');
-      
+
       setConversationHistory([]);
       setMessages([]);
       setCurrentChatId(null);
-      
+
       localStorage.removeItem('conversationHistory');
       localStorage.removeItem('currentChatId');
-      
+
       this.currentUser = null;
       this.pendingOperations = [];
-      
+
       console.log('✅ All conversations cleared');
     } catch (error) {
       console.error('❌ Error clearing conversations:', error);
+    }
+  }
+
+  /**
+   * Clear all conversations for current user (delete from Firebase and local)
+   */
+  async clearAllUserConversations(setConversationHistory, setMessages, setCurrentChatId) {
+    try {
+      if (!this.currentUser?.uid) {
+        console.log('❌ No user logged in - cannot clear conversations');
+        return false;
+      }
+
+      console.log('🧹 Clearing all conversations for user:', this.currentUser.email);
+
+      // Get all user conversations from Firebase
+      const conversations = await firebaseStorageService.getUserConversations(this.currentUser.uid);
+
+      if (conversations.length === 0) {
+        console.log('✅ No conversations to clear');
+        return true;
+      }
+
+      // Delete all conversations from Firebase
+      const deletePromises = conversations.map(conv =>
+        firebaseStorageService.deleteConversation(this.currentUser.uid, conv.id)
+      );
+
+      await Promise.all(deletePromises);
+      console.log(`✅ Deleted ${conversations.length} conversations from Firebase`);
+
+      // Clear local state
+      setConversationHistory([]);
+      setMessages([]);
+      setCurrentChatId(null);
+
+      // Clear local storage
+      localStorage.removeItem('conversationHistory');
+      localStorage.removeItem('currentChatId');
+
+      console.log('✅ All user conversations cleared successfully');
+      return true;
+
+    } catch (error) {
+      console.error('❌ Error clearing all user conversations:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Save conversation state before critical operations (login/logout/refresh)
+   */
+  async saveConversationStateBeforeCriticalOperation(messages, currentChatId, setConversationHistory) {
+    if (!currentChatId || !messages || messages.length === 0) {
+      console.log('💾 No conversation to save before critical operation');
+      return;
+    }
+
+    try {
+      console.log('💾 Saving conversation state before critical operation:', currentChatId);
+
+      // Force immediate save to localStorage
+      const conversations = JSON.parse(localStorage.getItem('conversationHistory') || '[]');
+      const existingIndex = conversations.findIndex(c => c.id === currentChatId);
+
+      const conversation = {
+        id: currentChatId,
+        title: conversations[existingIndex]?.title || 'New Conversation',
+        messages: messages,
+        lastUpdated: new Date().toISOString(),
+        userId: this.currentUser?.uid || 'anonymous',
+        createdAt: conversations[existingIndex]?.createdAt || new Date().toISOString()
+      };
+
+      if (existingIndex >= 0) {
+        conversations[existingIndex] = conversation;
+      } else {
+        conversations.unshift(conversation);
+      }
+
+      localStorage.setItem('conversationHistory', JSON.stringify(conversations));
+      localStorage.setItem('currentChatId', currentChatId);
+
+      // Also update the state
+      if (setConversationHistory) {
+        setConversationHistory(conversations);
+      }
+
+      // Save to Firebase if user is logged in
+      if (this.currentUser?.uid) {
+        try {
+          await firebaseStorageService.saveConversation(this.currentUser.uid, conversation);
+          console.log('✅ Conversation saved to Firebase before critical operation');
+        } catch (error) {
+          console.warn('⚠️ Failed to save to Firebase, but local save successful:', error.message);
+        }
+      }
+
+      console.log('✅ Conversation state saved successfully before critical operation');
+    } catch (error) {
+      console.error('❌ Failed to save conversation state before critical operation:', error);
     }
   }
 

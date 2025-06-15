@@ -60,10 +60,16 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     log_format: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     
-    # Optional AI Service Keys
+    # AI Service Keys
+    gemini_api_key: str = "AIzaSyDIDbm8CcUxtTTW3omJcOHQj1BWcmRWeYc"
     openai_api_key: Optional[str] = None
     anthropic_api_key: Optional[str] = None
     cohere_api_key: Optional[str] = None
+
+    # Gemini Configuration
+    gemini_model: str = "gemini-1.5-flash"
+    gemini_temperature: float = 0.3
+    gemini_max_tokens: int = 500
     
     # Database (if needed for storing results)
     database_url: Optional[str] = None

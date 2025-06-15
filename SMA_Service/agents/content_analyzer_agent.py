@@ -14,6 +14,7 @@ import logging
 from datetime import datetime
 import hashlib
 from collections import Counter
+from utils.gemini_service import gemini_service
 
 logger = logging.getLogger(__name__)
 
@@ -145,11 +146,21 @@ class ContentAnalyzerAgent:
             }
 
     async def categorize_content(self, content: str) -> str:
-        """Categorize content into predefined categories"""
+        """Categorize content into predefined categories using Gemini AI"""
         try:
+            # Try Gemini AI classification first
+            try:
+                gemini_result = gemini_service.classify_content(content)
+                if gemini_result and gemini_result.get('category'):
+                    logger.info(f"🤖 Gemini classified content as: {gemini_result['category']}")
+                    return gemini_result['category']
+            except Exception as gemini_error:
+                logger.warning(f"⚠️ Gemini classification failed, using fallback: {gemini_error}")
+
+            # Fallback to keyword-based classification
             content_lower = content.lower()
             category_scores = {}
-            
+
             # Calculate scores for each category
             for category, keywords in self.category_keywords.items():
                 score = 0
@@ -157,26 +168,35 @@ class ContentAnalyzerAgent:
                     # Count occurrences of each keyword
                     count = content_lower.count(keyword.lower())
                     score += count
-                
+
                 category_scores[category] = score
-            
+
             # Find the category with the highest score
             if category_scores:
                 best_category = max(category_scores, key=category_scores.get)
                 if category_scores[best_category] > 0:
                     return best_category
-            
+
             # Default category if no keywords found
             return 'general'
-            
+
         except Exception as e:
             logger.error(f"❌ Error categorizing content: {e}")
             return 'unknown'
 
     async def extract_keywords(self, content: str, max_keywords: int = 10) -> List[str]:
-        """Extract important keywords from content"""
+        """Extract important keywords from content using Gemini AI"""
         try:
-            # Simple keyword extraction based on frequency
+            # Try Gemini AI keyword extraction first
+            try:
+                gemini_keywords = gemini_service.extract_keywords(content, max_keywords)
+                if gemini_keywords:
+                    logger.info(f"🤖 Gemini extracted {len(gemini_keywords)} keywords")
+                    return gemini_keywords[:max_keywords]
+            except Exception as gemini_error:
+                logger.warning(f"⚠️ Gemini keyword extraction failed, using fallback: {gemini_error}")
+
+            # Fallback to frequency-based extraction
             # Remove common stop words
             stop_words = {
                 'le', 'la', 'les', 'un', 'une', 'des', 'du', 'de', 'et', 'ou',
@@ -185,21 +205,21 @@ class ContentAnalyzerAgent:
                 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be',
                 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did'
             }
-            
+
             # Clean and split content
             words = re.findall(r'\b[a-zA-ZÀ-ÿ]{3,}\b', content.lower())
-            
+
             # Filter out stop words
             filtered_words = [word for word in words if word not in stop_words]
-            
+
             # Count word frequency
             word_counts = Counter(filtered_words)
-            
+
             # Get most common words
-            keywords = [word for word, count in word_counts.most_common(max_keywords)]
-            
+            keywords = [word for word, _ in word_counts.most_common(max_keywords)]
+
             return keywords
-            
+
         except Exception as e:
             logger.error(f"❌ Error extracting keywords: {e}")
             return []
@@ -304,20 +324,29 @@ class ContentAnalyzerAgent:
             return 0.5  # Default relevance
 
     async def summarize_content(self, content: str, max_length: int = 200) -> str:
-        """Create a summary of the content"""
+        """Create a summary of the content using Gemini AI"""
         try:
             if len(content) <= max_length:
                 return content.strip()
-            
-            # Simple extractive summarization
+
+            # Try Gemini AI summarization first
+            try:
+                gemini_summary = gemini_service.summarize_content(content, max_length)
+                if gemini_summary and len(gemini_summary) <= max_length + 50:  # Allow some flexibility
+                    logger.info(f"🤖 Gemini generated summary: {len(gemini_summary)} chars")
+                    return gemini_summary
+            except Exception as gemini_error:
+                logger.warning(f"⚠️ Gemini summarization failed, using fallback: {gemini_error}")
+
+            # Fallback to extractive summarization
             sentences = re.split(r'[.!?]+', content)
-            
+
             # Filter out very short sentences
             sentences = [s.strip() for s in sentences if len(s.strip()) > 20]
-            
+
             if not sentences:
                 return content[:max_length] + "..."
-            
+
             # Take first few sentences that fit within max_length
             summary = ""
             for sentence in sentences:
@@ -325,9 +354,9 @@ class ContentAnalyzerAgent:
                     summary += sentence + ". "
                 else:
                     break
-            
+
             return summary.strip() or content[:max_length] + "..."
-            
+
         except Exception as e:
             logger.error(f"❌ Error summarizing content: {e}")
             return content[:max_length] + "..."

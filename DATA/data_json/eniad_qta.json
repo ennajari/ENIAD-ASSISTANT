@@ -1,0 +1,492 @@
+[
+  {
+    "question": "Quel est le nom officiel complet de l’établissement ?",
+    "text": "École Nationale de l’Intelligence Artificielle et du Digital de Berkane (ENIAD)",
+    "answer": "École Nationale de l’Intelligence Artificielle et du Digital de Berkane (ENIAD)"
+  },
+  {
+    "question": "À quelle université l’ENIAD est-elle rattachée ?",
+    "text": "Université Mohammed Premier (UMP)",
+    "answer": "Université Mohammed Premier (UMP)"
+  },
+  {
+    "question": "Quelle est l’adresse postale complète du campus ENIAD ?",
+    "text": "Route Aklim , 63255, Berkane, Maroc",
+    "answer": "Route Aklim , 63255, Berkane, Maroc"
+  },
+  {
+    "question": "Quel est le numéro de téléphone principal de l’ENIAD ?",
+    "text": "+212 5 36 50 29 79",
+    "answer": "+212 5 36 50 29 79"
+  },
+  {
+    "question": "Quel est le numéro de fax de l’ENIAD ?",
+    "text": "+212 5 36 50 06 09",
+    "answer": "+212 5 36 50 06 09"
+  },
+  {
+    "question": "Quelle adresse email de contact est fournie pour l’ENIAD ?",
+    "text": "eniad@ump.ac.ma",
+    "answer": "eniad@ump.ac.ma"
+  },
+  {
+    "question": "Quel est l’URL du site web officiel de l’ENIAD ?",
+    "text": "http://eniad.ump.ma",
+    "answer": "http://eniad.ump.ma"
+  },
+  {
+    "question": "Qui est le directeur de l’ENIAD et quelle est son adresse email ?",
+    "text": "Jaafar Khalid; Email : sminairelc@yahoo.fr",
+    "answer": "Jaafar Khalid (sminairelc@yahoo.fr)"
+  },
+  {
+    "question": "Quelles filières d’ingénieur propose l’ENIAD et leurs quotas ?",
+    "text": "Filières : IA (60 places), ROC (50), IRSI (50), GINF (60)",
+    "answer": "IA 60, ROC 50, IRSI 50, GINF 60"
+  },
+  {
+    "question": "Quel est le statut du poste de secrétaire général à l’ENIAD ?",
+    "text": "Secrétaire général : non renseigné",
+    "answer": "Non renseigné"
+  },
+  {
+    "question": "Quelles spécialités DUT sont acceptées pour l’admission ?",
+    "text": "DUT : Informatique, Réseaux, Systèmes embarqués, IA, Sciences des données",
+    "answer": "Informatique, Réseaux, Systèmes embarqués, IA, Sciences des données"
+  },
+  {
+    "question": "Quelles conditions s’appliquent aux titulaires de DEUG/DEUST/DEUP ?",
+    "text": "DEUG/DEUST/DEUP : Mathématiques Appliquées, Physique, mention ≥ 2",
+    "answer": "Mathématiques Appliquées, Physique, mention ≥ 2"
+  },
+  {
+    "question": "Quelles conditions doivent remplir les titulaires de licence scientifique ?",
+    "text": "Licence scientifique : Mathématiques, Physique, mention ≥ 3",
+    "answer": "Mathématiques, Physique, mention ≥ 3"
+  },
+  {
+    "question": "Quand ouvre la période de préinscription à l’ENIAD ?",
+    "text": "mi-juin",
+    "answer": "mi-juin"
+  },
+  {
+    "question": "Quand se termine la période de préinscription ?",
+    "text": "fin juillet",
+    "answer": "fin juillet"
+  },
+  {
+    "question": "Quand a lieu le concours écrit de l’ENIAD ?",
+    "text": "mi-septembre",
+    "answer": "mi-septembre"
+  },
+  {
+    "question": "Quand se tient le concours oral ?",
+    "text": "fin septembre",
+    "answer": "fin septembre"
+  },
+  {
+    "question": "Quand débute l’inscription administrative ?",
+    "text": "début octobre",
+    "answer": "début octobre"
+  },
+  {
+    "question": "Quelles sont les étapes de la procédure d’inscription ?",
+    "text": "Préinscription en ligne (formulaire et dépôt des pièces : CIN, diplômes, relevés, CV…); Étude de dossier académique et présélection; Concours écrit (mathématiques, informatique, soft skills); Entretien oral devant jury; Publication des résultats et inscription administrative",
+    "answer": "Préinscription en ligne (formulaire et dépôt des pièces : CIN, diplômes, relevés, CV…); Étude de dossier académique et présélection; Concours écrit (mathématiques, informatique, soft skills); Entretien oral devant jury; Publication des résultats et inscription administrative"
+  },
+  {
+    "question": "Quelles thématiques couvre le Lab IA et Deep Learning ?",
+    "text": "Lab IA et Deep Learning : Machine Learning, Vision, NLP",
+    "answer": "Machine Learning, Vision, NLP"
+  },
+  {
+    "question": "Quelles thématiques couvre le Lab Robotique & IoT ?",
+    "text": "Lab Robotique & IoT : Robotique mobile, Systèmes embarqués",
+    "answer": "Robotique mobile, Systèmes embarqués"
+  },
+  {
+    "question": "Quelles thématiques couvre le Lab Réseaux et Sécurité ?",
+    "text": "Lab Réseaux et Sécurité : Cybersécurité, Blockchain",
+    "answer": "Cybersécurité, Blockchain"
+  },
+  {
+    "question": "Quelles thématiques couvre le Lab Systèmes d’Information ?",
+    "text": "Lab Systèmes d’Information : Big Data, Cloud",
+    "answer": "Big Data, Cloud"
+  },
+  {
+    "question": "Quels partenariats industriels sont mentionnés ?",
+    "text": "Aucun",
+    "answer": "Aucun"
+  },
+  {
+    "question": "Quels partenariats académiques l’ENIAD entretient-elle ?",
+    "text": "UMP",
+    "answer": "UMP"
+  },
+  {
+    "question": "Quelles bourses sont disponibles via le CNOUS ?",
+    "text": "Disponibles selon critères académiques et sociaux",
+    "answer": "Disponibles selon critères académiques et sociaux"
+  },
+  {
+    "question": "Quelles bourses d’entreprises sont proposées ?",
+    "text": "Aucune",
+    "answer": "Aucune"
+  },
+  {
+    "question": "L’ENIAD est-il présent sur Facebook ?",
+    "text": "https://www.facebook.com/ENIADBERKANE",
+    "answer": "https://www.facebook.com/ENIADBERKANE"
+  },
+  {
+    "question": "L’ENIAD est-il présent sur Linkedin ?",
+    "text": "https://www.linkedin.com/school/eniadberkane/",
+    "answer": "https://www.linkedin.com/school/eniadberkane/"
+  },
+  {
+    "question": "L’ENIAD est-il présent sur Instagram ?",
+    "text": "https://www.instagram.com/eniadbmedia/",
+    "answer": "https://www.instagram.com/eniadbmedia/"
+  },
+  {
+    "question": "Quelle est la langue principale d’enseignement ?",
+    "text": "Français",
+    "answer": "Français"
+  },
+  {
+    "question": "Quelle langue technique est utilisée ?",
+    "text": "Anglais",
+    "answer": "Anglais"
+  },
+  {
+    "question": "Quelle est la durée du cycle ingénieur ?",
+    "text": "3 ans (cycle ingénieur)",
+    "answer": "3 ans (cycle ingénieur)"
+  },
+  {
+    "question": "Quel diplôme est délivré à l’issue du cycle ?",
+    "text": "Ingénieur d’État (Bac+5)",
+    "answer": "Ingénieur d’État (Bac+5)"
+  },
+  {
+    "question": "Quels sont les frais de scolarité ?",
+    "text": "Gratuit (droits universitaires UMP)",
+    "answer": "Gratuit (droits universitaires UMP)"
+  },
+  {
+    "question": "Par quelle autorité l’ENIAD est-elle accréditée ?",
+    "text": "Ministère de l’Enseignement Supérieur",
+    "answer": "Ministère de l’Enseignement Supérieur"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Programmation orientée objet en Java » au semestre 5 ?",
+    "text": "Programmation orientée objet en Java : cours 18h, TD 30h, TP 0h, AV 4h, EV 0h, VH 52h",
+    "answer": "52 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Programmation orientée objet en C++ » au semestre 5 ?",
+    "text": "Programmation orientée objet en C++ : cours 18h, TD 30h, TP 0h, AV 4h, EV 0h, VH 52h",
+    "answer": "52 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Programmation orientée objet en Python » au semestre 5 ?",
+    "text": "Programmation orientée objet en Python : cours 18h, TD 30h, TP 0h, AV 4h, EV 0h, VH 52h",
+    "answer": "52 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Ingénierie des bases de données » au semestre 5 ?",
+    "text": "Ingénierie des bases de données : cours 18h, TD 12h, TP 18h, AV 4h, EV 0h, VH 52h",
+    "answer": "52 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Système d’exploitation et compilation » au semestre 5 ?",
+    "text": "Système d’exploitation et compilation : cours 24h, TD 0h, TP 24h, AV 0h, EV 4h, VH 52h",
+    "answer": "52 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Compétences culturelles et artistiques » au semestre 5 ?",
+    "text": "Compétences culturelles et artistiques : cours 24h, TD 10h, TP 0h, AV 4h, EV 10h, VH 48h",
+    "answer": "48 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Français 1 » au semestre 5 ?",
+    "text": "Français 1 : cours 7h, TD 0h, TP 0h, AV 15h, EV 2h, VH 24h",
+    "answer": "24 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Anglais 1 » au semestre 5 ?",
+    "text": "Anglais 1 : cours 7h, TD 0h, TP 0h, AV 15h, EV 2h, VH 24h",
+    "answer": "24 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Développement d’applications Web » au semestre 6 ?",
+    "text": "Développement d’applications Web : cours 18h, TD 30h, TP 0h, AV 4h, EV 0h, VH 52h",
+    "answer": "52 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Conception et développement d’IHM » au semestre 6 ?",
+    "text": "Conception et développement d’IHM : cours 18h, TD 30h, TP 0h, AV 4h, EV 0h, VH 52h",
+    "answer": "52 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Réseaux informatique » au semestre 6 ?",
+    "text": "Réseaux informatique : cours 18h, TD 14h, TP 16h, AV 0h, EV 4h, VH 52h",
+    "answer": "52 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Technologie XML et génie logiciel » au semestre 6 ?",
+    "text": "Technologie XML et génie logiciel : cours 18h, TD 30h, TP 0h, AV 4h, EV 0h, VH 52h",
+    "answer": "52 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Statistiques et recherche opérationnelle » au semestre 6 ?",
+    "text": "Statistiques et recherche opérationnelle : cours 18h, TD 12h, TP 18h, AV 4h, EV 0h, VH 52h",
+    "answer": "52 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Gestion de projet et entrepreneuriat » au semestre 6 ?",
+    "text": "Gestion de projet et entrepreneuriat : cours 30h, TD 14h, TP 0h, AV 0h, EV 4h, VH 48h",
+    "answer": "48 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Français 2 » au semestre 6 ?",
+    "text": "Français 2 : cours 7h, TD 0h, TP 0h, AV 15h, EV 2h, VH 24h",
+    "answer": "24 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Anglais 2 » au semestre 6 ?",
+    "text": "Anglais 2 : cours 7h, TD 0h, TP 0h, AV 15h, EV 2h, VH 24h",
+    "answer": "24 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Atelier programmation avancée » au semestre 7 ?",
+    "text": "Atelier programmation avancée : cours 18h, TD 30h, TP 0h, AV 4h, EV 0h, VH 52h",
+    "answer": "52 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Développement avancé d’application » au semestre 7 ?",
+    "text": "Développement avancé d’application : cours 18h, TD 30h, TP 0h, AV 4h, EV 0h, VH 52h",
+    "answer": "52 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Gestion agile de projet informatique » au semestre 7 ?",
+    "text": "Gestion agile de projet informatique : cours 18h, TD 30h, TP 0h, AV 4h, EV 0h, VH 52h",
+    "answer": "52 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Développement d’application mobile » au semestre 7 ?",
+    "text": "Développement d’application mobile : cours 18h, TD 30h, TP 0h, AV 4h, EV 0h, VH 52h",
+    "answer": "52 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Machine Learning » au semestre 7 ?",
+    "text": "Machine Learning : cours 18h, TD 30h, TP 0h, AV 4h, EV 0h, VH 52h",
+    "answer": "52 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Emploi et curation de contenu » au semestre 7 ?",
+    "text": "Emploi et curation de contenu : cours 20h, TD 24h, TP 0h, AV 0h, EV 4h, VH 48h",
+    "answer": "48 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Français 3 » au semestre 7 ?",
+    "text": "Français 3 : cours 7h, TD 0h, TP 0h, AV 15h, EV 2h, VH 24h",
+    "answer": "24 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Anglais 3 » au semestre 7 ?",
+    "text": "Anglais 3 : cours 7h, TD 0h, TP 0h, AV 15h, EV 2h, VH 24h",
+    "answer": "24 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Administration réseaux et scripting » au semestre 8 ?",
+    "text": "Administration réseaux et scripting : cours 18h, TD 30h, TP 0h, AV 4h, EV 0h, VH 52h",
+    "answer": "52 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Business Intelligence et ERP » au semestre 8 ?",
+    "text": "Business Intelligence et ERP : cours 18h, TD 30h, TP 0h, AV 4h, EV 0h, VH 52h",
+    "answer": "52 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Atelier des activités pratiques et projets (PFA) » au semestre 8 ?",
+    "text": "Atelier des activités pratiques et projets (PFA) : cours 18h, TD 30h, TP 0h, AV 4h, EV 0h, VH 52h",
+    "answer": "52 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Deep Learning » au semestre 8 ?",
+    "text": "Deep Learning : cours 18h, TD 30h, TP 0h, AV 4h, EV 0h, VH 52h",
+    "answer": "52 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Atelier outils DevOps » au semestre 8 ?",
+    "text": "Atelier outils DevOps : cours 18h, TD 30h, TP 0h, AV 4h, EV 0h, VH 52h",
+    "answer": "52 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Ingénierie du prompt et littératie numérique » au semestre 8 ?",
+    "text": "Ingénierie du prompt et littératie numérique : cours 30h, TD 14h, TP 0h, AV 0h, EV 4h, VH 48h",
+    "answer": "48 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Français 4 » au semestre 8 ?",
+    "text": "Français 4 : cours 7h, TD 0h, TP 0h, AV 15h, EV 2h, VH 24h",
+    "answer": "24 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Anglais 4 » au semestre 8 ?",
+    "text": "Anglais 4 : cours 7h, TD 0h, TP 0h, AV 15h, EV 2h, VH 24h",
+    "answer": "24 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Big Data et NoSQL » au semestre 9 ?",
+    "text": "Big Data et NoSQL : cours 18h, TD 30h, TP 0h, AV 4h, EV 0h, VH 52h",
+    "answer": "52 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Atelier Usine logiciel » au semestre 9 ?",
+    "text": "Atelier Usine logiciel : cours 18h, TD 30h, TP 0h, AV 4h, EV 0h, VH 52h",
+    "answer": "52 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Systèmes d’information moderne » au semestre 9 ?",
+    "text": "Systèmes d’information moderne : cours 18h, TD 30h, TP 0h, AV 4h, EV 0h, VH 52h",
+    "answer": "52 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Ingénierie logiciel avancé » au semestre 9 ?",
+    "text": "Ingénierie logiciel avancé : cours 18h, TD 30h, TP 0h, AV 4h, EV 0h, VH 52h",
+    "answer": "52 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Interconnexion réseaux et sécurité réseaux » au semestre 9 ?",
+    "text": "Interconnexion réseaux et sécurité réseaux : cours 18h, TD 30h, TP 0h, AV 4h, EV 0h, VH 52h",
+    "answer": "52 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « IA et considérations éthiques et de régulation » au semestre 9 ?",
+    "text": "IA et considérations éthiques et de régulation : cours 20h, TD 24h, TP 0h, AV 0h, EV 4h, VH 48h",
+    "answer": "48 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Français 5 » au semestre 9 ?",
+    "text": "Français 5 : cours 7h, TD 0h, TP 0h, AV 15h, EV 2h, VH 24h",
+    "answer": "24 heures"
+  },
+  {
+    "question": "Quel est le volume horaire global du module « Anglais 5 » au semestre 9 ?",
+    "text": "Anglais 5 : cours 7h, TD 0h, TP 0h, AV 15h, EV 2h, VH 24h",
+    "answer": "24 heures"
+  },
+  {
+    "question": "Quelle est la mission de l’ENIAD ?",
+    "text": "Former des ingénieurs hautement qualifiés en intelligence artificielle et en digital, alignés sur les besoins du marché et la stratégie nationale de transformation numérique.",
+    "answer": "Former des ingénieurs hautement qualifiés en intelligence artificielle et en digital, alignés sur les besoins du marché et la stratégie nationale de transformation numérique."
+  },
+  {
+    "question": "Quelle est la vision de l’ENIAD ?",
+    "text": "Devenir un pôle d’excellence technologique et académique dans la région de l’Oriental, en structurant un écosystème d’innovation autour de l’IA et du numérique.",
+    "answer": "Devenir un pôle d’excellence technologique et académique dans la région de l’Oriental, en structurant un écosystème d’innovation autour de l’IA et du numérique."
+  },
+  {
+    "question": "Quel est l’historique de création de l’ENIAD ?",
+    "text": "Créée en 2023 dans le cadre de l’élargissement de l’offre de formation de l’UMP, l’ENIAD répond à la politique de régionalisation avancée et à la montée en puissance des technologies numériques au Maroc.",
+    "answer": "Créée en 2023 dans le cadre de l’élargissement de l’offre de formation de l’UMP, l’ENIAD répond à la politique de régionalisation avancée et à la montée en puissance des technologies numériques au Maroc."
+  },
+  {
+    "question": "Qui est coordinateur de la filière IA ?",
+    "text": "Coordinateur IA : Non renseigné",
+    "answer": "Non renseigné"
+  },
+  {
+    "question": "Qui est coordinateur de la filière ROC ?",
+    "text": "Coordinateur ROC : Non renseigné",
+    "answer": "Non renseigné"
+  },
+  {
+    "question": "Qui est coordinateur de la filière IRSI ?",
+    "text": "Coordinateur IRSI : Non renseigné",
+    "answer": "Non renseigné"
+  },
+  {
+    "question": "Qui est coordinateur de la filière GINF ?",
+    "text": "Coordinateur GINF : Non renseigné",
+    "answer": "Non renseigné"
+  },
+  {
+    "question": "Que comprend la préinscription en ligne ?",
+    "text": "Préinscription en ligne (formulaire et dépôt des pièces : CIN, diplômes, relevés, CV…)",
+    "answer": "Préinscription en ligne (formulaire et dépôt des pièces : CIN, diplômes, relevés, CV…)"
+  },
+  {
+    "question": "En quoi consiste l’étude de dossier académique et présélection ?",
+    "text": "Étude de dossier académique et présélection",
+    "answer": "Étude de dossier académique et présélection"
+  },
+  {
+    "question": "Que comprend le concours écrit de la procédure d’inscription ?",
+    "text": "Concours écrit (mathématiques, informatique, soft skills)",
+    "answer": "Concours écrit (mathématiques, informatique, soft skills)"
+  },
+  {
+    "question": "Comment se déroule l’entretien oral ?",
+    "text": "Entretien oral devant jury",
+    "answer": "Entretien oral devant jury"
+  },
+  {
+    "question": "Que couvre la phase de publication des résultats et d’inscription administrative ?",
+    "text": "Publication des résultats et inscription administrative",
+    "answer": "Publication des résultats et inscription administrative"
+  },
+  {
+    "question": "Qui est responsable du Lab IA et Deep Learning ?",
+    "text": "Responsable Lab IA et Deep Learning : Non renseigné",
+    "answer": "Non renseigné"
+  },
+  {
+    "question": "Qui est responsable du Lab Robotique & IoT ?",
+    "text": "Responsable Lab Robotique & IoT : Non renseigné",
+    "answer": "Non renseigné"
+  },
+  {
+    "question": "Qui est responsable du Lab Réseaux et Sécurité ?",
+    "text": "Responsable Lab Réseaux et Sécurité : Non renseigné",
+    "answer": "Non renseigné"
+  },
+  {
+    "question": "Qui est responsable du Lab Systèmes d’Information ?",
+    "text": "Responsable Lab Systèmes d’Information : Non renseigné",
+    "answer": "Non renseigné"
+  },
+  {
+    "question": "Quel laboratoire couvre les thématiques Machine Learning, Vision, NLP ?",
+    "text": "Lab IA et Deep Learning : Machine Learning, Vision, NLP",
+    "answer": "Lab IA et Deep Learning"
+  },
+  {
+    "question": "Quel laboratoire couvre les thématiques Robotique mobile, Systèmes embarqués ?",
+    "text": "Lab Robotique & IoT : Robotique mobile, Systèmes embarqués",
+    "answer": "Lab Robotique & IoT"
+  },
+  {
+    "question": "Quel laboratoire couvre les thématiques Cybersécurité, Blockchain ?",
+    "text": "Lab Réseaux et Sécurité : Cybersécurité, Blockchain",
+    "answer": "Lab Réseaux et Sécurité"
+  },
+  {
+    "question": "Quel laboratoire couvre les thématiques Big Data, Cloud ?",
+    "text": "Lab Systèmes d’Information : Big Data, Cloud",
+    "answer": "Lab Systèmes d’Information"
+  },
+  {
+    "question": "Quelle mention minimum est requise pour les titulaires de DEUG/DEUST/DEUP ?",
+    "text": "mention ≥ 2",
+    "answer": "2"
+  },
+  {
+    "question": "Quelle mention minimum est nécessaire pour les titulaires de licence scientifique ?",
+    "text": "mention ≥ 3",
+    "answer": "3"
+  }
+]

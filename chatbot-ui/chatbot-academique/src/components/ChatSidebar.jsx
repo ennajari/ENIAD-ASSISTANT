@@ -26,7 +26,8 @@ import {
   ChevronRight as ChevronRightIcon,
   History as HistoryIcon,
   Cloud as CloudIcon,
-  CloudOff as CloudOffIcon
+  CloudOff as CloudOffIcon,
+  DeleteSweep as DeleteSweepIcon
 } from '@mui/icons-material';
 import { DRAWER_WIDTH, translations } from '../constants/config';
 
@@ -35,7 +36,7 @@ const ChatSidebar = ({
   onClose = () => {},
   variant = 'persistent',
   anchor = 'left',
-  currentLanguage = 'en',
+  currentLanguage = 'fr',
   darkMode = false,
   prefersDarkMode = false,
   conversationHistory = [],
@@ -46,11 +47,12 @@ const ChatSidebar = ({
   onChatMenuOpen = () => {},
   onToggleDarkMode = () => {},
   onSettingsOpen = () => {},
+  onClearAllConversations = () => {},
   isMobile = false,
   onSidebarCollapse = () => {},
   sidebarCollapsed = false
 }) => {
-  const t = (key) => translations[currentLanguage]?.[key] || translations.en[key] || key;
+  const t = (key) => translations[currentLanguage]?.[key] || translations.fr[key] || key;
   const [showHistory, setShowHistory] = useState(true);
 
   const sidebarWidth = sidebarCollapsed ? 72 : DRAWER_WIDTH;
@@ -389,6 +391,55 @@ const ChatSidebar = ({
               }}
             />
           </Box>
+
+          {/* Clear All Conversations Button */}
+          {conversationHistory.length > 0 && (
+            <Box sx={{ px: 0, pt: 1 }}>
+              <Button
+                variant="text"
+                startIcon={currentLanguage !== 'ar' ? <DeleteSweepIcon fontSize="small" /> : null}
+                endIcon={currentLanguage === 'ar' ? <DeleteSweepIcon fontSize="small" /> : null}
+                onClick={onClearAllConversations}
+                sx={{
+                  color: darkMode ? 'rgba(239,68,68,0.8)' : 'rgba(239,68,68,0.7)',
+                  textTransform: 'none',
+                  fontWeight: 500,
+                  py: 1,
+                  px: 1,
+                  borderRadius: '8px',
+                  transition: 'all 0.2s ease',
+                  minWidth: 'auto',
+                  width: '100%',
+                  justifyContent: currentLanguage === 'ar' ? 'flex-end' : 'flex-start',
+                  direction: currentLanguage === 'ar' ? 'rtl' : 'ltr',
+                  fontSize: '0.75rem',
+                  lineHeight: 1.2,
+                  '& .MuiButton-startIcon': {
+                    marginLeft: currentLanguage === 'ar' ? 8 : 0,
+                    marginRight: currentLanguage === 'ar' ? 0 : 8,
+                    flexShrink: 0,
+                  },
+                  '& .MuiButton-endIcon': {
+                    marginLeft: currentLanguage === 'ar' ? 0 : 8,
+                    marginRight: currentLanguage === 'ar' ? 8 : 0,
+                    flexShrink: 0,
+                  },
+                  '&:hover': {
+                    bgcolor: darkMode ? 'rgba(239,68,68,0.1)' : 'rgba(239,68,68,0.05)',
+                    color: darkMode ? 'rgba(239,68,68,1)' : 'rgba(239,68,68,0.9)',
+                    transform: currentLanguage === 'ar' ? 'translateX(-2px)' : 'translateX(2px)',
+                  }
+                }}
+              >
+                {currentLanguage === 'ar'
+                  ? 'مسح جميع المحادثات'
+                  : currentLanguage === 'fr'
+                  ? 'Effacer toutes les conversations'
+                  : 'Clear all conversations'
+                }
+              </Button>
+            </Box>
+          )}
         </Box>
       )}
 
@@ -419,7 +470,7 @@ const ChatSidebar = ({
         </Box>
       )}
 
-      <Collapse in={showHistory && !sidebarCollapsed && user}>
+      <Collapse in={Boolean(showHistory && !sidebarCollapsed && user)}>
         <List sx={{
           overflow: 'auto',
           flex: 1,

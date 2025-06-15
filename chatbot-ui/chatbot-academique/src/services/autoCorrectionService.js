@@ -44,42 +44,7 @@ class AutoCorrectionService {
         'a': 'à',
         'ou': 'où'
       },
-      'en': {
-        // Common English typos in academic context
-        'eniad': 'ENIAD',
-        'ump': 'UMP',
-        'artifical intelligence': 'artificial intelligence',
-        'machine lerning': 'machine learning',
-        'machien learning': 'machine learning',
-        'neural netwoks': 'neural networks',
-        'neural network': 'neural networks',
-        'natural language procesing': 'natural language processing',
-        'computer vison': 'computer vision',
-        'data scince': 'data science',
-        'cybersecuirty': 'cybersecurity',
-        'web developement': 'web development',
-        'databse': 'database',
-        'algoritm': 'algorithm',
-        'algoritms': 'algorithms',
-        'programing': 'programming',
-        'tecnology': 'technology',
-        'tecnologies': 'technologies',
-        'universtiy': 'university',
-        'studnet': 'student',
-        'studnets': 'students',
-        'couse': 'course',
-        'couses': 'courses',
-        'modul': 'module',
-        'moduls': 'modules',
-        'trainig': 'training',
-        'berkane': 'Berkane',
-        'morocco': 'Morocco',
-        'moroccan': 'Moroccan',
-        'what is': 'what is',
-        'how does': 'how does',
-        'can you': 'can you',
-        'could you': 'could you'
-      },
+
       'ar': {
         // Common Arabic typos in academic context
         'انياد': 'إنياد',
@@ -133,23 +98,7 @@ class AutoCorrectionService {
           description: 'Correct "ca" to "ça"'
         }
       ],
-      'en': [
-        {
-          pattern: /\b(i)\s+/gi,
-          replacement: 'I ',
-          description: 'Capitalize "I"'
-        },
-        {
-          pattern: /\b(its)\s+(a)\b/gi,
-          replacement: 'it\'s $2',
-          description: 'Correct "its a" to "it\'s a"'
-        },
-        {
-          pattern: /\b(your)\s+(welcome)\b/gi,
-          replacement: 'you\'re $2',
-          description: 'Correct "your welcome" to "you\'re welcome"'
-        }
-      ],
+
       'ar': [
         {
           pattern: /\b(انا)\s+/gi,
@@ -176,19 +125,16 @@ class AutoCorrectionService {
    */
   detectLanguage(text) {
     if (!text) return 'fr';
-    
+
     const arabicPattern = /[\u0600-\u06FF]/;
     const frenchPattern = /\b(le|la|les|de|du|des|et|est|dans|pour|avec|sur|par|une|un|ce|cette|qui|que|où|comment|pourquoi)\b/i;
-    const englishPattern = /\b(the|and|is|in|for|with|on|by|a|an|this|that|which|what|where|how|why)\b/i;
-    
+
     if (arabicPattern.test(text)) {
       return 'ar';
     } else if (frenchPattern.test(text)) {
       return 'fr';
-    } else if (englishPattern.test(text)) {
-      return 'en';
     }
-    
+
     return 'fr'; // Default to French
   }
 
@@ -363,9 +309,8 @@ class AutoCorrectionService {
     return {
       size: this.correctionCache.size,
       maxAge: this.cacheExpiry,
-      languages: ['fr', 'en', 'ar'],
-      totalCorrections: Object.keys(this.corrections.fr).length + 
-                       Object.keys(this.corrections.en).length + 
+      languages: ['fr', 'ar'],
+      totalCorrections: Object.keys(this.corrections.fr).length +
                        Object.keys(this.corrections.ar).length
     };
   }

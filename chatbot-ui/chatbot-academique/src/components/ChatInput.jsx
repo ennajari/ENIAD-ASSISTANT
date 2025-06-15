@@ -23,7 +23,7 @@ const ChatInput = ({
   onKeyPress = () => {},
   onSubmit = () => {},
   isLoading = false,
-  currentLanguage = 'en',
+  currentLanguage = 'fr',
   darkMode = false,
   isRecording = false,
   onToggleRecording = () => {},
@@ -34,7 +34,7 @@ const ChatInput = ({
   isSMACompleted = false,
   smaStatusMessage = ''
 }) => {
-  const t = (key) => translations[currentLanguage]?.[key] || translations.en[key] || key;
+  const t = (key) => translations[currentLanguage]?.[key] || translations.fr[key] || key;
 
   // Autocomplete state
   const [showAutocomplete, setShowAutocomplete] = useState(false);

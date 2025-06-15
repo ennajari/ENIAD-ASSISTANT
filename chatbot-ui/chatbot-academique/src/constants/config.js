@@ -1,4 +1,4 @@
-export const API_URL = "https://abdellah-ennajari-23--llama3-openai-compatible-serve.modal.run";
+export const API_URL = "/api/llama";
 
 export const LANGUAGES = [
   { code: 'fr', label: 'Français', flag: '🇫🇷' },
@@ -29,6 +29,9 @@ export const translations = {
     assistant: "Assistant Académique ENIAD",
     startPrompt: "Posez votre question ou choisissez un sujet ci-dessous pour commencer une nouvelle conversation.",
     errorMessage: "Désolé, une erreur est survenue. Veuillez réessayer.",
+    networkError: "Erreur réseau. Veuillez vérifier votre connexion et réessayer.",
+    rateLimitError: "Trop de requêtes. Veuillez attendre un moment avant de réessayer.",
+    authError: "Erreur d'authentification. Veuillez vous reconnecter.",
     disclaimer: "ENIAD AI peut faire des erreurs. Vérifiez les informations importantes.",
     version: "v1.0.0",
     suggestions: [
@@ -53,6 +56,16 @@ export const translations = {
     language: "Langue",
     about: "À propos",
     poweredBy: "Alimenté par une technologie IA moderne pour des expériences d'apprentissage améliorées.",
+
+    // RAG Settings translations
+    ragSystem: "Système RAG",
+    ragParameters: "Paramètres RAG",
+    ragStatus: "État du système RAG",
+    ragError: "Erreur système RAG",
+    ragServiceError: "Erreur service RAG interne",
+    projectId: "ID du projet",
+    lastVerification: "Dernière vérification",
+    terminationPoint: "Point de terminaison",
     expand: "Développer la barre latérale",
     collapse: "Réduire la barre latérale",
     chatHistory: "Historique",
@@ -73,6 +86,11 @@ export const translations = {
     indexInfo: "Info de l'index",
     lastCheck: "Dernière vérification",
     ragStatusHelp: "Ceci montre l'état de connexion à votre système RAG_Project. Assurez-vous que votre serveur FastAPI fonctionne sur le point de terminaison configuré.",
+    error: "Erreur",
+    refresh: "Actualiser",
+    expand: "Développer",
+    collapse: "Réduire",
+    unknown: "Inconnu",
     // SMA System
     smaActive: "SMA Activé - Intelligence Web en temps réel",
     smaInactive: "Activer SMA - Surveillance intelligente des sites",
@@ -102,6 +120,9 @@ export const translations = {
     assistant: "المساعد الأكاديمي ENIAD",
     startPrompt: "اطرح سؤالك أو اختر موضوعًا أدناه لبدء محادثة جديدة.",
     errorMessage: "عذراً، حدث خطأ. يرجى المحاولة مرة أخرى.",
+    networkError: "خطأ في الشبكة. يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
+    rateLimitError: "طلبات كثيرة جداً. يرجى الانتظار قليلاً قبل المحاولة مرة أخرى.",
+    authError: "خطأ في المصادقة. يرجى تسجيل الدخول مرة أخرى.",
     disclaimer: "قد يرتكب ENIAD AI أخطاء. يرجى التحقق من المعلومات المهمة.",
     version: "الإصدار 1.0.0",
     suggestions: [
@@ -134,6 +155,16 @@ export const translations = {
     language: "اللغة",
     about: "حول",
     poweredBy: "مدعوم بتقنية الذكاء الاصطناعي الحديثة لتجارب تعليمية محسّنة.",
+
+    // RAG Settings translations
+    ragSystem: "نظام RAG",
+    ragParameters: "معاملات RAG",
+    ragStatus: "حالة نظام RAG",
+    ragError: "خطأ في نظام RAG",
+    ragServiceError: "خطأ في خدمة RAG الداخلية",
+    projectId: "معرف المشروع",
+    lastVerification: "آخر تحقق",
+    terminationPoint: "نقطة الإنهاء",
     // RAG System
     ragSystem: "نظام RAG",
     ragHealthy: "نظام RAG متصل",
@@ -146,6 +177,11 @@ export const translations = {
     indexInfo: "معلومات الفهرس",
     lastCheck: "آخر فحص",
     ragStatusHelp: "يُظهر هذا حالة الاتصال بنظام RAG_Project الخاص بك. تأكد من تشغيل خادم FastAPI على نقطة النهاية المكونة.",
+    error: "خطأ",
+    refresh: "تحديث",
+    expand: "توسيع",
+    collapse: "طي",
+    unknown: "غير معروف",
     // SMA System
     smaActive: "Sما نشط - ذكاء الويب في الوقت الفعلي",
     smaInactive: "تفعيل SMA - مراقبة ذكية للمواقع",

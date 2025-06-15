@@ -84,12 +84,16 @@ class FirebaseStorageService {
       });
 
       const conversationRef = doc(db, this.conversationsCollection, conversation.id);
+
+      // Clean conversation data to remove undefined values
+      const cleanedConversation = this.cleanConversationData(conversation);
+
       const conversationData = {
-        ...conversation,
+        ...cleanedConversation,
         userId: userId,
         lastUpdated: new Date().toISOString(), // Use consistent field name
         updatedAt: serverTimestamp(), // Keep for Firebase ordering
-        createdAt: conversation.createdAt || serverTimestamp()
+        createdAt: cleanedConversation.createdAt || new Date().toISOString()
       };
 
       await setDoc(conversationRef, conversationData, { merge: true });
@@ -108,6 +112,80 @@ class FirebaseStorageService {
   }
 
   /**
+   * Clean conversation data to remove undefined values
+   */
+  cleanConversationData(conversation) {
+    if (!conversation || typeof conversation !== 'object') {
+      return {
+        id: Date.now().toString(),
+        title: 'New Conversation',
+        messages: [],
+        createdAt: new Date().toISOString(),
+        lastUpdated: new Date().toISOString()
+      };
+    }
+
+    const cleaned = {};
+
+    // Only include defined values
+    Object.keys(conversation).forEach(key => {
+      const value = conversation[key];
+      if (value !== undefined && value !== null) {
+        if (Array.isArray(value)) {
+          // Clean array items
+          cleaned[key] = value.map(item => {
+            if (typeof item === 'object' && item !== null) {
+              return this.cleanObject(item);
+            }
+            return item !== undefined && item !== null ? item : null;
+          }).filter(item => item !== null);
+        } else if (typeof value === 'object') {
+          // Clean object properties
+          const cleanedObj = this.cleanObject(value);
+          if (Object.keys(cleanedObj).length > 0) {
+            cleaned[key] = cleanedObj;
+          }
+        } else {
+          cleaned[key] = value;
+        }
+      }
+    });
+
+    // Ensure required fields have default values
+    return {
+      id: cleaned.id || Date.now().toString(),
+      title: cleaned.title || 'New Conversation',
+      messages: cleaned.messages || [],
+      createdAt: cleaned.createdAt || new Date().toISOString(),
+      lastUpdated: cleaned.lastUpdated || new Date().toISOString(),
+      ...cleaned
+    };
+  }
+
+  /**
+   * Clean object properties recursively
+   */
+  cleanObject(obj) {
+    if (!obj || typeof obj !== 'object') return {};
+
+    const cleaned = {};
+    Object.keys(obj).forEach(key => {
+      const value = obj[key];
+      if (value !== undefined && value !== null) {
+        if (typeof value === 'object' && !Array.isArray(value)) {
+          const cleanedNested = this.cleanObject(value);
+          if (Object.keys(cleanedNested).length > 0) {
+            cleaned[key] = cleanedNested;
+          }
+        } else {
+          cleaned[key] = value;
+        }
+      }
+    });
+    return cleaned;
+  }
+
+  /**
    * Get all conversations for a user
    */
   async getUserConversations(userId) {
@@ -119,11 +197,12 @@ class FirebaseStorageService {
     try {
       console.log('📥 Getting conversations for user:', userId);
       const conversationsRef = collection(db, this.conversationsCollection);
+
+      // Use simple query without orderBy to avoid index requirement
       const q = query(
         conversationsRef,
         where('userId', '==', userId),
-        orderBy('updatedAt', 'desc'),
-        limit(50) // Limit to last 50 conversations
+        limit(100) // Increased limit since we'll sort in memory
       );
 
       const querySnapshot = await getDocs(q);
@@ -139,12 +218,23 @@ class FirebaseStorageService {
           id: doc.id,
           title: data.title,
           messageCount: data.messages?.length || 0,
-          userId: data.userId
+          userId: data.userId,
+          lastUpdated: data.lastUpdated || data.updatedAt
         });
       });
 
-      console.log(`✅ Retrieved ${conversations.length} conversations for user:`, userId);
-      return conversations;
+      // Sort conversations by lastUpdated/updatedAt in memory (most recent first)
+      conversations.sort((a, b) => {
+        const dateA = new Date(a.lastUpdated || a.updatedAt || a.createdAt || 0);
+        const dateB = new Date(b.lastUpdated || b.updatedAt || b.createdAt || 0);
+        return dateB - dateA; // Descending order (newest first)
+      });
+
+      // Limit to 50 most recent conversations
+      const limitedConversations = conversations.slice(0, 50);
+
+      console.log(`✅ Retrieved ${limitedConversations.length} conversations for user (sorted by date):`, userId);
+      return limitedConversations;
     } catch (error) {
       console.error('❌ Error getting user conversations:', error);
       console.error('Error details:', {
@@ -152,6 +242,41 @@ class FirebaseStorageService {
         message: error.message,
         userId: userId
       });
+
+      // If the error is still about indexes, try an even simpler query
+      if (error.code === 'failed-precondition') {
+        console.log('🔄 Retrying with basic query (no sorting)...');
+        try {
+          const basicQuery = query(
+            collection(db, this.conversationsCollection),
+            where('userId', '==', userId)
+          );
+
+          const basicSnapshot = await getDocs(basicQuery);
+          const basicConversations = [];
+
+          basicSnapshot.forEach((doc) => {
+            basicConversations.push({
+              id: doc.id,
+              ...doc.data()
+            });
+          });
+
+          // Sort in memory
+          basicConversations.sort((a, b) => {
+            const dateA = new Date(a.lastUpdated || a.updatedAt || a.createdAt || 0);
+            const dateB = new Date(b.lastUpdated || b.updatedAt || b.createdAt || 0);
+            return dateB - dateA;
+          });
+
+          console.log(`✅ Retrieved ${basicConversations.length} conversations with basic query`);
+          return basicConversations.slice(0, 50);
+        } catch (basicError) {
+          console.error('❌ Basic query also failed:', basicError);
+          return [];
+        }
+      }
+
       return [];
     }
   }
@@ -352,23 +477,25 @@ class FirebaseStorageService {
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
 
-      const conversationsRef = collection(db, this.conversationsCollection);
-      const q = query(
-        conversationsRef,
-        where('userId', '==', userId),
-        where('updatedAt', '<', cutoffDate)
-      );
-
-      const querySnapshot = await getDocs(q);
-      const deletePromises = [];
-
-      querySnapshot.forEach((doc) => {
-        deletePromises.push(deleteDoc(doc.ref));
+      // Get all user conversations first, then filter in memory to avoid index issues
+      const allConversations = await this.getUserConversations(userId);
+      const oldConversations = allConversations.filter(conv => {
+        const updatedAt = new Date(conv.lastUpdated || conv.updatedAt || conv.createdAt || 0);
+        return updatedAt < cutoffDate;
       });
+
+      if (oldConversations.length === 0) {
+        console.log('✅ No old conversations to clean up');
+        return 0;
+      }
+
+      const deletePromises = oldConversations.map(conv =>
+        deleteDoc(doc(db, this.conversationsCollection, conv.id))
+      );
 
       await Promise.all(deletePromises);
       console.log(`✅ Cleaned up ${deletePromises.length} old conversations`);
-      
+
       return deletePromises.length;
     } catch (error) {
       console.error('❌ Error cleaning up conversations:', error);

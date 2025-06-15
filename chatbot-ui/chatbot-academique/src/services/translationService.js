@@ -37,79 +37,14 @@ class TranslationService {
         'traitement du langage naturel': 'معالجة اللغة الطبيعية',
         'vision par ordinateur': 'الرؤية الحاسوبية',
         'science des données': 'data science',
-        'sécurité informatique': 'cybersecurity',
-        'développement web': 'web development',
-        'base de données': 'database',
-        'algorithme': 'algorithm',
-        'algorithmes': 'algorithms'
-      },
-      'fr_to_ar': {
-        'École Nationale de l\'Intelligence Artificielle et Digitale': 'المدرسة الوطنية للذكاء الاصطناعي والرقمي',
-        'ENIAD': 'إنياد',
-        'Université Mohammed Premier': 'جامعة محمد الأول',
-        'UMP': 'جامعة محمد الأول',
-        'formation': 'تكوين',
-        'formations': 'برامج',
-        'module': 'وحدة',
-        'modules': 'وحدات',
-        'cours': 'دورة',
-        'programme': 'برنامج',
-        'étudiant': 'طالب',
-        'étudiants': 'طلاب',
-        'intelligence artificielle': 'الذكاء الاصطناعي',
-        'apprentissage automatique': 'التعلم الآلي',
-        'réseaux de neurones': 'الشبكات العصبية',
-        'traitement du langage naturel': 'معالجة اللغة الطبيعية',
-        'vision par ordinateur': 'رؤية الحاسوب',
-        'science des données': 'علم البيانات',
         'sécurité informatique': 'الأمن السيبراني',
         'développement web': 'تطوير الويب',
         'base de données': 'قاعدة البيانات',
         'algorithme': 'خوارزمية',
         'algorithmes': 'خوارزميات'
       },
-      'en_to_fr': {
-        'National School of Artificial Intelligence and Digital': 'École Nationale de l\'Intelligence Artificielle et Digitale',
-        'artificial intelligence': 'intelligence artificielle',
-        'machine learning': 'apprentissage automatique',
-        'neural networks': 'réseaux de neurones',
-        'natural language processing': 'traitement du langage naturel',
-        'computer vision': 'vision par ordinateur',
-        'data science': 'science des données',
-        'cybersecurity': 'sécurité informatique',
-        'web development': 'développement web',
-        'database': 'base de données',
-        'algorithm': 'algorithme',
-        'algorithms': 'algorithmes',
-        'student': 'étudiant',
-        'students': 'étudiants',
-        'course': 'cours',
-        'program': 'programme',
-        'module': 'module',
-        'modules': 'modules',
-        'training': 'formation'
-      },
-      'en_to_ar': {
-        'National School of Artificial Intelligence and Digital': 'المدرسة الوطنية للذكاء الاصطناعي والرقمي',
-        'artificial intelligence': 'الذكاء الاصطناعي',
-        'machine learning': 'التعلم الآلي',
-        'neural networks': 'الشبكات العصبية',
-        'natural language processing': 'معالجة اللغة الطبيعية',
-        'computer vision': 'رؤية الحاسوب',
-        'data science': 'علم البيانات',
-        'cybersecurity': 'الأمن السيبراني',
-        'web development': 'تطوير الويب',
-        'database': 'قاعدة البيانات',
-        'algorithm': 'خوارزمية',
-        'algorithms': 'خوارزميات',
-        'student': 'طالب',
-        'students': 'طلاب',
-        'course': 'دورة',
-        'program': 'برنامج',
-        'module': 'وحدة',
-        'modules': 'وحدات',
-        'training': 'تكوين'
-      },
+
+
       'ar_to_fr': {
         'المدرسة الوطنية للذكاء الاصطناعي والرقمي': 'École Nationale de l\'Intelligence Artificielle et Digitale',
         'إنياد': 'ENIAD',
@@ -133,29 +68,7 @@ class TranslationService {
         'وحدات': 'modules',
         'تكوين': 'formation'
       },
-      'ar_to_en': {
-        'المدرسة الوطنية للذكاء الاصطناعي والرقمي': 'National School of Artificial Intelligence and Digital',
-        'إنياد': 'ENIAD',
-        'جامعة محمد الأول': 'Mohammed First University',
-        'الذكاء الاصطناعي': 'artificial intelligence',
-        'التعلم الآلي': 'machine learning',
-        'الشبكات العصبية': 'neural networks',
-        'معالجة اللغة الطبيعية': 'natural language processing',
-        'رؤية الحاسوب': 'computer vision',
-        'علم البيانات': 'data science',
-        'الأمن السيبراني': 'cybersecurity',
-        'تطوير الويب': 'web development',
-        'قاعدة البيانات': 'database',
-        'خوارزمية': 'algorithm',
-        'خوارزميات': 'algorithms',
-        'طالب': 'student',
-        'طلاب': 'students',
-        'دورة': 'course',
-        'برنامج': 'program',
-        'وحدة': 'module',
-        'وحدات': 'modules',
-        'تكوين': 'training'
-      }
+
     };
   }
 
@@ -232,7 +145,7 @@ class TranslationService {
   /**
    * Translate SMA results to target language
    * @param {Object} smaResults - SMA search results
-   * @param {string} targetLanguage - Target language (fr, en, ar)
+   * @param {string} targetLanguage - Target language (fr, ar)
    * @returns {Object} Translated SMA results
    */
   async translateSMAResults(smaResults, targetLanguage = 'fr') {

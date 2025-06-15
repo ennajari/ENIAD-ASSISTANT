@@ -24,7 +24,7 @@ export default function Login() {
 
   // Language adaptation
   const { language: lang } = useLanguage();
-
+  const translations = {
     fr: {
       title: 'Portail Académique ENIAD',
       subtitle: 'Bienvenue ! Veuillez vous connecter avec votre compte Google académique.',

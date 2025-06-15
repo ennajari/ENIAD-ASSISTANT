@@ -3,13 +3,10 @@ import connectDB from "@/config/db";
 import Chat from "@/models/Chat";
 import { getAuth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Initialize OpenAI client with Llama3 model configuration
-const openai = new OpenAI({
-    baseURL: 'https://abdellah-ennajari-23--llama3-openai-compatible-serve.modal.run/v1',
-    apiKey: "super-secret-key"
-});
+// Initialize Gemini AI client
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "AIzaSyDIDbm8CcUxtTTW3omJcOHQj1BWcmRWeYc");
 
 const chatBotResponseSchema = {
     "title": "ChatBotResponse",
@@ -133,17 +130,23 @@ export async function POST(req){
             });
         });
 
-        // Call the Llama3 model API to get a chat completion
-        const completion = await openai.chat.completions.create({
-            model: "ahmed-ouka/llama3-8b-eniad-merged-32bit",
-            messages: prompte_Task_messages,
-            temperature: 0.2,
-            max_tokens: 1024,
-            stream: false
-        });
+        // Call the Gemini API to get a chat completion
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-        const message = completion.choices[0].message;
-        message.timestamp = Date.now()
+        // Convert messages to Gemini format
+        const geminiPrompt = prompte_Task_messages.map(msg =>
+            `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`
+        ).join('\n\n');
+
+        const result = await model.generateContent(geminiPrompt);
+        const response = await result.response;
+        const text = response.text();
+
+        const message = {
+            role: "assistant",
+            content: text,
+            timestamp: Date.now()
+        };
 
         // Generate audio from the response using ElevenLabs
         console.log('Preparing to call ElevenLabs for TTS...');
