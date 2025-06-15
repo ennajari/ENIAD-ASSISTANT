@@ -98,6 +98,12 @@ export const translations = {
     smaEnhanced: "Réponse enrichie par SMA",
     smaWebIntelligence: "Intelligence Web SMA",
     smaRealTimeData: "Données en temps réel d'ENIAD et UMP",
+
+    // Model Selection
+    modelSelector: "Sélecteur de Modèle IA",
+    geminiModel: "Gemini API",
+    llamaModel: "Llama (Notre Projet)",
+    modelDescription: "Choisissez le modèle d'IA pour générer les réponses",
   },
 
   ar: {
@@ -189,5 +195,11 @@ export const translations = {
     smaEnhanced: "استجابة محسّنة بـ SMA",
     smaWebIntelligence: "ذكاء الويب SMA",
     smaRealTimeData: "بيانات في الوقت الفعلي من ENIAD و UMP",
+
+    // Model Selection
+    modelSelector: "منتقي نموذج الذكاء الاصطناعي",
+    geminiModel: "جيميني API",
+    llamaModel: "لاما (مشروعنا)",
+    modelDescription: "اختر نموذج الذكاء الاصطناعي لتوليد الإجابات",
   }
 };

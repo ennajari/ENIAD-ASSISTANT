@@ -1,7 +1,7 @@
 @echo off
 echo ========================================
 echo    ENIAD Enhanced SMA System
-echo    Comprehensive Search & Intelligence
+echo    With News Pages + Image Processing
 echo ========================================
 echo.
 
@@ -17,16 +17,17 @@ echo   ✅ Vector Database Storage
 echo   ✅ Multi-language Support (FR/AR/EN)
 echo.
 
-echo 🌐 ENIAD URLs Integrated:
+echo 🌐 ENIAD URLs Now Integrated:
 echo   • https://eniad.ump.ma/fr/actualite
+echo   • https://eniad.ump.ma/fr/actualite?page=2
+echo   • https://eniad.ump.ma/fr/actualite?page=3
 echo   • https://eniad.ump.ma/fr/cycle-ingenieur-intelligence-artificielle-ia
 echo   • https://eniad.ump.ma/fr/cycle-ingenieur-robotique-et-objets-connectes-roc
-echo   • https://eniad.ump.ma/fr/cycle-ingenieur-genie-informatique-ginf
-echo   • https://eniad.ump.ma/fr/concours-de-recrutement
-echo   • And 6 more ENIAD pages...
+echo   • And 8 more ENIAD pages with image processing...
 echo.
 
 echo 📦 Installing/Updating dependencies...
+cd SMA_Service
 pip install -r requirements.txt --quiet
 if %errorlevel% neq 0 (
     echo ⚠️ Some dependencies may need manual installation
@@ -44,60 +45,47 @@ echo   • SMA Status: http://localhost:8001/sma/status
 echo   • API Docs: http://localhost:8001/docs
 echo.
 echo 🧪 Test Interfaces:
-echo   • SMA Test: file:///%~dp0test_sma.html
-echo   • RAG Test: file:///%~dp0test_rag.html
+echo   • SMA Test: file:///%~dp0SMA_Service/test_sma.html
+echo   • Integration Test: python test_integration.py
 echo.
-echo 🎯 Example Queries to Test:
+echo 🎯 Example Enhanced Queries:
 echo   • "Quelles formations en IA sont disponibles à ENIAD?"
 echo   • "Comment s'inscrire aux concours de recrutement?"
 echo   • "ما هي آخر أخبار المدرسة؟"
 echo   • "Programmes de robotique et objets connectés"
 echo.
 
-REM Start the service in background
-start /B python -m uvicorn main:app --host 0.0.0.0 --port 8001 --reload --log-level info
+REM Start the service
+echo ⏳ Starting service...
+start /B python main.py
 
 echo ⏳ Waiting for service to start...
-timeout /t 10 /nobreak >nul
+timeout /t 15 /nobreak >nul
 
 echo.
-echo 🔍 Testing system health...
-curl -s http://localhost:8001/health >nul 2>&1
-if %errorlevel% equ 0 (
-    echo ✅ Service is running successfully!
-    echo.
-    echo 🧪 Running quick demo...
-    python demo_enhanced_system.py
-    echo.
-    echo 🎉 Enhanced SMA System is ready!
-    echo.
-    echo 📖 Next Steps:
-    echo   1. Open test_sma.html in your browser
-    echo   2. Try the "Intelligent Query System" section
-    echo   3. Ask questions about ENIAD in French or Arabic
-    echo   4. Check the comprehensive search results
-    echo.
-    echo 📚 For detailed guide, see: ENHANCED_SYSTEM_GUIDE.md
-    echo.
-) else (
-    echo ❌ Service failed to start. Check the logs above.
-    echo.
-    echo 🔧 Troubleshooting:
-    echo   1. Ensure Python 3.8+ is installed
-    echo   2. Check if port 8001 is available
-    echo   3. Verify Gemini API key in .env file
-    echo   4. Install missing dependencies manually
-    echo.
-)
+echo 🔍 Testing enhanced system...
+python test_integration.py
 
-echo Press any key to open test interface...
+echo.
+echo 🎉 Enhanced SMA System is ready!
+echo.
+echo 📖 Next Steps:
+echo   1. Start your main interface: cd chatbot-ui/chatbot-academique && npm run dev
+echo   2. Test the SMA button in the chat interface
+echo   3. Try intelligent queries about ENIAD
+echo   4. Check that real results appear with sources and images
+echo.
+echo 📚 For detailed guide, see: SMA_Service/ENHANCED_SYSTEM_GUIDE.md
+echo.
+
+echo Press any key to open main interface directory...
 pause >nul
 
-REM Open test interface
-start "" "test_sma.html"
+REM Open main interface directory
+start "" "chatbot-ui\chatbot-academique"
 
 echo.
-echo 🎯 Service is running. Press Ctrl+C to stop.
+echo 🎯 SMA Service is running. Press Ctrl+C to stop.
 echo 📊 Monitor logs and test the intelligent query system!
 echo.
 
