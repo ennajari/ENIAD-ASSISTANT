@@ -14,6 +14,7 @@ import {
 import { translations } from '../constants/config';
 import FloatingIcons from './FloatingIcons';
 import MessageBubble from './MessageBubble';
+import MessageMetadata from './MessageMetadata';
 
 const ChatContent = ({
   messages,
@@ -432,6 +433,14 @@ const ChatContent = ({
                 supported={supported}
                 t={t}
               />
+
+              {/* Métadonnées du message (modèle, sources, etc.) */}
+              {msg.role === 'assistant' && (
+                <MessageMetadata
+                  message={msg}
+                  currentLanguage={currentLanguage}
+                />
+              )}
             </Box>
           ))}
 

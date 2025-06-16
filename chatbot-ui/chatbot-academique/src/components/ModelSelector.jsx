@@ -32,27 +32,39 @@ const ModelSelector = ({
   const models = {
     gemini: {
       name: currentLanguage === 'ar' ? 'جيميني API' : 'Gemini API',
-      description: currentLanguage === 'ar' 
+      description: currentLanguage === 'ar'
         ? 'نموذج جوجل المتقدم للذكاء الاصطناعي'
         : 'Modèle IA avancé de Google',
       icon: <AutoAwesomeIcon />,
       color: '#4285f4',
-      features: currentLanguage === 'ar' 
+      features: currentLanguage === 'ar'
         ? ['سريع', 'دقيق', 'متعدد اللغات']
         : ['Rapide', 'Précis', 'Multilingue'],
       status: 'active'
     },
+    rag: {
+      name: currentLanguage === 'ar' ? 'RAG + نموذج محلي' : 'RAG + Modèle Local',
+      description: currentLanguage === 'ar'
+        ? 'نظام RAG مع نموذج ENIAD المحلي'
+        : 'Système RAG avec modèle ENIAD local',
+      icon: <PsychologyIcon />,
+      color: '#10a37f',
+      features: currentLanguage === 'ar'
+        ? ['قاعدة معرفة', 'محلي', 'متخصص ENIAD']
+        : ['Base de connaissances', 'Local', 'Spécialisé ENIAD'],
+      status: 'active'
+    },
     llama: {
       name: currentLanguage === 'ar' ? 'لاما (مشروعنا)' : 'Llama (Notre Projet)',
-      description: currentLanguage === 'ar' 
+      description: currentLanguage === 'ar'
         ? 'نموذج مخصص لمشروع ENIAD'
         : 'Modèle personnalisé pour ENIAD',
       icon: <PsychologyIcon />,
-      color: '#10a37f',
-      features: currentLanguage === 'ar' 
+      color: '#ff6b35',
+      features: currentLanguage === 'ar'
         ? ['مخصص', 'محلي', 'متخصص']
         : ['Personnalisé', 'Local', 'Spécialisé'],
-      status: 'active'
+      status: 'limited'
     }
   };
 
@@ -179,47 +191,50 @@ const ModelSelector = ({
             mt: 2
           }}>
             <Box sx={{ textAlign: 'center' }}>
-              <SpeedIcon sx={{ 
-                color: selectedModel === 'gemini' ? '#4285f4' : '#10a37f',
-                mb: 0.5 
+              <SpeedIcon sx={{
+                color: selectedModel === 'gemini' ? '#4285f4' :
+                       selectedModel === 'rag' ? '#10a37f' : '#ff6b35',
+                mb: 0.5
               }} />
               <Typography variant="caption" display="block">
                 {currentLanguage === 'ar' ? 'السرعة' : 'Vitesse'}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {selectedModel === 'gemini' ? 
+                {selectedModel === 'gemini' ?
                   (currentLanguage === 'ar' ? 'سريع جداً' : 'Très rapide') :
-                  (currentLanguage === 'ar' ? 'سريع' : 'Rapide')
+                  selectedModel === 'rag' ?
+                  (currentLanguage === 'ar' ? 'سريع' : 'Rapide') :
+                  (currentLanguage === 'ar' ? 'متوسط' : 'Moyen')
                 }
               </Typography>
             </Box>
 
             <Box sx={{ textAlign: 'center' }}>
-              <SecurityIcon sx={{ 
-                color: selectedModel === 'llama' ? '#10a37f' : '#4285f4',
-                mb: 0.5 
+              <SecurityIcon sx={{
+                color: selectedModel === 'gemini' ? '#4285f4' : '#10a37f',
+                mb: 0.5
               }} />
               <Typography variant="caption" display="block">
                 {currentLanguage === 'ar' ? 'الخصوصية' : 'Confidentialité'}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {selectedModel === 'llama' ? 
-                  (currentLanguage === 'ar' ? 'محلي' : 'Local') :
-                  (currentLanguage === 'ar' ? 'سحابي' : 'Cloud')
+                {selectedModel === 'gemini' ?
+                  (currentLanguage === 'ar' ? 'سحابي' : 'Cloud') :
+                  (currentLanguage === 'ar' ? 'محلي' : 'Local')
                 }
               </Typography>
             </Box>
 
             <Box sx={{ textAlign: 'center' }}>
-              <LanguageIcon sx={{ 
+              <LanguageIcon sx={{
                 color: selectedModel === 'gemini' ? '#4285f4' : '#10a37f',
-                mb: 0.5 
+                mb: 0.5
               }} />
               <Typography variant="caption" display="block">
                 {currentLanguage === 'ar' ? 'التخصص' : 'Spécialisation'}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {selectedModel === 'gemini' ? 
+                {selectedModel === 'gemini' ?
                   (currentLanguage === 'ar' ? 'عام' : 'Général') :
                   (currentLanguage === 'ar' ? 'ENIAD' : 'ENIAD')
                 }

@@ -1,0 +1,201 @@
+CAHIER DES NORMES PEDAGOGIQUES NATIONALES
+DU
+CYCLE INGENIEUR
+Version de 2014
+
+1. NORMES RELATIVES AU CYCLE INGENIEUR
+
+| Cycle Ingénieur | CL1 |
+| Le cycle ingénieur est un cursus de formation d'enseignement supérieur d'une durée de six semestres accessible selon les conditions prévues au niveau de la norme CL5. |
+| Le Cycle Ingénieur est sanctionné par un diplôme d'ingénieur d'Etat. |
+
+| Année universitaire | CL2 |
+| L'année universitaire en cycle Ingénieur est composée de 2 semestres comprenant chacun 16 à 18 semaines d'enseignement et d'évaluation. Les périodes de stage ne sont pas incluses dans ces semaines. |
+
+| Organisation du cycle Ingénieur | CL3 |
+| L'organisation du cursus sur les six semestres de la formation est définie par l'équipe pédagogique de chacune des filières du cycle ingénieur en coordination avec les instances pédagogiques de l'établissement. |
+
+| Composition d'un semestre du cycle Ingénieur | CL4 |
+| Chaque semestre comprend 6 à 8 modules avec un volume horaire en présenté global semestriel minimal de 384 heures. |
+
+| Conditions d'accès | CL5 |
+| (Contenu manquant dans le document fourni) |
+
+2. NORMES RELATIVES AUX FILIERES (FL)
+
+| Définition de la filière | FL1 |
+| Une filière ingénieur est un cursus de formation comprenant un ensemble cohérent de modules pris dans un ou plusieurs champs disciplinaires d'ingénierie et de disciplines connexes et ayant pour objectif de faire acquérir à l'étudiant des connaissances, des aptitudes et des compétences spécifiques. Une filière ingénieur peut comporter plusieurs options. |
+
+| Intitulé de la filière | FL2 |
+| L'intitulé reflète les objectifs et le contenu de la filière. |
+
+| Composition d'une Filière | FL3 |
+| Une filière ingénieur est composée de 30 à 40 modules répartis sur cinq semestres avec un volume horaire global semestriel minimal de 384 heures d'enseignement et d'évaluation et d'un Projet de Fin d'Etude (PFE) réalisé durant tout le sixième semestre. Des modules au choix peuvent être ajoutés au cours de la formation. |
+
+| Structure d'une filière Ingénieur | FL4 |
+| Les cinq premiers semestres de formation d'ingénieur sont composés de trois blocs de modules: 1. Le bloc des modules scientifiques et techniques de base et de spécialisation, composé, d'une part, de modules reflétant les caractères scientifique et technique généraux de la formation d'ingénieur et, d'autre part, de modules spécifiques à une spécialisation dans le cadre de la filière. Ce bloc représente 60 à 80% du volume horaire global des cinq premiers semestres de la filière. 2. Le bloc de modules de Management composé essentiellement de modules de management de projets, de management d'entreprise.... Il représente 10 à 20% du volume horaire global des cinq premiers semestres de la filière. 3. Le bloc de modules de langues, de Communication et des TIC représentant 10 à 20% du volume horaire global des cinq premiers semestres de la filière. Le sixième semestre est consacré au PFE. |
+
+| Cohérence | FL5 |
+| Les objectifs et les contenus des modules composant une filière sont cohérents avec les objectifs de la filière. |
+
+| Passerelles | FL6 |
+| Toute filière du cycle Ingénieur prévoit des passerelles avec d'autres filières du même établissement ou des filières d'autres établissements permettant à un élève ingénieur, tout en conservant ses acquis, de se réorienter au sein d'un même établissement ou d'un établissement vers un autre conformément aux critères et pré-requis déterminés dans le descriptif de la filière exigés par l'équipe pédagogique de chaque filière choisie. |
+
+| Domiciliation de la filière | FL7 |
+| Une filière est rattachée administrativement à un établissement d'enseignement supérieur et elle est conforme aux missions de cet établissement. Ses modules peuvent être assurés par un ou plusieurs départements, voire plusieurs établissements d'enseignement supérieur ou encore par des intervenants du milieu socioéconomique. |
+
+| Coordonnateur pédagogique de la filière | FL8 |
+| Le coordonnateur pédagogique d'une filière est un professeur de l'enseignement supérieur ou, à défaut, un professeur habilité ou, à défaut un professeur assistant, qui appartient à l'établissement d'attache de la filière et qui est désigné par le chef d'établissement, sur proposition des coordonnateurs des modules de la filière et après avis du chef de Département dont il relève. Le coordonnateur pédagogique de la filière, intervenant dans les enseignements de la filière, anime l'équipe pédagogique de la filière et assure le suivi du déroulement des enseignements, des projets et des stages, de l'évaluation et des délibérations en coordination avec les départements dont relèvent les modules de la filière et sous la responsabilité du chef de l'établissement. |
+
+| Demande d'accréditation | FL9 |
+| Toute filière nationale dans un établissement de formation d'ingénieur doit faire l'objet d'une demande d'accréditation. Celle-ci est présentée conformément au descriptif établi à cet effet et conformément à la réglementation en vigueur. |
+
+| Demande d'accréditation (descriptif de la filière) | FL10 |
+| La demande d'accréditation d'une filière est présentée conformément au descriptif établi à cet effet. Ce descriptif précise notamment : - Le département; - l'intitulé de la filière; - les intitulés des options éventuelles de la filière; - les objectifs de la formation; - les compétences à acquérir; - les conditions d'accès; - la liste ordonnée des modules en indiquant leur nature (scientifiques et techniques de base et de spécialisation, management, langues et communication et TIC); - les noms du coordonnateur pédagogique de la filière, des coordonnateurs des modules et des intervenants dans la formation; - la description du stage ou projet de fin d'étude; - la liste des partenaires; - les moyens logistiques et matériels disponibles; - les retombées de la formation; - les débouchés de la formation; - l'association du secteur socioprofessionnel dans l'élaboration et l'encadrement de la formation; - les descriptifs des modules de la filière avec leur syllabus et les compétences à acquérir; - un CV succinct du coordonnateur de la filière; - les engagements des intervenants extremes à l'établissement; - les avis motivés des : - coordonnateur pédagogique de la filière; - chef du département dont relève le coordonnateur de la filière; - chefs des départements impliqués dans la filière; - président du conseil de l'établissement d'attache de la filière; - président de conseil de l'université. |
+
+| Durée de l'accréditation | FL11 |
+| L'accréditation de la filière est accordée par l'autorité gouvernementale chargée de l'enseignement supérieur, après avis de la Commission Nationale de Coordination de l'Enseignement Supérieur (CNCES) pour une durée de cinq années. Elle est renouvelable après évaluation de la filière. Durant la période d'accréditation, les filières doivent faire l'objet d'auto-évaluations annuelles. A l'issue de l'accréditation, chaque filière doit faire l'objet d'une auto-évaluation globale qui est transmise à l'autorité gouvernementale chargée de l'enseignement supérieur, en cas de demande ou non du renouvellement de l'accréditation. |
+
+3. NORMES MODULES (MD)
+
+| Définition | MD1 |
+| Le module est l'unité fondamentale du système de formation. Il comprend un à trois éléments de module qui peuvent être enseignés dans une ou plusieurs langues; un élément de module peut être soit une matière enseignée sous forme de cours théoniques accompagnés ou non de travaux dirigés et/ou de travaux pratiques, soit une activité pratique consistant en travaux sur le terrain ou projet. Les différents éléments d'un module constituent une unité cohérente. Une activité pratique peut constituer une partie d'un module, un module entier ou plusieurs modules. Une partie d'un module peut être enseignée à distance et/ou par alternance dans la limite fixée par l'établissement. |
+
+| Intitulé | MD2 |
+| L'intitulé d'un module reflète son contenu et ses objectifs. |
+
+| Volume horaire d'un module d'enseignement | MD3 |
+| Un module d'enseignement s'étale sur un semestre et correspond à un volume horaire minimum de 48 heures d'enseignement et d'évaluation. Le volume horaire d'un module peut être décliné en crédits selon les modalités définies par l'établissement. |
+
+| Projet de fin d'études | MD4 |
+| Un projet de fin d'études (PFE) est spécifique à la filière. Il est obligatoire et doit être réalisé de préférence en milieu socioéconomique. Le dernier semestre du Cycle Ingénieur est consacré au Projet de fin d'étude. |
+
+| Activité pratique | MD5 |
+| L'activité pratique peut prendre différentes formes : - Stages. - Projets hors PFE - Travaux de terrain - Visites d'études - Autres forme d'activités d'ouverture précisées dans le descriptif. L'activité pratique peut constituer tout ou partie d'un module. |
+
+| Stages | MD6 |
+| Des stages avec rapport et soutenance doivent être intégrés dans le cadre de la formation. Le stage peut être réalisé dans une entreprise privée, publique ou semi-publique, dans une administration, dans des collectivités locales, etc. Deux stages au minimum sont nécessaires durant les quatre premiers semestres. La durée minimale, par année, du stage est de 20 jours ouvrables. |
+
+| Projets | MD7 |
+| Des projets avec rapport peuvent être réalisés dans le cadre de la formation. Le projet peut être réalisé dans l'établissement d'attache de la filière ou dans une entreprise privée, publique ou semi-publique, dans une administration, dans des collectivités locales, etc. |
+
+| Domiciliation | MD8 |
+| Un module relève d'un département. D'autres départements peuvent y contribuer. |
+
+| Coordonnateur du module | MD9 |
+| Le coordonnateur d'un module appartient au département d'attache du module. Il est désigné par le Chef d'établissement sur proposition de l'équipe pédagogue assurant l'encadrement du module. Il assure le suivi du déroulement des enseignements, de l'évaluation et des délibérations du module en coordination avec l'équipe pédagogique du module et en concertation avec le coordonnateur pédagogique de la filière et du chef de département d'attache du module, et ce pour la durée de l'accréditation de la filière. L'équipe pédagogique du module est constituée des intervenants dans le module qui sont en charge de l'exécution des enseignements, des évaluations et des délibérations. |
+
+| Descriptif de module | MD10 |
+| Le module fait l'objet d'un descriptif détaillé précisant en particulier : - l'intitulé - les objectifs; - les pré-requis; - les syllabus du module; - les éléments du module et leurs contenus; - les modalités d'organisation des activités pratiques; - les modalités d'évaluation spécifiques; - les modalités de validation du module; - la méthode de calcul de la note du module; - le nom du coordonnateur du module. - la liste de l'équipe pédagogique. |
+
+4. NORMES REGIME DES ETUDES ET EVALUATIONS (RG)
+
+| Evaluation | RG1 |
+| L'évaluation des connaissances, des aptitudes et des compétences pour chaque module s'effectue sous forme de contrôle continu qui peut prendre la forme d'examens, de tests, de devoirs, d'exposés, de rapports de stage ou de tout autre moyen de contrôle. |
+
+| Règlement de l'évaluation | RG2 |
+| Chaque établissement élabore un règlement de l'évaluation des connaissances, des aptitudes et des compétences, adopté par le conseil de l'université et porté à la connaissance des étudiants. Ce règlement porte, entre autres, sur les modalités d'évaluation, les fraudes, les retards, les absences et les modalités de consultation des copies par les étudiants. |
+
+| Note de module | RG3 |
+| La note d'un module est une moyenne pondérée des différentes évaluations des éléments qui le composent. La pondération tient compte de la nature des évaluations et des volumes horaires des différents éléments ainsi que de leur nature. Cette pondération est définie par l'équipe pédagogique du module et précisée dans le descriptif de la filière. |
+
+| Validation de module | RG4 |
+| Un module est acquis soit par validation soit par compensation. Un module est validé si sa note est supérieure ou égale à une note minimale fixée par l'établissement. Cette dernière ne doit cependant pas être inférieure à 10 sur 20. |
+
+| Contrôle de Rattrapage | RG5 |
+| Un étudiant n'ayant pas validé un ou plusieurs modules bénéficie d'un contrôle de rattrapage pour chacun des modules non validés. Un étudiant n'a droit qu'à un seul rattrapage par module et par année universitaire. L'étudiant conserve, pour le rattrapage, les notes obtenues dans les éléments du module qui sont supérieures ou égales à la note de validation adoptée par l'établissement. Le contrôle de rattrapage est réalisé en fin du semestre où sont programmés les modules concernés. Les modalités de prise en considération de la note de rattrapage dans celle du module sont précisées dans le descriptif de filière. |
+
+| Jury de semestre | RG6 |
+| Le jury de semestre d'une filière est composé du Chef d'établissement ou son représentant, Président, du coordonnateur pédagogique de la filière, des coordonnateurs des modules de la filière dispensés au cours du semestre et d'enseignants qui assurent l'encadrement de ces modules. Après délibérations, le jury du semestre arrête : - la liste des étudiants ayant validé les modules; - la liste des étudiants autorisés à passer le contrôle de rattrapage. Le coordonnateur pédagogique de la filière élabore un procès verbal, visé par les membres du jury, communiqué au chef du département dont il relève et transmis au chef d'établissement en vue de le porter à la connaissance des étudiants. |
+
+| Moyenne générale d'année | RG7 |
+| La moyenne générale d'année est égale à la moyenne des notes des différents modules suivis durant l'année considérée selon le descriptif de la filière. |
+
+| Validation d'année | RG8 |
+| Une année d'une filière du cycle ingénieur est validée et donne droit à l'inscription à l'année suivante si les trois conditions suivantes sont satisfaites: - La moyenne générale d'année est supérieure ou égale à une moyenne minimale de validation d'année précisée dans le descriptif de la filière; - Le nombre de modules non validés de l'année est inférieur au seuil fixé dans le descriptif de la filière conformément à son règlement d'évaluation; - Aucune note de module n'est inférieure à la limite fixée dans le descriptif de la filière conformément à son règlement d'évaluation. Le seuil de validation d'année est égal à celui de validation de module. |
+
+| Jury d'année | RG9 |
+| Le jury d'année d'une filière du cycle Ingénieur est composé du Chef d'établissement ou son représentant, Président, du coordonnateur pédagogique de la filière, des coordonnateurs des modules de la filière dispensés au cours des deux semestres de l'année considérée et des enseignants qui assurent l'encadrement de ces modules. Le jury arrête la liste des étudiants ayant validé l'année selon les dispositions du règlement intérieur de l'établissement. |
+
+| Année de réserve | RG10 |
+| Le chef de l'établissement peut, après délibération du jury d'année, accorder à un étudiant une année de réserve dans le cas où une année est non validée. Durant cette année, l'étudiant doit suivre obligatoirement et prioritairement les modules non validés. Dans le cas où l'étudiant a obtenu sa moyenne générale de validation mais ne répond pas aux autres conditions de validation d'année, il pourra s'inscrire à tout ou partie des modules de l'année suivante tout en satisfaisant les conditions de validation de l'année précédente. L'étudiant n'a droit qu'à une seule année de réserve durant le cycle ingénieur. |
+
+| Moyenne générale du cinquième semestre | RG11 |
+| La moyenne générale du cinquième semestre est égale à la moyenne des notes des différents modules suivis durant ce semestre. |
+
+| Validation du cinquième semestre | RG12 |
+| Le cinquième semestre d'une filière du cycle Ingénieur est validé si les trois conditions suivantes sont satisfaites: - La moyenne générale du cinquième semestre est supérieure ou égale à la moyenne de validation d'année adoptée par l'établissement. - Le nombre de modules non validés du semestre est inférieur au seuil fixé dans le descriptif de la filière. - Aucune note de module n'est inférieure à une limite fixée dans le descriptif de la filière. |
+
+| Validation du projet de fin d'étude | RG13 |
+| Le projet de fin d'étude (PFE) est validé si l'étudiant y obtient une note égale ou supérieure à une limite fixée dans le descriptif de la filière. |
+
+| Obtention du diplôme |
+| L'étudiant obtient le diplôme s'il valide, les deux premières années, le cinquième semestre et le PFE. La moyenne globale, servant pour l'obtention du diplôme et la détermination des mentions, est une moyenne pondérée des moyennes générales, des deux premières années, du cinquième semestre et de la note du PFE. Les pondérations utilisées pour le calcul de cette moyenne sont fixées par l'établissement. |
+
+| Jury de filière | RG15 |
+| Pour chaque filière, le jury pour l'attribution du diplôme est composé du Chef d'établissement ou de son représentant, président, du coordonnateur pédagogique de la filière, des coordonnateurs des modules et des enseignants qui assurent l'encadrement des modules de la filière. Après délibération, le Jury établit un Procès verbal, arrête la liste des étudiants admis pour l'obtention du diplôme de la filière et attribue les mentions. Le procès verbal doit être visé par les membres du jury, communiqué au chef de département dont relève le coordinateur de la filière et transmis au chef de l'établissement en vue de le porter à la connaissance des étudiants. |
+
+| Attestation | RG16 |
+| Un étudiant n'ayant pas validé une année, et ayant utilisé l'année de réserve sans la valider, n'a plus le droit de se réinscrire dans une filière du cycle Ingénieur de l'établissement et reçoit une attestation faisant état des années et des modules validés. |
+
+de l'Ecole Nationale de l'Intelligence Artificielle et du Digital de Berkane
+I. Condition générale
+Article 1 : Le présent règlement intérieur de l'ENIAD Berkane est établi et approuvé par le conseil d'établissement.
+Article 2 : Le conseil d'établissement est le seul habilité à faire des modifications du présent règlement chaque fois qu'il est nécessaire.
+Article 3 : Ce règlement concerne les obligations, les procédures, et le comportement au sein de l'école
+Article 4 : L'étudiant en signant ce règlement est tenu de le respecter.
+II. Admission à l'école
+Article 5 : L'inscription en troisième année de l'ENIAD Berkane est ouverte aux candidats titulaires du DUT/DEUST et DEUG ou une licence (Pro/fondamentale/Sciences et techniques).
+Cette inscription est subordonnée à une procédure de sélection dont les modalités sont fixées par le ministère de tutelle.
+Article 6 : Une police d'assurance annuelle est obligatoire pour une inscription ou une reinscription à l'école.
+Article 7 : Les étudiants majeurs sont les seuls interlocuteurs de l'administration et des équipes pédagogiques à l'exclusion de tout tiers tel que parent ou ami.
+III. Absence, retard et discipline
+Article 8 : L'assiduité à toutes les activités pédagogiques organisées dans le cadre de la formation est obligatoire.
+Article 9 : Les étudiants sont tenus de respecter l'emploi du temps et la répartition des groupes.
+Article 9bis : Les téléphones portables doivent être éteints durant les activités pédagogiques. Tout étudiant ne respectant pas cette directive sera exclu de l'activité en cours par l'enseignant.
+Article 10 : Tout cumul d'un nombre d'absences injustifiées d'un total de 7h30min est sanctionné par un jour d'exclusion de l'école et de trois jours pour une absence répétée. Si l'étudiant récidive, il passera au conseil de discipline.
+Article 11 : Toute absence doit donner lieu à la remise d'un justificatif à la scolarité dans les 48 heures qui suivent l'absence.
+Article 12 : Un nombre d'absences consécutives justifiées ou non, de plus de 3 semaines ouvrables pendant le cycle de formation est considéré par le conseil pédagogique comme incompatible avec l'acquisition des connaissances et des compétences requises. Toutefois, le conseil se réserve le droit de se prononcer sur chaque cas considéré individuellement.
+Article 13 : Tout étudiant exclu d'une activité pédagogique pour manquement à la discipline ou pour retard sera considéré comme absent injustifié à cette activité.
+Article 14 : Les étudiants sont tenus de respecter : - les enseignants, le personnel administratif et leurs collègues (étudiants), - les locaux et les espaces de l'école, - les constantes et le système de valeurs de notre pays. Sera sanctionné tout acte d'indiscipline portant atteinte aux personnes, aux locaux ou à la patrie, de manière directe (insultes, menaces, violences, agressions, vandalismes ...) ou de manière indirecte (par téléphone, médias sociaux (facebook, X, instagram, youtube, whatsapp, skype, ...). L'étudiant responsable de cet acte et ses complices seront traduits devant le conseil de discipline pour décider de la sanction adéquate.
+Article 14bis : Les étudiants doivent porter une tenue vestimentaire appropriée à l'école, aux visites et aux stages en entreprise.
+Article 15 : Lors des visites et des stages en entreprise, les étudiants doivent se conformer aux statuts et règlements en vigueur dans ces établissements.
+IV. Contrôle et examens
+Article 16 : La notion de contrôle continu est étroitement liée à la notion d'assiduité; En conséquence. Toute absence injustifiée de 3 séances dans une matière entraîne l'interdiction de participer au prochain contrôle dans cette matière, dans ce cas la note zéro (0) est attribuée automatiquement.
+Article 17: Toute absence individuelle ou collective non justifiée aux devoirs surveillés, contrôles et examens entraîne l'attribution de la note zéro (0). Pour les étudiants qui auront dûment justifié cette absence auprès de l'enseignant et de la scolarité, un contrôle de remplacement écrit ou oral pourra être organisé par le professeur. L'étudiant devra contacter l'enseignant le plus rapidement possible dans un délai maximum d'une semaine après le jour de sa rentrée, afin de justifier son absence et de fixer une date pour le contrôle de remplacement (séparé du rattrapage). Dans le cas contraire : (si l'étudiant ne se présente pas au nouveau contrôle de remplacement) la note zéro est définitive.
+Article 18 : lors d'une évaluation, l'étudiant ne pourra quitter la salle qu'après un délai minimum de 30 minutes après le début de l'épreuve. De même, tout étudiant ayant un retard de 15 minutes lors du contrôle ne sera pas autorisé à rentrer dans la salle. Le retard d'un étudiant ne peut conduire à une prolongation de la durée d'épreuve.
+Article 19: L'usage de tout document est interdit sauf autorisation donnée par l'enseignant responsable de l'épreuve.
+Article 20: Toute fraude ou tentative de fraude fera l'objet d'une procédure disciplinaire.
+Article 21: Toute copie non rendue entraîne la note zéro.
+Article 22: Lors de l'épreuve, le prêt des calculatrices et du matériel pour écrire et dessiner est interdit.
+Article 23 : Lors de l'épreuve, les téléphones portables doivent être éteints.
+Article 24 : La répartition des étudiants dans la salle d'examen est du ressort de l'enseignant et des surveillants.
+Article 25: Les contrôles de classe peuvent être faits à tout moment sans préavis.
+V. DISPOSITIONS PARTICULIÈRES
+Article 26 : L'accès à l'école
+L'accès de toute personne étrangère à l'école sans motif est interdit.
+Article 27 : L'usage des locaux pédagogique
+L'accès à tous les locaux pédagogiques est strictement interdit aux étudiants en dehors des séquences pédagogiques. En aucun cas, les étudiants ne pourront rester dans les locaux après l'heure normale de fermeture sauf dérogation accordée par la direction.
+Article 28 : Utilisation des matériels et logiciels informatiques :
+Les étudiants ont le droit d'accéder et de circuler sur le réseau internet. Mais toute utilisation de ce réseau qui ne respecterait pas l'objectif pédagogique fixé par les départements, serait suivie de sanctions pouvant aller jusqu'au passage devant le conseil disciplinaire de l'école. D'autre part, l'utilisation des ordinateurs portables et tout autre équipement numérique, y compris téléphones portables et tablettes, en cours, en travaux dirigés et en travaux pratiques devra être préalablement autorisée par l'enseignant.
+Article 29: Diffusion des travaux pédagogiques :
+La diffusion vers l'extérieur, par exemple mise en ligne sur Internet, des travaux pédagogiques réalisés dans le cadre de la formation (travaux pratiques, travaux personnels à rendre, projets) devra être autorisée par le(s) enseignant(s) encadrant ces travaux. Sont concernés tous les types de documents, dont imprimés, audio et audiovisuels.(loi 08-09 pour la protection des données à caractère personnel)
+Article 30: Utilisation du logo institutionnel
+L'utilisation du logo de l'ENIAD Berkane est soumise à des règles strictes. Les étudiants ayant l'intention de l'utiliser sur un moyen de communication de tout type (affiche, message electronique par exemple, utilisation sur facebook, youtube, twitter, instagram, whatsapp) doivent en demander l'autorisation de la Direction.
+Article 31: L'usage de la bibliothèque
+L'usage de la bibliothèque est soumis à une réglementation qui peut être consultée auprès de la direction de l'école.
+Article 32: L'usage des locaux sociaux
+Les locaux sociaux sont soumis aux horaires fixés par la direction et ne peuvent être utilisés pour des réunions de tout genre, ou toute autre activité en contradiction avec le réglement intérieur de l'établissement.
+Article 33: Le bizutage
+Le bizutage est strictement interdit.
+Article 34: L'affichage
+Tout affichage de tout genre est interdit s'il n'est pas autorisé par la direction.
+Article 35: Réunions, assemblées et activités para universitaire
+Toute réunion, assemblée ou activité doit faire l'objet d'une autorisation écrite sur la base d'une demande écrite déposée auprès de la direction auparavant.
+Article 36 : Il est strictement interdit de fumer dans les locaux de l'ENIAD Berkane (Dahir n° 1-91-112 du 27 moharrem 1416 (26 juin 1995) portant promulgation de la loi n° 15-91 relative à l'interdiction de fumer). La propreté et le bon état des locaux est l'affaire de tous et doivent être respectés. Toute dégradation des locaux et du matériel entraînera des poursuites à l'encontre de celui ou celle qui en est la cause.
+Article 36 bis : Toute utilisation et ou détention des produits (cigarette électronique, stupéfiants, alcool, psychotropes, ...) fera l'objet d'une sanction disciplinaire majeure et d'une poursuite judiciaire.
+Article 37 : Au-delà des obligations réglementaires, une tenue appropriée, le respect des horaires, le respect des personnels enseignants et administratifs, et des étudiants sont non seulement des éléments de savoir-vivre, mais également l'insertion professionnelle et sociale.
+
+Je soussigné M., Mlle CIN
+inscrit(e) en année, filière déclare avoir pris connaissance du règlement intérieur de l'école et m'engage à le respecter.
+Berkane, le Signature : Lu et approuvé

@@ -2,6 +2,7 @@ import axios from 'axios';
 import { API_URL } from '../constants/config';
 import staticSuggestionsService from '../services/staticSuggestionsService';
 import ragApiService from '../services/ragApiService';
+import realRagService from '../services/realRagService';
 import speechService from '../services/speechService';
 import smaService from '../services/smaService';
 import translationService from '../services/translationService';
@@ -270,17 +271,14 @@ export const createChatHandlers = (
           smaResultsCount: smaResults?.results?.length || 0
         });
 
-        // Query your custom Llama3 model
-        const ragResponse = await ragApiService.query({
-          query: truncatedQuery, // Use truncated query for cost optimization
-          language: currentLanguage,
-          userId: user?.uid,
-          context,
-          options: {
-            chatId: currentChatId,
-            smaResults: smaResults // Pass translated SMA results to the model
-          }
-        });
+        // Use REAL RAG backend instead of fake API
+        console.log('🤖 Using REAL RAG backend on port 5000');
+        const realRagService = (await import('../services/realRagService.js')).default;
+
+        const ragResponse = await realRagService.generateAnswerWithBackend(
+          truncatedQuery,
+          currentLanguage
+        );
 
         // Combine RAG sources with SMA sources
         const combinedSources = [
@@ -288,16 +286,20 @@ export const createChatHandlers = (
           ...(smaResults?.sources || [])
         ];
 
+        // Handle REAL RAG response format
         botMessage = {
           role: 'assistant',
-          content: ragResponse.content,
-          id: ragResponse.id,
+          content: ragResponse.answer || ragResponse.content || 'Désolé, je n\'ai pas pu générer une réponse.',
+          id: Date.now().toString(),
           chatId: currentChatId,
           timestamp: new Date().toISOString(),
-          sources: combinedSources,
-          confidence: ragResponse.confidence,
+          userId: user?.uid,
+          model: 'RAG + Ollama (Real Backend)',
+          sources: ragResponse.sources || [],
           metadata: {
             ...ragResponse.metadata,
+            realRagUsed: true,
+            backend: 'localhost:5000',
             smaEnhanced: !!smaResults,
             smaResultsCount: smaResults?.total_found || 0
           },
@@ -314,7 +316,50 @@ export const createChatHandlers = (
         // Model selection logic
         console.log(`🤖 Using selected model: ${selectedModel}`);
 
-        if (selectedModel === 'llama') {
+        if (selectedModel === 'rag') {
+          // Use RAG + Local Model
+          console.log('📚 Using RAG + Local Model - ENIAD knowledge base');
+
+          try {
+            // Use the real RAG service
+            const ragResponse = await realRagService.generateAnswer(correctedInput, currentLanguage);
+
+            if (ragResponse.success) {
+              botMessage = {
+                role: 'assistant',
+                content: ragResponse.answer,
+                id: Date.now().toString(),
+                chatId: currentChatId,
+                timestamp: new Date().toISOString(),
+                sources: ragResponse.sources || [],
+                confidence: ragResponse.metadata?.confidence || 0.9,
+                metadata: {
+                  ...ragResponse.metadata,
+                  model: ragResponse.metadata?.model || 'rag-local',
+                  provider: ragResponse.metadata?.provider || 'eniad-rag',
+                  smaEnhanced: !!smaResults,
+                  smaResultsCount: smaResults?.total_found || 0,
+                  documentsUsed: ragResponse.metadata?.documentsUsed || 0
+                },
+                smaResults: smaResults
+              };
+
+              console.log('✅ RAG response generated:', {
+                confidence: ragResponse.metadata?.confidence || 0.9,
+                sourcesCount: ragResponse.sources?.length || 0,
+                documentsUsed: ragResponse.metadata?.documentsUsed || 0,
+                backend: ragResponse.metadata?.backend || false
+              });
+            } else {
+              throw new Error('RAG service failed: ' + ragResponse.answer);
+            }
+
+          } catch (ragError) {
+            console.warn('⚠️ RAG model failed, falling back to Gemini:', ragError.message);
+            // Fall back to Gemini if RAG fails
+            selectedModel = 'gemini';
+          }
+        } else if (selectedModel === 'llama') {
           // Use Llama model (your project model)
           console.log('🦙 Using Llama model - Custom ENIAD project model');
 

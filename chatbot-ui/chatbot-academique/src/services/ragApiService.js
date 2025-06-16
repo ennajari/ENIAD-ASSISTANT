@@ -12,11 +12,11 @@ class RAGApiService {
     // Enhanced API Server Configuration (Custom Model + RAG + SMA)
     this.baseURL = import.meta.env.VITE_RAG_API_BASE_URL || '/api/llama';
     this.apiKey = import.meta.env.VITE_RAG_API_KEY;
-    this.projectId = import.meta.env.VITE_RAG_PROJECT_ID || 'eniad-assistant';
+    this.projectId = import.meta.env.VITE_RAG_PROJECT_ID || 'eniadassistant';
     this.timeout = 60000; // 60 seconds timeout for model inference
 
-    // RAG System Configuration (for direct monitoring)
-    this.ragSystemURL = import.meta.env.VITE_RAG_SYSTEM_BASE_URL || '/api/rag';
+    // RAG System Configuration (for direct monitoring) - CORRECTED TO PORT 5000
+    this.ragSystemURL = import.meta.env.VITE_RAG_SYSTEM_BASE_URL || 'http://localhost:5000';
 
     // Error logging throttling
     this.lastErrorLogged = 0;
@@ -151,7 +151,7 @@ class RAGApiService {
 
   /**
    * Search documents using your RAG system
-   * Uses your endpoint: /api/v1/nlp/index/search/{project_id}
+   * Uses your endpoint: /search/{project_id}
    * @param {string} query - Search query
    * @param {string} language - Language code
    * @param {number} limit - Number of results
@@ -163,19 +163,20 @@ class RAGApiService {
       const pid = projectId || this.projectId;
 
       const payload = {
-        text: query.trim(),
-        limit: limit
+        query: query.trim(),
+        llm_type: "ollama",
+        mode: "hybrid"
       };
 
       console.log('🔍 Searching documents in your RAG system:', {
-        endpoint: `/api/v1/nlp/index/search/${pid}`,
+        endpoint: `/search/${pid}`,
         query: query.substring(0, 50) + '...',
         limit
       });
 
-      const response = await this.api.post(`/api/v1/nlp/index/search/${pid}`, payload);
+      const response = await this.ragApi.post(`/search/${pid}`, payload);
 
-      if (response.data.signal === 'VECTORDB_SEARCH_SUCCESS') {
+      if (response.data.signal === 'vectordb_search_success') {
         return response.data.results || [];
       } else {
         console.warn('⚠️ Search returned non-success signal:', response.data.signal);
@@ -189,7 +190,7 @@ class RAGApiService {
 
   /**
    * Get project index information from RAG system
-   * Uses RAG system endpoint: /api/v1/nlp/index/info/{project_id}
+   * Uses RAG system endpoint: /status (simplified)
    * @param {string} projectId - Project ID
    * @returns {Promise<Object>} Index information
    */
@@ -198,23 +199,27 @@ class RAGApiService {
       const pid = projectId || this.projectId;
 
       console.log('📊 Getting project info from RAG system:', {
-        endpoint: `/api/v1/nlp/index/info/${pid}`,
+        endpoint: `/status`,
         ragSystemURL: this.ragSystemURL
       });
 
-      const response = await this.ragApi.get(`/api/v1/nlp/index/info/${pid}`);
+      const response = await this.ragApi.get(`/status`);
 
-      if (response.data.signal === 'VECTORDB_COLLECTION_RETRIEVED') {
+      if (response.data && response.data.status === 'operational') {
         return {
           status: 'success',
-          info: response.data.collection_info,
+          info: {
+            projects: response.data.projects || [],
+            total_files: response.data.total_files || 0,
+            total_chunks: response.data.total_chunks || 0
+          },
           projectId: pid
         };
       } else {
-        console.warn('⚠️ Project info returned non-success signal:', response.data.signal);
+        console.warn('⚠️ Project info returned non-operational status:', response.data);
         return {
           status: 'error',
-          message: 'Failed to retrieve project info'
+          message: 'RAG system not operational'
         };
       }
     } catch (error) {
@@ -241,33 +246,22 @@ class RAGApiService {
           error: 'RAG system URL not configured',
           projectId: this.projectId,
           baseURL: this.ragSystemURL || 'Not configured',
-          message: 'Please set VITE_RAG_SYSTEM_BASE_URL=http://localhost:8000 in your .env file'
+          message: 'Please set VITE_RAG_SYSTEM_BASE_URL=http://localhost:5000/api/v1 in your .env file'
         };
       }
 
-      // Try to check RAG system health
-      const response = await this.ragApi.get('/health');
+      // Try to check RAG system health using the correct endpoint
+      const response = await this.ragApi.get('/status');
 
       if (response.status === 200 && response.data) {
-        // Also try to get collection info
-        try {
-          const infoResponse = await this.ragApi.get(`/api/v1/nlp/index/info/${this.projectId}`);
-          return {
-            status: 'healthy',
-            projectId: this.projectId,
-            baseURL: this.ragSystemURL,
-            info: infoResponse.data,
-            message: 'RAG system is operational'
-          };
-        } catch (infoError) {
-          return {
-            status: 'healthy',
-            projectId: this.projectId,
-            baseURL: this.ragSystemURL,
-            message: 'RAG system is running but collection info unavailable',
-            warning: infoError.message
-          };
-        }
+        // RAG system is responding, mark as healthy
+        return {
+          status: 'healthy',
+          projectId: this.projectId,
+          baseURL: this.ragSystemURL,
+          info: response.data,
+          message: 'RAG system is operational and responding correctly'
+        };
       } else {
         return {
           status: 'unhealthy',

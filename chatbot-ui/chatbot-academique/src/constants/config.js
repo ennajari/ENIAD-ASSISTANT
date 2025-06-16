@@ -103,7 +103,17 @@ export const translations = {
     modelSelector: "Sélecteur de Modèle IA",
     geminiModel: "Gemini API",
     llamaModel: "Llama (Notre Projet)",
+    ragModel: "RAG + Modèle Local",
     modelDescription: "Choisissez le modèle d'IA pour générer les réponses",
+
+    // RAG Status Messages
+    ragConnected: "Système RAG connecté",
+    ragDisconnected: "Système RAG déconnecté",
+    ragHealthy: "Système RAG en ligne",
+    ragUnhealthy: "Problèmes système RAG",
+    ragError: "Erreur système RAG",
+    ragUnknown: "Statut RAG inconnu",
+    ragWorking: "Système RAG opérationnel",
   },
 
   ar: {
@@ -200,6 +210,16 @@ export const translations = {
     modelSelector: "منتقي نموذج الذكاء الاصطناعي",
     geminiModel: "جيميني API",
     llamaModel: "لاما (مشروعنا)",
+    ragModel: "RAG + نموذج محلي",
     modelDescription: "اختر نموذج الذكاء الاصطناعي لتوليد الإجابات",
+
+    // RAG Status Messages
+    ragConnected: "نظام RAG متصل",
+    ragDisconnected: "نظام RAG غير متصل",
+    ragHealthy: "نظام RAG يعمل بشكل طبيعي",
+    ragUnhealthy: "مشاكل في نظام RAG",
+    ragError: "خطأ في نظام RAG",
+    ragUnknown: "حالة RAG غير معروفة",
+    ragWorking: "نظام RAG يعمل",
   }
 };
