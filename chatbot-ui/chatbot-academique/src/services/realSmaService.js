@@ -54,8 +54,13 @@ class RealSmaService {
         return await this.executeWithBackend(query, options);
       }
 
-      // Otherwise, use local simulation with real AI
-      return await this.executeWithLocalSimulation(query, options);
+      // NO FAKE SIMULATION - Only real SMA backend
+      console.error('❌ SMA backend not available and no fake simulation allowed');
+      return {
+        success: false,
+        error: 'SMA backend required - no fake simulation',
+        agents: this.agents
+      };
 
     } catch (error) {
       console.error('❌ Error executing SMA workflow:', error);
@@ -161,15 +166,26 @@ class RealSmaService {
         console.error('❌ Fallback search also failed:', fallbackError);
       }
 
-      // Final fallback to local simulation
-      return await this.executeWithLocalSimulation(query, options);
+      // NO FAKE SIMULATION - Return error
+      console.error('❌ All SMA backends failed - no fake simulation allowed');
+      return {
+        success: false,
+        error: 'SMA backend required - no fake simulation',
+        agents: this.agents
+      };
     }
   }
 
   /**
-   * Execute workflow using local simulation with real AI
+   * REMOVED - No fake simulation allowed
    */
   async executeWithLocalSimulation(query, options) {
+    console.error('🚫 FAKE SIMULATION REMOVED - Use only real SMA backend');
+    return {
+      success: false,
+      error: 'Fake simulation removed - use real SMA backend only',
+      agents: this.agents
+    };
     try {
       const { language = 'fr', includeTranslation = true } = options;
       const startTime = Date.now();
@@ -177,7 +193,7 @@ class RealSmaService {
       // Step 1: Web Scraper Agent
       console.log('🕷️ Step 1: Web Scraper Agent');
       this.agents.webScraper.status = 'running';
-      const scrapedData = await this.simulateWebScraping(query);
+      const scrapedData = []; // No fake scraping
       this.agents.webScraper.status = 'completed';
       this.agents.webScraper.lastRun = new Date().toISOString();
       this.agents.webScraper.results = scrapedData;
@@ -238,66 +254,11 @@ class RealSmaService {
   }
 
   /**
-   * Simulate web scraping with realistic ENIAD/UMP data
+   * REMOVED - No fake web scraping simulation
    */
   async simulateWebScraping(query) {
-    try {
-      // Simulate realistic web scraping results
-      const mockScrapedData = [
-        {
-          url: 'https://eniad.ump.ma/fr/actualites/nouvelle-formation-ia',
-          title: 'Nouvelle formation en Intelligence Artificielle à ENIAD',
-          content: `ENIAD lance une nouvelle formation spécialisée en Intelligence Artificielle appliquée à l'éducation. Cette formation de 2 ans prépare les étudiants aux métiers émergents de l'IA dans le secteur éducatif. Le programme inclut des modules sur l'apprentissage automatique, le traitement du langage naturel, et l'éthique de l'IA.`,
-          timestamp: new Date().toISOString(),
-          language: 'fr',
-          category: 'news'
-        },
-        {
-          url: 'https://eniad.ump.ma/fr/recherche/projets-ia',
-          title: 'Projets de recherche en IA - ENIAD',
-          content: `Les équipes de recherche d'ENIAD travaillent sur plusieurs projets innovants : développement d'assistants pédagogiques intelligents, analyse automatique de performances d'apprentissage, et création de contenus éducatifs adaptatifs. Ces projets sont financés par des partenaires nationaux et internationaux.`,
-          timestamp: new Date().toISOString(),
-          language: 'fr',
-          category: 'research'
-        },
-        {
-          url: 'https://www.ump.ma/actualites/partenariat-eniad',
-          title: 'Partenariat UMP-ENIAD pour l\'innovation pédagogique',
-          content: `L'Université Mohammed Premier et ENIAD signent un accord de partenariat pour développer des solutions d'IA appliquées à l'enseignement supérieur. Ce partenariat vise à créer des outils d'aide à la décision pour les étudiants et les enseignants.`,
-          timestamp: new Date().toISOString(),
-          language: 'fr',
-          category: 'news'
-        },
-        {
-          url: 'https://eniad.ump.ma/fr/evenements/conference-ia-2024',
-          title: 'Conférence Internationale IA & Éducation 2024',
-          content: `ENIAD organise sa conférence annuelle sur l'Intelligence Artificielle et l'Éducation du 15 au 17 mai 2024. L'événement rassemblera des experts internationaux pour discuter des dernières avancées en IA éducative. Inscription ouverte jusqu'au 30 avril.`,
-          timestamp: new Date().toISOString(),
-          language: 'fr',
-          category: 'events'
-        }
-      ];
-
-      // Filter based on query relevance
-      const relevantData = mockScrapedData.filter(item => {
-        const queryLower = query.toLowerCase();
-        const titleLower = item.title.toLowerCase();
-        const contentLower = item.content.toLowerCase();
-        
-        return titleLower.includes(queryLower) || 
-               contentLower.includes(queryLower) ||
-               queryLower.split(' ').some(word => 
-                 titleLower.includes(word) || contentLower.includes(word)
-               );
-      });
-
-      console.log(`🕷️ Web scraper found ${relevantData.length} relevant documents`);
-      return relevantData.length > 0 ? relevantData : mockScrapedData.slice(0, 2);
-
-    } catch (error) {
-      console.error('❌ Error in web scraping simulation:', error);
-      return [];
-    }
+    console.error('🚫 FAKE WEB SCRAPING REMOVED - Use only real SMA backend');
+    return [];
   }
 
   /**

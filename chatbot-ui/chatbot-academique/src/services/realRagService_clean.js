@@ -107,18 +107,18 @@ class RealRagService {
   }
 
   /**
-   * Generate answer using ONLY real RAG backend with LLM choice
+   * Generate answer using ONLY real RAG backend
    */
-  async generateAnswerWithBackend(query, language = 'fr', llmType = 'ollama') {
+  async generateAnswerWithBackend(query, language = 'fr') {
     try {
-      console.log(`🤖 Generating RAG answer with backend (${llmType}) for: "${query}"`);
+      console.log(`🤖 Generating RAG answer with backend for: "${query}"`);
 
       const response = await axios.post(`${this.ragApiUrl}/answer/${this.projectId}`, {
         query: query,
-        llm_type: llmType, // "ollama" or "modal"
+        llm_type: "ollama",
         mode: "hybrid",
         return_prompt: false
-      }, { timeout: 60000 }); // Increased timeout for Modal API
+      }, { timeout: 30000 });
 
       if (response.data.signal === 'rag_answer_success') {
         return {
@@ -126,9 +126,8 @@ class RealRagService {
           answer: response.data.answer,
           sources: response.data.chat_history || [],
           metadata: {
-            model: llmType === 'modal' ? 'RAG + Modal API (Custom)' : 'RAG + Ollama',
-            documentsUsed: response.data.context_chunks || 0,
-            llm_used: response.data.llm_used || llmType,
+            model: 'RAG + Ollama',
+            documentsUsed: response.data.chat_history?.length || 0,
             backend: true
           }
         };
@@ -136,7 +135,7 @@ class RealRagService {
         throw new Error('RAG answer failed: ' + response.data.signal);
       }
     } catch (error) {
-      console.error(`❌ RAG backend answer failed (${llmType}):`, error);
+      console.error('❌ RAG backend answer failed:', error);
       return {
         success: false,
         error: error.message,
