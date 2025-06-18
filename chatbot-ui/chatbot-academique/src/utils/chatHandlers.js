@@ -11,6 +11,7 @@ import firebaseStorageService from '../services/firebaseStorageService';
 import conversationStateManager from '../services/conversationStateManager';
 import geminiService from '../services/geminiService';
 import coordinationService from '../services/coordinationService';
+import modalService from '../services/modalService';
 
 export const createChatHandlers = (
   chatState,
@@ -362,79 +363,121 @@ export const createChatHandlers = (
             };
           }
         } else if (selectedModel === 'llama') {
-          // Use Llama model (your project model)
-          console.log('🦙 Using Llama model - Custom ENIAD project model');
+          // Use Notre Projet model with RAG + SMA support
+          console.log('🚀 Using Notre Projet model - Custom ENIAD with RAG + SMA support');
+          console.log('💰 Testing disabled - paid service');
 
           try {
-            // Prepare context from recent messages (limited for cost optimization)
-            const context = messages.slice(-5).map(msg => ({
-              role: msg.role,
-              content: msg.content.length > 200 ? msg.content.substring(0, 200) + '...' : msg.content,
-              timestamp: msg.timestamp
-            }));
+            let modalResponse;
 
-            // Smart context truncation for cost optimization
-            const truncatedQuery = correctedInput.length > 500
-              ? correctedInput.substring(0, 500) + '...'
-              : correctedInput;
+            // Check if SMA is active and we have SMA results
+            if (isSMAActive && smaResults && smaResults.results && smaResults.results.length > 0) {
+              console.log('🔄 Using Notre Projet with Combined SMA+RAG approach');
 
-            console.log('💰 Cost optimization applied for Llama model:', {
-              originalQueryLength: correctedInput.length,
-              truncatedQueryLength: truncatedQuery.length,
-              contextMessages: context.length,
-              smaResultsCount: smaResults?.results?.length || 0
-            });
+              // Get RAG context first
+              const ragContext = await realRagService.searchDocuments(correctedInput, currentLanguage);
+              const contextText = ragContext.success && ragContext.results.length > 0
+                ? ragContext.results.map(doc => doc.text).join('\n\n')
+                : '';
 
-            // Query your custom Llama3 model
-            const ragResponse = await ragApiService.query({
-              query: truncatedQuery,
-              language: currentLanguage,
-              userId: user?.uid,
-              context,
-              options: {
+              // Use Modal for combined SMA+RAG
+              modalResponse = await modalService.generateCombinedResponse(
+                correctedInput,
+                contextText,
+                smaResults,
+                currentLanguage
+              );
+            } else {
+              console.log('📚 Using Notre Projet with RAG only');
+
+              // Get RAG context
+              const ragContext = await realRagService.searchDocuments(correctedInput, currentLanguage);
+              const contextText = ragContext.success && ragContext.results.length > 0
+                ? ragContext.results.map(doc => doc.text).join('\n\n')
+                : '';
+
+              // Use Modal for RAG only
+              modalResponse = await modalService.generateRAGResponse(
+                correctedInput,
+                contextText,
+                currentLanguage
+              );
+            }
+
+            if (modalResponse.success) {
+              botMessage = {
+                role: 'assistant',
+                content: modalResponse.answer,
+                id: Date.now().toString(),
                 chatId: currentChatId,
+                timestamp: new Date().toISOString(),
+                sources: modalResponse.sources || [],
+                confidence: modalResponse.metadata?.confidence || 0.9,
+                metadata: {
+                  ...modalResponse.metadata,
+                  model: 'notre-projet',
+                  provider: 'modal-llama3-custom',
+                  smaEnhanced: !!(isSMAActive && smaResults),
+                  smaResultsCount: smaResults?.total_found || 0,
+                  usage: modalResponse.metadata?.usage,
+                  structured_response: modalResponse.metadata?.structured_response,
+                  intent: modalResponse.metadata?.intent
+                },
                 smaResults: smaResults
-              }
-            });
+              };
 
-            // Combine RAG sources with SMA sources
-            const combinedSources = [
-              ...(ragResponse.sources || []),
-              ...(smaResults?.sources || [])
-            ];
-
-            botMessage = {
-              role: 'assistant',
-              content: ragResponse.content,
-              id: ragResponse.id,
-              chatId: currentChatId,
-              timestamp: new Date().toISOString(),
-              sources: combinedSources,
-              confidence: ragResponse.confidence,
-              metadata: {
-                ...ragResponse.metadata,
-                model: 'llama3-eniad',
-                provider: 'custom-project',
-                smaEnhanced: !!smaResults,
-                smaResultsCount: smaResults?.total_found || 0
-              },
-              smaResults: smaResults
-            };
-
-            console.log('✅ Llama model response generated:', {
-              confidence: ragResponse.confidence,
-              sourcesCount: ragResponse.sources?.length || 0,
-              tokensUsed: ragResponse.tokens_used
-            });
+              console.log('✅ Notre Projet response generated:', {
+                confidence: modalResponse.metadata?.confidence || 0.9,
+                sourcesCount: modalResponse.sources?.length || 0,
+                approach: modalResponse.metadata?.combined_approach ? 'SMA+RAG' : 'RAG-only',
+                structured: modalResponse.metadata?.structured_response,
+                intent: modalResponse.metadata?.intent,
+                usage: modalResponse.metadata?.usage
+              });
+            } else {
+              throw new Error('Notre Projet service failed: ' + modalResponse.error);
+            }
 
           } catch (llamaError) {
-            console.warn('⚠️ Llama model failed, falling back to Gemini:', llamaError.message);
-            // Fall back to Gemini if Llama fails
-            // selectedModel = 'gemini'; // Cannot reassign const, will be handled below
+            console.warn('⚠️ Notre Projet model failed, falling back to coordination service:', llamaError.message);
+
+            // Fallback to coordination service
+            try {
+              const fallbackResponse = await coordinationService.routeRequest('rag', correctedInput, currentLanguage, {
+                smaResults: smaResults,
+                isSMAActive: isSMAActive
+              });
+
+              if (fallbackResponse.success) {
+                botMessage = {
+                  role: 'assistant',
+                  content: fallbackResponse.answer,
+                  id: Date.now().toString(),
+                  chatId: currentChatId,
+                  timestamp: new Date().toISOString(),
+                  sources: fallbackResponse.sources || [],
+                  confidence: fallbackResponse.metadata?.confidence || 0.8,
+                  metadata: {
+                    ...fallbackResponse.metadata,
+                    model: 'notre-projet-fallback',
+                    provider: 'coordination-fallback',
+                    modal_attempted: true,
+                    modal_failed: true,
+                    fallback_used: true
+                  },
+                  smaResults: smaResults
+                };
+              } else {
+                throw new Error('Fallback also failed');
+              }
+            } catch (fallbackError) {
+              console.error('❌ Both Notre Projet and fallback failed:', fallbackError.message);
+              // Will be handled by emergency fallback
+            }
           }
         }
 
-        if (selectedModel === 'gemini' || !botMessage) {
+        if (selectedModel === 'gemini' || (!botMessage && selectedModel !== 'rag' && selectedModel !== 'llama')) {
           // Use SMA + Gemini via Coordination Service
           console.log('✨ Using SMA + Gemini via Coordination Service');
           console.log('🚫 NO Ollama for SMA - Gemini exclusive for SMA');

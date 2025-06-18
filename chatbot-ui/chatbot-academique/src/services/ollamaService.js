@@ -11,15 +11,18 @@ class OllamaService {
   constructor() {
     this.baseUrl = 'http://localhost:11434';
     this.isAvailable = false;
-    this.generationModel = 'llama3.2:1b'; // Génération de texte
+    this.generationModel = 'llama3:8b-instruct-q4_K_M'; // Optimized for RTX 4060
+    this.fallbackModel = 'llama3.2:1b'; // Fallback if 8B not available
     this.embeddingModel = 'nomic-embed-text'; // Embeddings (768 dimensions)
     this.ollamaPath = 'C:\\Users\\ROG FLOW\\AppData\\Local\\Programs\\Ollama\\ollama.exe';
     this.checkAvailability();
 
-    console.log('🦙 Ollama Service initialized for RAG ONLY (NO Gemini):', {
+    console.log('🦙 Ollama Service initialized for RAG ONLY (NO Gemini) - RTX 4060 Optimized:', {
       generation: this.generationModel,
+      fallback: this.fallbackModel,
       embedding: this.embeddingModel,
-      purpose: 'RAG EXCLUSIVELY'
+      purpose: 'RAG EXCLUSIVELY',
+      gpu_optimized: 'RTX 4060'
     });
   }
 
@@ -31,17 +34,57 @@ class OllamaService {
       const response = await axios.get(`${this.baseUrl}/api/tags`, { timeout: 5000 });
       this.isAvailable = response.status === 200;
       console.log('✅ Ollama is available');
-      
+
       // Vérifier les modèles installés
       const models = response.data.models || [];
       console.log('📚 Modèles disponibles:', models.map(m => m.name));
-      
+
+      // Auto-detect best available model
+      const availableModels = models.map(m => m.name);
+      const bestModel = this.selectBestModel(availableModels);
+
+      if (bestModel !== this.generationModel) {
+        console.log(`🔄 Switching to better model: ${bestModel}`);
+        this.generationModel = bestModel;
+      }
+
       return true;
     } catch (error) {
       this.isAvailable = false;
       console.log('⚠️ Ollama not available:', error.message);
       return false;
     }
+  }
+
+  /**
+   * Sélectionner le meilleur modèle disponible pour RTX 4060
+   */
+  selectBestModel(availableModels) {
+    // Priority order optimized for RTX 4060: 8B > 7B > 3B > 1B
+    const modelPriority = [
+      'llama3:8b-instruct-q4_K_M',
+      'llama3:8b-instruct',
+      'llama3:8b',
+      'mistral:7b-instruct',
+      'llama3.2:3b-instruct-q4_K_M',
+      'llama3.2:3b',
+      'llama3.2:1b',
+      'llama3.2'
+    ];
+
+    for (const preferredModel of modelPriority) {
+      const found = availableModels.find(model =>
+        model.includes(preferredModel) || model.startsWith(preferredModel.split(':')[0])
+      );
+      if (found) {
+        console.log(`🎯 Best model detected: ${found} (optimized for RTX 4060)`);
+        return found;
+      }
+    }
+
+    // Fallback to first available model
+    console.log(`⚠️ Using fallback model: ${availableModels[0] || this.fallbackModel}`);
+    return availableModels[0] || this.fallbackModel;
   }
 
   /**
