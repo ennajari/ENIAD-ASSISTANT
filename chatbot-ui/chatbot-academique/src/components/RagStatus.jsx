@@ -25,7 +25,7 @@ import {
   ExpandMore as ExpandIcon,
   ExpandLess as CollapseIcon
 } from '@mui/icons-material';
-import ragApiService from '../services/ragApiService';
+import realRagService from '../services/realRagService';
 import { useLanguage } from '../contexts/LanguageContext';
 import { translations } from '../constants/config';
 
@@ -41,18 +41,44 @@ const RagStatus = ({ darkMode = false }) => {
   const checkRagStatus = async () => {
     setLoading(true);
     try {
-      console.log('🔍 Checking RAG system status...');
-      const healthStatus = await ragApiService.getHealthStatus();
-      setStatus(healthStatus);
+      console.log('🔍 Checking Real RAG system status...');
+
+      // Test connection first
+      const connectionTest = await realRagService.testConnection();
+
+      if (connectionTest.success) {
+        // Get detailed status
+        const detailedStatus = await realRagService.getStatus();
+        const collectionInfo = await realRagService.getCollectionInfo();
+
+        setStatus({
+          status: 'healthy',
+          connection: connectionTest,
+          systemStatus: detailedStatus,
+          collectionInfo: collectionInfo,
+          projectId: realRagService.projectId,
+          baseURL: realRagService.ragApiUrl,
+          backend: 'corrected_rag_project_8009'
+        });
+      } else {
+        setStatus({
+          status: 'unhealthy',
+          error: connectionTest.error,
+          message: connectionTest.message,
+          projectId: realRagService.projectId,
+          baseURL: realRagService.ragApiUrl
+        });
+      }
+
       setLastCheck(new Date());
-      console.log('✅ RAG status check completed:', healthStatus);
+      console.log('✅ Real RAG status check completed');
     } catch (error) {
-      console.error('❌ RAG status check failed:', error);
+      console.error('❌ Real RAG status check failed:', error);
       setStatus({
         status: 'error',
         error: error.message,
-        projectId: ragApiService.projectId,
-        baseURL: ragApiService.baseURL
+        projectId: realRagService.projectId,
+        baseURL: realRagService.ragApiUrl
       });
       setLastCheck(new Date());
     } finally {
@@ -191,7 +217,22 @@ const RagStatus = ({ darkMode = false }) => {
                 />
               </ListItem>
 
-              {status?.info && (
+              {status?.collectionInfo && (
+                <ListItem sx={{ px: 0, py: 0.5 }}>
+                  <ListItemIcon sx={{ minWidth: 32 }}>
+                    <StorageIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <Typography variant="body2" color="text.secondary">
+                        <strong>{t('documents') || 'Documents'}:</strong> {status.collectionInfo.documentsCount || 0}
+                      </Typography>
+                    }
+                  />
+                </ListItem>
+              )}
+
+              {status?.systemStatus && (
                 <ListItem sx={{ px: 0, py: 0.5 }}>
                   <ListItemIcon sx={{ minWidth: 32 }}>
                     <CheckIcon sx={{ fontSize: 16, color: 'success.main' }} />
@@ -199,7 +240,22 @@ const RagStatus = ({ darkMode = false }) => {
                   <ListItemText
                     primary={
                       <Typography variant="body2" color="text.secondary">
-                        <strong>{t('indexInfo') || 'Index Info'}:</strong> {JSON.stringify(status.info)}
+                        <strong>{t('systemStatus') || 'System'}:</strong> {status.systemStatus.status || 'Unknown'}
+                      </Typography>
+                    }
+                  />
+                </ListItem>
+              )}
+
+              {status?.backend && (
+                <ListItem sx={{ px: 0, py: 0.5 }}>
+                  <ListItemIcon sx={{ minWidth: 32 }}>
+                    <BrainIcon sx={{ fontSize: 16, color: 'primary.main' }} />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <Typography variant="body2" color="text.secondary">
+                        <strong>{t('backend') || 'Backend'}:</strong> {status.backend}
                       </Typography>
                     }
                   />
