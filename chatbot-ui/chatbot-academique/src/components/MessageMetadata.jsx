@@ -17,7 +17,6 @@ import {
   Source as SourceIcon,
   ExpandMore as ExpandIcon,
   ExpandLess as CollapseIcon,
-  Verified as VerifiedIcon,
   Speed as SpeedIcon
 } from '@mui/icons-material';
 
@@ -123,30 +122,7 @@ const MessageMetadata = ({ message, currentLanguage }) => {
           </Tooltip>
         )}
 
-        {/* Indicateur de confiance */}
-        {message.confidence && (
-          <Tooltip 
-            title={
-              isArabic 
-                ? `مستوى الثقة: ${(message.confidence * 100).toFixed(0)}%`
-                : `Niveau de confiance: ${(message.confidence * 100).toFixed(0)}%`
-            } 
-            arrow
-          >
-            <Chip
-              icon={<VerifiedIcon sx={{ fontSize: 14 }} />}
-              label={`${(message.confidence * 100).toFixed(0)}%`}
-              size="small"
-              color={message.confidence > 0.8 ? 'success' : message.confidence > 0.6 ? 'warning' : 'default'}
-              variant="outlined"
-              sx={{ 
-                fontSize: '0.75rem',
-                height: 24,
-                '& .MuiChip-icon': { fontSize: 14 }
-              }}
-            />
-          </Tooltip>
-        )}
+
 
         {/* Bouton d'expansion pour plus de détails */}
         {(sources.length > 0 || Object.keys(metadata).length > 2) && (

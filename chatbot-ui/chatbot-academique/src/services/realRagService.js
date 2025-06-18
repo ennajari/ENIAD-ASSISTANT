@@ -9,7 +9,7 @@ import ollamaService from './ollamaService.js';
 
 class RealRagService {
   constructor() {
-    this.ragApiUrl = import.meta.env.VITE_RAG_API_URL || 'http://localhost:8004';
+    this.ragApiUrl = import.meta.env.VITE_RAG_API_URL || 'http://localhost:8009';
     this.ragApiV1Url = `${this.ragApiUrl}/api/v1`;
     this.projectId = '1';  // Match RAG backend project ID
     this.isRagAvailable = false;
@@ -24,7 +24,7 @@ class RealRagService {
     console.log('🦙 Real RAG Service initialized - CONNECTING TO REAL BACKEND');
     console.log('📡 RAG API URL:', this.ragApiUrl);
     console.log('📡 RAG API V1 URL:', this.ragApiV1Url);
-    console.log('✅ Will use friend\'s RAG project with uploaded DATA files');
+    console.log('✅ Will use corrected RAG project with uploaded DATA files');
   }
 
   /**
@@ -33,16 +33,16 @@ class RealRagService {
   async testConnection() {
     try {
       console.log('🔍 Testing Real RAG backend connection...');
-      const response = await axios.get(`${this.ragApiUrl}/docs`, { timeout: 10000 });
+      const response = await axios.get(`${this.ragApiUrl}/status`, { timeout: 10000 });
       this.isRagAvailable = response.status === 200;
-      console.log('✅ Real RAG backend is available on port 8004');
-      console.log('📡 Connected to friend\'s RAG project');
-      return { success: true, message: 'Real RAG backend connected', backend: 'friend_rag_project' };
+      console.log('✅ Real RAG backend is available on port 8009');
+      console.log('📡 Connected to corrected RAG project');
+      return { success: true, message: 'Real RAG backend connected', backend: 'corrected_rag_project' };
     } catch (error) {
       this.isRagAvailable = false;
       console.log('⚠️ Real RAG backend not available - Will use fallback');
       console.log(`   Error: ${error.message}`);
-      console.log('💡 Start RAG server: cd RAG_Project/src && python -m uvicorn main:app --port 8004');
+      console.log('💡 Start RAG server: cd RAG_Project/src && python main_corrige.py');
       return { success: false, message: 'Real RAG backend required', error: error.message };
     }
   }
@@ -126,8 +126,9 @@ class RealRagService {
       console.log('📡 Calling REAL RAG backend:', `${this.ragApiV1Url}/nlp/index/answer/${this.projectId}`);
 
       const response = await axios.post(`${this.ragApiV1Url}/nlp/index/answer/${this.projectId}`, {
-        text: query,
-        limit: 5
+        query: query,
+        language: language,
+        max_results: 5
       }, {
         timeout: 60000,
         headers: {
@@ -135,26 +136,28 @@ class RealRagService {
         }
       });
 
-      if (response.data.signal === 'rag_answer_success') {
+      if (response.data && response.data.answer) {
         return {
           success: true,
           answer: response.data.answer,
-          sources: response.data.chat_history || [],
+          sources: response.data.sources || [],
           metadata: {
-            model: 'RAG + Friend\'s Project (Real)',
-            documentsUsed: response.data.chat_history?.length || 0,
+            model: 'RAG + Corrected Project (Real)',
+            documentsUsed: response.data.sources?.length || 0,
             llm_used: 'ollama',
             embedding_model: 'nomic-embed-text',
-            generation_model: 'llama3.2:1b',
-            backend: 'real_rag_server_8004',
+            generation_model: 'llama3:8b-instruct-q4_K_M',
+            backend: 'real_rag_server_8009',
             gemini_used: false,  // Explicitly no Gemini
             real_rag_used: true,
             data_files_used: true,
-            project_id: this.projectId
+            project_id: this.projectId,
+            confidence: response.data.confidence || 0.0,
+            timestamp: response.data.timestamp
           }
         };
       } else {
-        throw new Error('RAG answer failed: ' + response.data.signal);
+        throw new Error('Invalid RAG response format');
       }
     } catch (error) {
       console.error(`❌ RAG Ollama answer failed:`, error);
@@ -273,7 +276,11 @@ class RealRagService {
 
       // Try Real RAG backend first (with uploaded DATA files)
       if (this.isRagAvailable) {
-        console.log('📡 Using Real RAG backend with friend\'s project...');
+        console.log('📡 Using Real RAG backend with corrected project...');
+
+        // Initialize RAG system if needed
+        await this.initializeRAGSystem();
+
         const backendResult = await this.generateAnswerWithOllama(query, language);
 
         if (backendResult.success) {
@@ -343,9 +350,8 @@ class RealRagService {
       return {
         success: true,
         status: response.data.status,
-        projects: response.data.projects,
-        totalFiles: response.data.total_files,
-        totalChunks: response.data.total_chunks,
+        service: response.data.service,
+        initialization: response.data.initialization,
         ragAvailable: this.isRagAvailable
       };
     } catch (error) {
@@ -358,26 +364,59 @@ class RealRagService {
   }
 
   /**
-   * Upload document to RAG backend
+   * Upload and index documents from DATA folder
    */
-  async uploadDocument(file) {
+  async uploadAndIndexDocuments() {
     try {
-      const formData = new FormData();
-      formData.append('file', file);
+      console.log('📁 Uploading and indexing documents from DATA folder...');
 
       const response = await axios.post(
-        `${this.ragApiUrl}/upload/${this.projectId}`,
-        formData,
+        `${this.ragApiV1Url}/nlp/index/upload/${this.projectId}`,
+        {},
         {
-          headers: { 'Content-Type': 'multipart/form-data' },
-          timeout: 60000
+          timeout: 120000,
+          headers: { 'Content-Type': 'application/json' }
         }
       );
 
+      if (response.data) {
+        console.log('✅ Documents uploaded and indexed successfully');
+        return {
+          success: true,
+          totalProcessed: response.data.total_processed,
+          totalErrors: response.data.total_errors,
+          processedFiles: response.data.processed_files,
+          errors: response.data.errors
+        };
+      } else {
+        throw new Error('Invalid upload response');
+      }
+    } catch (error) {
+      console.error('❌ Document upload failed:', error);
       return {
-        success: response.data.signal === 'file_upload_success',
-        fileId: response.data.file_id,
-        message: response.data.message
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Get RAG collection info
+   */
+  async getCollectionInfo() {
+    try {
+      const response = await axios.get(
+        `${this.ragApiV1Url}/nlp/index/info/${this.projectId}`,
+        { timeout: 10000 }
+      );
+
+      return {
+        success: true,
+        documentsCount: response.data.documents_count,
+        status: response.data.status,
+        languages: response.data.languages_supported,
+        categories: response.data.categories,
+        lastUpdated: response.data.last_updated
       };
     } catch (error) {
       return {
@@ -388,27 +427,46 @@ class RealRagService {
   }
 
   /**
-   * Process uploaded documents
+   * Initialize RAG system with documents
    */
-  async processDocuments() {
+  async initializeRAGSystem() {
     try {
-      const response = await axios.post(
-        `${this.ragApiUrl}/process/${this.projectId}`,
-        {
-          chunk_size: 400,
-          overlab_size: 100,
-          reset: 0,
-          llm_type: "ollama"
-        },
-        { timeout: 120000 }
-      );
+      console.log('🚀 Initializing RAG system...');
 
-      return {
-        success: response.data.signal === 'processing_success',
-        insertedChunks: response.data.inserted_chunks,
-        processedFiles: response.data.processed_files
-      };
+      // First check status
+      const status = await this.getStatus();
+      if (!status.success) {
+        throw new Error('RAG backend not available');
+      }
+
+      // Check collection info
+      const collectionInfo = await this.getCollectionInfo();
+
+      // If no documents, upload them
+      if (collectionInfo.success && collectionInfo.documentsCount === 0) {
+        console.log('📁 No documents found, uploading from DATA folder...');
+        const uploadResult = await this.uploadAndIndexDocuments();
+
+        if (uploadResult.success) {
+          console.log(`✅ Uploaded ${uploadResult.totalProcessed} documents`);
+          return {
+            success: true,
+            message: 'RAG system initialized with documents',
+            documentsUploaded: uploadResult.totalProcessed
+          };
+        } else {
+          throw new Error('Document upload failed: ' + uploadResult.error);
+        }
+      } else {
+        console.log('✅ RAG system already has documents');
+        return {
+          success: true,
+          message: 'RAG system already initialized',
+          documentsCount: collectionInfo.documentsCount
+        };
+      }
     } catch (error) {
+      console.error('❌ RAG initialization failed:', error);
       return {
         success: false,
         error: error.message
