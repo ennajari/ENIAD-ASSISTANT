@@ -28,6 +28,8 @@ export const translations = {
     stopRecording: "Arrêter l'enregistrement",
     assistant: "Assistant Académique ENIAD",
     startPrompt: "Posez votre question ou choisissez un sujet ci-dessous pour commencer une nouvelle conversation.",
+    welcomeGreeting: "Salut, je suis Eniad-Assistant.",
+    welcomeSubtext: "Comment puis-je vous aider aujourd'hui ?",
     errorMessage: "Désolé, une erreur est survenue. Veuillez réessayer.",
     networkError: "Erreur réseau. Veuillez vérifier votre connexion et réessayer.",
     rateLimitError: "Trop de requêtes. Veuillez attendre un moment avant de réessayer.",
@@ -38,6 +40,49 @@ export const translations = {
       "Quels sont les programmes de formation disponibles à l'ENIAD ?",
       "Comment puis-je m'inscrire à l'ENIAD ?",
       "Quelles sont les conditions d'admission à l'ENIAD ?",
+    ],
+    // Welcome categories
+    welcomeCategories: [
+      {
+        title: "Conditions d'Admission",
+        subtitle: "شروط القبول",
+        icon: "🎓",
+        questions: [
+          "Quelles sont les conditions d'admission à l'ENIAD ?",
+          "Comment puis-je m'inscrire à l'ENIAD ?",
+          "Quels documents sont nécessaires pour l'inscription ?"
+        ]
+      },
+      {
+        title: "Spécialisations",
+        subtitle: "التخصصات",
+        icon: "📚",
+        questions: [
+          "Quels sont les programmes de formation disponibles à l'ENIAD ?",
+          "Quelles spécialisations sont offertes en intelligence artificielle ?",
+          "Quelle est la durée des études à l'ENIAD ?"
+        ]
+      },
+      {
+        title: "Bourses d'Études",
+        subtitle: "المنح الدراسية",
+        icon: "☀️",
+        questions: [
+          "Y a-t-il des bourses d'études disponibles ?",
+          "Comment postuler pour une bourse d'études ?",
+          "Quels sont les critères d'éligibilité pour les bourses ?"
+        ]
+      },
+      {
+        title: "Vie sur le Campus",
+        subtitle: "الحياة الجامعية",
+        icon: "🏛️",
+        questions: [
+          "Comment accéder au campus ENIAD ?",
+          "Y a-t-il une bibliothèque sur le campus ?",
+          "Y a-t-il des clubs étudiants ?"
+        ]
+      }
     ],
     usingSystemPreference: "Utilise les préférences système",
     editTitle: "Modifier le titre de la conversation",
@@ -91,6 +136,14 @@ export const translations = {
     expand: "Développer",
     collapse: "Réduire",
     unknown: "Inconnu",
+
+    // Additional RAG error messages
+    ragNotRunning: "Service RAG non démarré sur le port 8004",
+    ragStartInstructions: "Pour démarrer RAG: cd RAG_Project/src && python main.py",
+    ragOptional: "Le service RAG est optionnel - le chatbot fonctionne sans lui",
+    ragTimeout: "Délai d'attente du service RAG (port 8004)",
+    ragNetworkError: "Erreur réseau lors de la connexion au service RAG",
+    ragCheckLogs: "Vérifiez les logs du service RAG",
     // SMA System
     smaActive: "SMA Activé - Intelligence Web en temps réel",
     smaInactive: "Activer SMA - Surveillance intelligente des sites",
@@ -135,6 +188,8 @@ export const translations = {
     stopRecording: "إيقاف التسجيل",
     assistant: "المساعد الأكاديمي ENIAD",
     startPrompt: "اطرح سؤالك أو اختر موضوعًا أدناه لبدء محادثة جديدة.",
+    welcomeGreeting: "مرحباً، أنا مساعد إنياد.",
+    welcomeSubtext: "كيف يمكنني مساعدتك اليوم؟",
     errorMessage: "عذراً، حدث خطأ. يرجى المحاولة مرة أخرى.",
     networkError: "خطأ في الشبكة. يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
     rateLimitError: "طلبات كثيرة جداً. يرجى الانتظار قليلاً قبل المحاولة مرة أخرى.",
@@ -145,6 +200,49 @@ export const translations = {
       "ما هي البرامج التدريبية المتاحة في ENIAD؟",
       "كيف يمكنني التسجيل في ENIAD؟",
       "ما هي شروط القبول في ENIAD؟",
+    ],
+    // Welcome categories
+    welcomeCategories: [
+      {
+        title: "شروط القبول",
+        subtitle: "Conditions d'Admission",
+        icon: "🎓",
+        questions: [
+          "ما هي شروط القبول في ENIAD؟",
+          "كيف يمكنني التسجيل في ENIAD؟",
+          "ما هي الوثائق المطلوبة للتسجيل؟"
+        ]
+      },
+      {
+        title: "التخصصات",
+        subtitle: "Spécialisations",
+        icon: "📚",
+        questions: [
+          "ما هي البرامج التدريبية المتاحة في ENIAD؟",
+          "ما هي التخصصات المتاحة في الذكاء الاصطناعي؟",
+          "ما هي مدة الدراسة في ENIAD؟"
+        ]
+      },
+      {
+        title: "المنح الدراسية",
+        subtitle: "Bourses d'Études",
+        icon: "☀️",
+        questions: [
+          "هل توجد منح دراسية متاحة؟",
+          "كيف أتقدم بطلب للحصول على منحة دراسية؟",
+          "ما هي معايير الأهلية للمنح الدراسية؟"
+        ]
+      },
+      {
+        title: "الحياة الجامعية",
+        subtitle: "Vie sur le Campus",
+        icon: "🏛️",
+        questions: [
+          "كيف أصل إلى حرم ENIAD؟",
+          "هل توجد مكتبة في الحرم؟",
+          "هل توجد نوادي طلابية؟"
+        ]
+      }
     ],
     usingSystemPreference: "يستخدم تفضيلات النظام",
     editTitle: "تعديل عنوان المحادثة",
@@ -198,6 +296,14 @@ export const translations = {
     expand: "توسيع",
     collapse: "طي",
     unknown: "غير معروف",
+
+    // Additional RAG error messages in Arabic
+    ragNotRunning: "خدمة RAG غير مشغلة على المنفذ 8004",
+    ragStartInstructions: "لبدء RAG: cd RAG_Project/src && python main.py",
+    ragOptional: "خدمة RAG اختيارية - يعمل الشات بوت بدونها",
+    ragTimeout: "انتهت مهلة خدمة RAG (المنفذ 8004)",
+    ragNetworkError: "خطأ في الشبكة عند الاتصال بخدمة RAG",
+    ragCheckLogs: "تحقق من سجلات خدمة RAG",
     // SMA System
     smaActive: "Sما نشط - ذكاء الويب في الوقت الفعلي",
     smaInactive: "تفعيل SMA - مراقبة ذكية للمواقع",

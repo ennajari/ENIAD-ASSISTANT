@@ -10,6 +10,7 @@ import autoCorrectionService from '../services/autoCorrectionService';
 import firebaseStorageService from '../services/firebaseStorageService';
 import conversationStateManager from '../services/conversationStateManager';
 import geminiService from '../services/geminiService';
+import coordinationService from '../services/coordinationService';
 
 export const createChatHandlers = (
   chatState,
@@ -138,7 +139,7 @@ export const createChatHandlers = (
 
           // Use direct API call to working SMA endpoint
           try {
-            const smaResponse = await axios.post('http://localhost:8001/sma/intelligent-query', {
+            const smaResponse = await axios.post('http://localhost:8002/sma/intelligent-query', {
               query: optimizedQuery,
               language: currentLanguage,
               search_depth: 'medium',
@@ -271,58 +272,26 @@ export const createChatHandlers = (
           smaResultsCount: smaResults?.results?.length || 0
         });
 
-        // Use REAL RAG backend instead of fake API
-        console.log('🤖 Using REAL RAG backend on port 5000');
-        const realRagService = (await import('../services/realRagService.js')).default;
-
-        const ragResponse = await realRagService.generateAnswerWithBackend(
-          truncatedQuery,
-          currentLanguage
-        );
-
-        // Combine RAG sources with SMA sources
-        const combinedSources = [
-          ...(ragResponse.sources || []),
-          ...(smaResults?.sources || [])
-        ];
-
-        // Handle REAL RAG response format
-        botMessage = {
-          role: 'assistant',
-          content: ragResponse.answer || ragResponse.content || 'Désolé, je n\'ai pas pu générer une réponse.',
-          id: Date.now().toString(),
-          chatId: currentChatId,
-          timestamp: new Date().toISOString(),
-          userId: user?.uid,
-          model: 'RAG + Ollama (Real Backend)',
-          sources: ragResponse.sources || [],
-          metadata: {
-            ...ragResponse.metadata,
-            realRagUsed: true,
-            backend: 'localhost:5000',
-            smaEnhanced: !!smaResults,
-            smaResultsCount: smaResults?.total_found || 0
-          },
-          smaResults: smaResults // Include SMA results for display
-        };
-
-        console.log('✅ RAG response generated:', {
-          confidence: ragResponse.confidence,
-          sourcesCount: ragResponse.sources?.length || 0,
-          tokensUsed: ragResponse.tokens_used
-        });
+        // REMOVED: Old RAG backend code to avoid connection errors
+        console.log('🚫 Skipping old RAG backend - Using coordination service instead');
 
       } else {
-        // Model selection logic
+        // Model selection logic with clear separation
         console.log(`🤖 Using selected model: ${selectedModel}`);
+        console.log('🎯 SEPARATION POLICY:');
+        console.log('   🦙 RAG = Ollama/Llama UNIQUEMENT');
+        console.log('   ✨ SMA = Gemini UNIQUEMENT');
 
         if (selectedModel === 'rag') {
-          // Use RAG + Local Model
-          console.log('📚 Using RAG + Local Model - ENIAD knowledge base');
+          // Use RAG + Ollama ONLY via Coordination Service
+          console.log('🦙 Using RAG via Coordination Service - Ollama ONLY');
+          console.log('🚫 NO Gemini fallback - Strict separation enforced');
 
           try {
-            // Use the real RAG service
-            const ragResponse = await realRagService.generateAnswer(correctedInput, currentLanguage);
+            // Use coordination service for RAG
+            const ragResponse = await coordinationService.routeRequest('rag', correctedInput, currentLanguage, {
+              smaResults: smaResults
+            });
 
             if (ragResponse.success) {
               botMessage = {
@@ -335,29 +304,62 @@ export const createChatHandlers = (
                 confidence: ragResponse.metadata?.confidence || 0.9,
                 metadata: {
                   ...ragResponse.metadata,
-                  model: ragResponse.metadata?.model || 'rag-local',
-                  provider: ragResponse.metadata?.provider || 'eniad-rag',
+                  model: 'rag',  // RAG model identifier
+                  provider: 'coordination-rag-ollama',
+                  coordination_used: true,
+                  separation_enforced: true,
                   smaEnhanced: !!smaResults,
-                  smaResultsCount: smaResults?.total_found || 0,
-                  documentsUsed: ragResponse.metadata?.documentsUsed || 0
+                  smaResultsCount: smaResults?.total_found || 0
                 },
                 smaResults: smaResults
               };
 
-              console.log('✅ RAG response generated:', {
+              console.log('✅ RAG Coordination response generated:', {
                 confidence: ragResponse.metadata?.confidence || 0.9,
                 sourcesCount: ragResponse.sources?.length || 0,
-                documentsUsed: ragResponse.metadata?.documentsUsed || 0,
-                backend: ragResponse.metadata?.backend || false
+                coordination_policy: ragResponse.metadata?.coordination_policy,
+                gemini_excluded: ragResponse.metadata?.gemini_excluded
               });
             } else {
-              throw new Error('RAG service failed: ' + ragResponse.answer);
+              // Show coordination error
+              botMessage = {
+                role: 'assistant',
+                content: ragResponse.answer || (currentLanguage === 'ar' ?
+                  'عذراً، نظام RAG مع Ollama غير متاح حالياً. يرجى التأكد من تشغيل Ollama.' :
+                  'Désolé, le système RAG avec Ollama n\'est pas disponible. Veuillez vérifier qu\'Ollama est démarré.'),
+                id: Date.now().toString(),
+                chatId: currentChatId,
+                timestamp: new Date().toISOString(),
+                metadata: {
+                  model: 'rag',
+                  provider: 'coordination-rag-failed',
+                  coordination_used: true,
+                  separation_enforced: true,
+                  error: ragResponse.error || 'Coordination failed'
+                }
+              };
             }
 
           } catch (ragError) {
-            console.warn('⚠️ RAG model failed, falling back to Gemini:', ragError.message);
-            // Fall back to Gemini if RAG fails
-            selectedModel = 'gemini';
+            console.error('❌ RAG Coordination failed:', ragError.message);
+
+            // Show coordination error
+            botMessage = {
+              role: 'assistant',
+              content: currentLanguage === 'ar' ?
+                'عذراً، حدث خطأ في تنسيق نظام RAG. يرجى التأكد من:\n\n1. تشغيل Ollama (ollama serve)\n2. توفر النماذج المطلوبة\n3. تشغيل خادم RAG\n\n🎯 نظام التنسيق يضمن: RAG = Ollama فقط' :
+                'Désolé, erreur dans la coordination RAG. Veuillez vérifier :\n\n1. Ollama est démarré (ollama serve)\n2. Les modèles requis sont disponibles\n3. Le serveur RAG fonctionne\n\n🎯 Système de coordination : RAG = Ollama uniquement',
+              id: Date.now().toString(),
+              chatId: currentChatId,
+              timestamp: new Date().toISOString(),
+              metadata: {
+                model: 'rag',
+                provider: 'coordination-rag-error',
+                coordination_used: true,
+                separation_enforced: true,
+                error: ragError.message
+              }
+            };
           }
         } else if (selectedModel === 'llama') {
           // Use Llama model (your project model)
@@ -428,41 +430,40 @@ export const createChatHandlers = (
           } catch (llamaError) {
             console.warn('⚠️ Llama model failed, falling back to Gemini:', llamaError.message);
             // Fall back to Gemini if Llama fails
-            selectedModel = 'gemini';
+            // selectedModel = 'gemini'; // Cannot reassign const, will be handled below
           }
         }
 
-        if (selectedModel === 'gemini') {
-          // Use Gemini API
-          console.log('✨ Using Gemini API');
+        if (selectedModel === 'gemini' || !botMessage) {
+          // Use SMA + Gemini via Coordination Service
+          console.log('✨ Using SMA + Gemini via Coordination Service');
+          console.log('🚫 NO Ollama for SMA - Gemini exclusive for SMA');
 
-          // Always enable Gemini fallback for better reliability
-          const useGeminiFallback = true; // Force enable for reliability
-
-          // Check if SMA results are available - use Gemini with SMA context
+          // Check if SMA results are available - use coordination for SMA
           if (smaResults && smaResults.results && smaResults.results.length > 0) {
-          console.log('🧠 Using Gemini with SMA context via local service');
+          console.log('🧠 Using Coordination Service for SMA + Gemini');
 
           try {
-            // Call our SMA service to use Gemini with context
-            const response = await axios.post('http://localhost:8001/sma/chat-with-context', {
-              query: correctedInput,
-              language: currentLanguage,
-              sma_results: smaResults
+            // Use coordination service for SMA + Gemini
+            const smaResponse = await coordinationService.routeRequest('sma', correctedInput, currentLanguage, {
+              smaResults: smaResults
             });
 
-            if (response.data && response.data.final_answer) {
+            if (smaResponse.success) {
               botMessage = {
                 role: 'assistant',
-                content: response.data.final_answer,
+                content: smaResponse.answer,
                 id: Date.now().toString(),
                 chatId: currentChatId,
                 timestamp: new Date().toISOString(),
-                sources: response.data.sources || smaResults.sources || [],
-                confidence: response.data.confidence || 0.9,
+                sources: smaResponse.sources || smaResults.sources || [],
+                confidence: smaResponse.metadata?.confidence || 0.9,
                 metadata: {
-                  model: response.data.model || 'gemini-1.5-flash',
-                  provider: response.data.provider || 'gemini-via-sma',
+                  ...smaResponse.metadata,
+                  model: 'gemini',  // Gemini model identifier
+                  provider: 'coordination-sma-gemini',
+                  coordination_used: true,
+                  separation_enforced: true,
                   smaEnhanced: true,
                   smaResultsCount: smaResults.total_found || 0,
                   websitesScanned: smaResults.metadata?.websites_scanned || 13
@@ -470,13 +471,15 @@ export const createChatHandlers = (
                 smaResults: smaResults
               };
 
-              console.log('✅ Gemini response with SMA context generated:', {
+              console.log('✅ SMA Coordination response generated:', {
                 confidence: botMessage.confidence,
                 sourcesCount: botMessage.sources?.length || 0,
-                smaResultsCount: smaResults.total_found || 0
+                smaResultsCount: smaResults.total_found || 0,
+                coordination_policy: smaResponse.metadata?.coordination_policy,
+                ollama_excluded: smaResponse.metadata?.ollama_excluded
               });
             } else {
-              throw new Error('No response from Gemini service');
+              throw new Error('Coordination SMA failed: ' + smaResponse.answer);
             }
           } catch (geminiError) {
             console.warn('⚠️ Gemini with SMA context failed, using direct SMA results:', geminiError.message);
@@ -528,7 +531,7 @@ export const createChatHandlers = (
                 total_found: 1
               };
 
-              const response = await axios.post('http://localhost:8001/sma/chat-with-context', {
+              const response = await axios.post('http://localhost:8002/sma/chat-with-context', {
                 query: correctedInput,
                 language: currentLanguage,
                 sma_results: minimalSmaResults
@@ -544,7 +547,7 @@ export const createChatHandlers = (
                   sources: response.data.sources || [],
                   confidence: response.data.confidence || 0.9,
                   metadata: {
-                    model: response.data.model || 'gemini-1.5-flash',
+                    model: 'gemini',  // Gemini model identifier
                     provider: response.data.provider || 'gemini-via-sma',
                     smaEnhanced: false,
                     corsWorkaround: true
@@ -631,7 +634,7 @@ export const createChatHandlers = (
             chatId: currentChatId,
             timestamp: new Date().toISOString(),
             metadata: {
-              model: 'ahmed-ouka/llama3-8b-eniad-merged-32bit',
+              model: 'llama',  // Llama model identifier
               provider: 'modal',
               usage: response.data.usage
             }

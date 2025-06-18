@@ -15,8 +15,8 @@ class RAGApiService {
     this.projectId = import.meta.env.VITE_RAG_PROJECT_ID || 'eniadassistant';
     this.timeout = 60000; // 60 seconds timeout for model inference
 
-    // RAG System Configuration (for direct monitoring) - CORRECTED TO PORT 5000
-    this.ragSystemURL = import.meta.env.VITE_RAG_SYSTEM_BASE_URL || 'http://localhost:5000';
+    // RAG System Configuration (for direct monitoring) - CORRECTED TO PORT 8003
+    this.ragSystemURL = import.meta.env.VITE_RAG_SYSTEM_BASE_URL || 'http://localhost:8003';
 
     // Error logging throttling
     this.lastErrorLogged = 0;
@@ -282,20 +282,20 @@ class RAGApiService {
       let helpMessage = 'RAG service is optional. The chatbot will work without it.';
 
       if (error.code === 'ECONNREFUSED' || error.message.includes('ECONNREFUSED')) {
-        errorMessage = 'Connection refused - RAG service not running';
-        helpMessage = 'RAG service is optional. The chatbot will work without it.';
+        errorMessage = 'RAG service not running on port 8003';
+        helpMessage = 'To start RAG: cd RAG_Project/src && python main.py. Service is optional - chatbot works without it.';
       } else if (error.code === 'ENOTFOUND' || error.message.includes('ENOTFOUND')) {
-        errorMessage = 'Host not found - Check RAG system URL';
-        helpMessage = 'RAG service is optional. The chatbot will work without it.';
+        errorMessage = 'RAG service host not found';
+        helpMessage = 'Check VITE_RAG_SYSTEM_BASE_URL in .env file. Service is optional.';
       } else if (error.message.includes('timeout')) {
-        errorMessage = 'Connection timeout - RAG service not responding';
-        helpMessage = 'RAG service is optional. The chatbot will work without it.';
+        errorMessage = 'RAG service timeout (port 8003)';
+        helpMessage = 'Service may be starting up. Check if python main.py is running in RAG_Project/src.';
       } else if (error.message.includes('Network Error')) {
-        errorMessage = 'Network Error';
-        helpMessage = 'RAG service is optional. The chatbot will work without it.';
+        errorMessage = 'Network error connecting to RAG service';
+        helpMessage = 'Check if RAG service is running: cd RAG_Project/src && python main.py';
       } else if (error.response?.status === 500) {
         errorMessage = 'RAG service internal error';
-        helpMessage = 'RAG service is optional. The chatbot will work without it.';
+        helpMessage = 'Check RAG service logs. Service is optional - chatbot works without it.';
       }
 
       return {

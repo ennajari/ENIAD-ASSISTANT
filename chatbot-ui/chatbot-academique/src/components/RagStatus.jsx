@@ -153,9 +153,14 @@ const RagStatus = ({ darkMode = false }) => {
           <Box sx={{ mt: 2 }}>
             {status?.error && (
               <Alert severity="error" sx={{ mb: 2, borderRadius: '8px' }}>
-                <Typography variant="body2">
+                <Typography variant="body2" sx={{ mb: 1 }}>
                   <strong>{t('error') || 'Error'}:</strong> {status.error}
                 </Typography>
+                {status.message && (
+                  <Typography variant="body2" sx={{ fontSize: '0.85rem', opacity: 0.8 }}>
+                    💡 {status.message}
+                  </Typography>
+                )}
               </Alert>
             )}
 

@@ -31,6 +31,7 @@ import speechService from './services/speechService';
 import ApiConnectionTest from './components/Debug/ApiConnectionTest';
 import InterfaceTest from './components/Debug/InterfaceTest';
 import FirebaseTest from './components/Debug/FirebaseTest';
+import AvatarTest from './components/Debug/AvatarTest';
 
 function App() {
   const navigate = useNavigate();
@@ -473,6 +474,7 @@ function App() {
         <Route path="/test" element={<InterfaceTest />} />
         <Route path="/firebase" element={<FirebaseTest />} />
         <Route path="/gemini" element={<GeminiTest />} />
+        <Route path="/avatar" element={<AvatarTest />} />
         <Route
           path="/"
           element={

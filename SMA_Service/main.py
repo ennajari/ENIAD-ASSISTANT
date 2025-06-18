@@ -283,13 +283,79 @@ async def startup_event():
     """Initialize SMA service on startup"""
     logger.info("🤖 Starting ENIAD SMA Service...")
 
-    # Initialize default monitoring data
+    # Initialize default monitoring data - Enhanced ENIAD sites
     default_sites = [
         {
-            "name": "ENIAD",
+            "name": "ENIAD - Accueil",
             "url": "https://eniad.ump.ma/fr",
             "priority": "high",
             "categories": ["news", "documents", "announcements", "events", "photos"]
+        },
+        {
+            "name": "ENIAD - Actualités",
+            "url": "https://eniad.ump.ma/fr/actualite",
+            "priority": "high",
+            "categories": ["news", "announcements", "events"]
+        },
+        {
+            "name": "ENIAD - IRSI",
+            "url": "https://eniad.ump.ma/fr/cycle-ingenieur-ingenierie-reseaux-et-securite-informatique-irsi",
+            "priority": "high",
+            "categories": ["academic", "programs", "documents"]
+        },
+        {
+            "name": "ENIAD - ROC",
+            "url": "https://eniad.ump.ma/fr/cycle-ingenieur-robotique-et-objets-connectes-roc",
+            "priority": "high",
+            "categories": ["academic", "programs", "documents"]
+        },
+        {
+            "name": "ENIAD - IA",
+            "url": "https://eniad.ump.ma/fr/cycle-ingenieur-intelligence-artificielle-ia",
+            "priority": "high",
+            "categories": ["academic", "programs", "documents"]
+        },
+        {
+            "name": "ENIAD - GINF",
+            "url": "https://eniad.ump.ma/fr/cycle-ingenieur-genie-informatique-ginf",
+            "priority": "high",
+            "categories": ["academic", "programs", "documents"]
+        },
+        {
+            "name": "ENIAD - Assurance Maladie",
+            "url": "https://eniad.ump.ma/fr/assurance-maladie-obligatoire",
+            "priority": "medium",
+            "categories": ["services", "administrative", "documents"]
+        },
+        {
+            "name": "ENIAD - Bourses",
+            "url": "https://eniad.ump.ma/fr/bourses",
+            "priority": "medium",
+            "categories": ["services", "financial", "documents"]
+        },
+        {
+            "name": "ENIAD - Centre de Santé",
+            "url": "https://eniad.ump.ma/fr/centre-de-sante-universitaire",
+            "priority": "medium",
+            "categories": ["services", "health", "documents"]
+        },
+        {
+            "name": "ENIAD - Activités Culturelles",
+            "url": "https://eniad.ump.ma/fr/activites-culturelles",
+            "priority": "medium",
+            "categories": ["events", "cultural", "announcements"]
+        },
+        {
+            "name": "ENIAD - Concours de Recrutement",
+            "url": "https://eniad.ump.ma/fr/concours-de-recrutement",
+            "priority": "high",
+            "categories": ["recruitment", "announcements", "documents"]
+        },
+        {
+            "name": "ENIAD - Appels à Candidatures",
+            "url": "https://eniad.ump.ma/fr/appels-a-candidatures",
+            "priority": "high",
+            "categories": ["recruitment", "announcements", "documents"]
         },
         {
             "name": "UMP",
@@ -1204,7 +1270,7 @@ if __name__ == "__main__":
     uvicorn.run(
         "main:app",
         host="0.0.0.0",
-        port=8001,
+        port=8002,
         reload=True,
         log_level="info"
     )

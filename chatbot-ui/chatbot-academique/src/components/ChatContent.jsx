@@ -15,6 +15,7 @@ import { translations } from '../constants/config';
 import FloatingIcons from './FloatingIcons';
 import MessageBubble from './MessageBubble';
 import MessageMetadata from './MessageMetadata';
+import UserAvatar from './UserAvatar';
 
 const ChatContent = ({
   messages,
@@ -216,13 +217,111 @@ const ChatContent = ({
                 }}
               />
             </Box>
-            <Typography variant="h5" sx={{ fontWeight: 600, mb: 1 }}>
-              {t('assistant')}
-            </Typography>
-            <Typography variant="body1" sx={{ mb: 3, maxWidth: '600px' }}>
-              {t('startPrompt')}
+            {/* Chat Icon and Greeting */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+              <Box sx={{
+                fontSize: '1.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: darkMode ? '#e2e8f0' : '#2d3748'
+              }}>
+                💬
+              </Box>
+              <Typography variant="h5" sx={{ fontWeight: 600, color: darkMode ? '#e2e8f0' : '#2d3748' }}>
+                {t('welcomeGreeting') || 'Hi, I\'m Eniad-Assistant.'}
+              </Typography>
+            </Box>
+            <Typography variant="body1" sx={{ mb: 4, maxWidth: '600px', color: darkMode ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.7)' }}>
+              {t('welcomeSubtext') || 'How can I help you today?'}
             </Typography>
 
+            {/* Welcome Categories */}
+            <Box sx={{ width: '100%', maxWidth: 'lg', px: { xs: 1, sm: 2, md: 3 }, mb: 4 }}>
+              <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }} justifyContent="center" alignItems="stretch">
+                {(() => {
+                  // Get welcome categories from translations
+                  const welcomeCategories = translations[currentLanguage]?.welcomeCategories || translations.fr.welcomeCategories || [];
+
+                  return welcomeCategories.map((category, index) => (
+                    <Grid item xs={12} sm={6} md={3} key={index}>
+                      <Paper
+                        elevation={0}
+                        onClick={() => {
+                          // Pick a random question from the category
+                          const randomQuestion = category.questions[Math.floor(Math.random() * category.questions.length)];
+                          onQuestionClick(randomQuestion);
+                        }}
+                        sx={{
+                          p: { xs: 2, sm: 2.5, md: 3 },
+                          borderRadius: '12px',
+                          border: `1px solid ${darkMode ? '#2d3748' : '#e2e8f0'}`,
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          minHeight: { xs: 100, sm: 110, md: 120 },
+                          maxHeight: { xs: 140, sm: 150, md: 160 },
+                          height: 'auto',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          backgroundColor: darkMode ? '#1a202c' : '#ffffff',
+                          textAlign: 'center',
+                          '&:hover': {
+                            borderColor: darkMode ? '#4a5568' : '#cbd5e0',
+                            transform: 'translateY(-2px)',
+                            boxShadow: darkMode
+                              ? '0 6px 20px rgba(0,0,0,0.25)'
+                              : '0 6px 20px rgba(0,0,0,0.08)',
+                            backgroundColor: darkMode ? '#2d3748' : '#f7fafc'
+                          }
+                        }}
+                      >
+                        {/* Icon */}
+                        <Box sx={{
+                          fontSize: { xs: '1.8rem', sm: '2rem', md: '2.2rem' },
+                          mb: 1,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: { xs: 40, sm: 45, md: 50 },
+                          height: { xs: 40, sm: 45, md: 50 },
+                          borderRadius: '50%',
+                          backgroundColor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(16, 163, 127, 0.1)',
+                        }}>
+                          {category.icon}
+                        </Box>
+
+                        {/* Title */}
+                        <Typography sx={{
+                          fontSize: { xs: '0.85rem', sm: '0.9rem', md: '0.95rem' },
+                          fontWeight: 600,
+                          color: darkMode ? '#e2e8f0' : '#2d3748',
+                          mb: 0.3,
+                          lineHeight: 1.2,
+                          textAlign: 'center',
+                        }}>
+                          {category.title}
+                        </Typography>
+
+                        {/* Subtitle */}
+                        <Typography sx={{
+                          fontSize: { xs: '0.7rem', sm: '0.75rem', md: '0.8rem' },
+                          color: darkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)',
+                          fontWeight: 400,
+                          lineHeight: 1.1,
+                          textAlign: 'center',
+                        }}>
+                          {category.subtitle}
+                        </Typography>
+                      </Paper>
+                    </Grid>
+                  ));
+                })()}
+              </Grid>
+            </Box>
+
+            {/* Dynamic Suggestions */}
             <Box sx={{ width: '100%', maxWidth: 'lg', px: { xs: 2, sm: 3 } }}>
               <Grid container spacing={{ xs: 2, sm: 3, md: 3 }} justifyContent="center" alignItems="stretch">
                 {(() => {
@@ -348,46 +447,34 @@ const ChatContent = ({
                 gap: 2,
                 px: 1
               }}>
-                <Avatar
-                  sx={{
-                    width: 32,
-                    height: 32,
-                    bgcolor: msg.role === 'user'
-                      ? 'transparent'
-                      : 'rgba(16, 163, 127, 0.1)',
-                    color: '#fff',
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    border: msg.role === 'user' && user?.photoURL
-                      ? '2px solid rgba(16, 163, 127, 0.3)'
-                      : 'none',
-                  }}
-                >
-                  {msg.role === 'user' ? (
-                    user?.photoURL ? (
-                      <Box
-                        component="img"
-                        src={user.photoURL}
-                        alt={user.displayName || user.email || 'User'}
-                        sx={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          borderRadius: '50%'
-                        }}
-                      />
-                    ) : (
-                      <PersonIcon fontSize="small" sx={{ color: '#10a37f' }} />
-                    )
-                  ) : (
+                {msg.role === 'user' ? (
+                  <UserAvatar
+                    user={user}
+                    size={32}
+                    darkMode={darkMode}
+                    showBorder={!!user?.photoURL}
+                    sx={{
+                      border: user?.photoURL ? '2px solid rgba(16, 163, 127, 0.3)' : 'none',
+                    }}
+                  />
+                ) : (
+                  <Avatar
+                    sx={{
+                      width: 32,
+                      height: 32,
+                      bgcolor: 'rgba(16, 163, 127, 0.1)',
+                      color: '#fff',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                    }}
+                  >
                     <Box
                       sx={{
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        width: 24,
-                        height: 24,
-                        p: 0.5
+                        width: 20,
+                        height: 20,
                       }}
                     >
                       <Box
@@ -405,8 +492,8 @@ const ChatContent = ({
                         }}
                       />
                     </Box>
-                  )}
-                </Avatar>
+                  </Avatar>
+                )}
                 <Typography sx={{
                   fontSize: '14px',
                   fontWeight: 600,
@@ -469,19 +556,29 @@ const ChatContent = ({
                   }}
                 >
                   <Box
-                    component="img"
-                    src="/logo_icon.png"
-                    alt="ENIAD Assistant"
-                    onError={(e) => {
-                      // Fallback to SVG if PNG fails
-                      e.target.src = "/logo_icon.svg";
-                    }}
                     sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                       width: 20,
                       height: 20,
-                      objectFit: 'contain'
                     }}
-                  />
+                  >
+                    <Box
+                      component="img"
+                      src="/logo_icon.png"
+                      alt="ENIAD Assistant"
+                      onError={(e) => {
+                        // Fallback to SVG if PNG fails
+                        e.target.src = "/logo_icon.svg";
+                      }}
+                      sx={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain'
+                      }}
+                    />
+                  </Box>
                 </Avatar>
                 <Typography sx={{
                   fontSize: '14px',

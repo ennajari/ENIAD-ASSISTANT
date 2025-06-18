@@ -1,6 +1,8 @@
 /**
- * Service Ollama pour modèles locaux
- * Intégration avec Llama 3.2 pour les tests RAG
+ * Service Ollama pour RAG UNIQUEMENT
+ * Llama 3.2 + nomic-embed-text pour RAG SEULEMENT
+ * 🚫 PAS DE GEMINI - Ollama exclusif pour RAG
+ * Gemini réservé pour SMA et web scraping uniquement
  */
 
 import axios from 'axios';
@@ -9,11 +11,16 @@ class OllamaService {
   constructor() {
     this.baseUrl = 'http://localhost:11434';
     this.isAvailable = false;
-    this.currentModel = 'llama3.2:1b'; // Modèle léger parfait pour 8GB RAM
+    this.generationModel = 'llama3.2:1b'; // Génération de texte
+    this.embeddingModel = 'nomic-embed-text'; // Embeddings (768 dimensions)
     this.ollamaPath = 'C:\\Users\\ROG FLOW\\AppData\\Local\\Programs\\Ollama\\ollama.exe';
     this.checkAvailability();
 
-    console.log('🦙 Ollama Service initialized with model:', this.currentModel);
+    console.log('🦙 Ollama Service initialized for RAG ONLY (NO Gemini):', {
+      generation: this.generationModel,
+      embedding: this.embeddingModel,
+      purpose: 'RAG EXCLUSIVELY'
+    });
   }
 
   /**
@@ -82,6 +89,8 @@ class OllamaService {
 
       console.log(`🤖 Génération avec ${model}:`, prompt.substring(0, 100) + '...');
 
+      console.log(`🔗 Calling Ollama API: ${this.baseUrl}/api/generate`);
+
       const response = await axios.post(`${this.baseUrl}/api/generate`, {
         model: model,
         prompt: prompt,
@@ -148,39 +157,53 @@ class OllamaService {
   }
 
   /**
-   * Générer des embeddings (simulation simple)
+   * Générer des embeddings avec nomic-embed-text (REAL)
    */
   async generateEmbeddings(text, options = {}) {
     try {
-      // Pour l'instant, simulation simple
-      // Ollama ne supporte pas encore les embeddings directement
-      console.log('⚠️ Embeddings simulés pour Ollama');
-      
-      // Générer un vecteur simple basé sur le texte
+      console.log(`🔢 Generating REAL embeddings with ${this.embeddingModel}...`);
+
+      const response = await axios.post(`${this.baseUrl}/api/embeddings`, {
+        model: this.embeddingModel,
+        prompt: text
+      }, { timeout: 30000 });
+
+      if (response.data && response.data.embedding) {
+        console.log(`✅ Real embeddings generated: ${response.data.embedding.length} dimensions`);
+        return {
+          success: true,
+          embedding: response.data.embedding,
+          model: this.embeddingModel,
+          dimensions: response.data.embedding.length
+        };
+      } else {
+        throw new Error('Invalid embedding response from Ollama');
+      }
+    } catch (error) {
+      console.error('❌ Real embeddings failed, using fallback:', error);
+
+      // Fallback to simple hash-based embedding
       const words = text.toLowerCase().split(/\s+/);
-      const embedding = new Array(384).fill(0); // Dimension standard
-      
-      // Hash simple pour créer un vecteur reproductible
+      const embedding = new Array(768).fill(0); // nomic-embed-text dimensions
+
       for (let i = 0; i < words.length; i++) {
         const word = words[i];
         for (let j = 0; j < word.length; j++) {
           const charCode = word.charCodeAt(j);
-          embedding[charCode % 384] += 1;
+          embedding[charCode % 768] += 1;
         }
       }
-      
-      // Normaliser
+
       const norm = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
       const normalizedEmbedding = embedding.map(val => val / (norm || 1));
-      
+
       return {
         success: true,
         embedding: normalizedEmbedding,
-        model: 'ollama-simulation'
+        model: 'ollama-fallback-768',
+        dimensions: 768,
+        fallback: true
       };
-    } catch (error) {
-      console.error('❌ Erreur embeddings Ollama:', error);
-      throw error;
     }
   }
 
@@ -229,39 +252,132 @@ class OllamaService {
   }
 
   /**
-   * Réponse optimisée pour ENIAD
+   * Réponse RAG optimisée pour ENIAD avec Ollama UNIQUEMENT
    */
-  async generateENIADResponse(query, language = 'fr', context = '') {
+  async generateRAGResponse(query, language = 'fr', context = []) {
     try {
-      const systemPrompt = language === 'ar' ? 
-        'أنت مساعد أكاديمي لمعهد ENIAD متخصص في الذكاء الاصطناعي وعلوم البيانات. أجب بدقة ووضوح.' :
-        'Tu es l\'assistant académique ENIAD spécialisé en intelligence artificielle et science des données. Réponds avec précision et clarté.';
+      console.log('🦙 Generating RAG response with Ollama ONLY (NO Gemini)');
 
-      const contextPrompt = context ? 
-        (language === 'ar' ? `السياق: ${context}\n\n` : `Contexte: ${context}\n\n`) : '';
+      // Ensure context is an array
+      const contextArray = Array.isArray(context) ? context : [];
 
-      const fullPrompt = `${systemPrompt}\n\n${contextPrompt}Question: ${query}\n\nRéponse:`;
+      const systemPrompt = language === 'ar' ?
+        'أنت مساعد أكاديمي لمعهد ENIAD متخصص في الذكاء الاصطناعي. استخدم المعلومات المقدمة للإجابة بدقة. لا تستخدم Gemini - Ollama فقط.' :
+        'Tu es l\'assistant académique ENIAD spécialisé en IA. Utilise les informations fournies pour répondre avec précision. Pas de Gemini - Ollama uniquement.';
 
-      const result = await this.generateResponse(fullPrompt, {
+      // Build context from RAG documents
+      const contextText = contextArray.length > 0
+        ? contextArray.map((doc, i) => `Document ${i+1}: ${doc.content || doc.text || doc || ''}`).join('\n\n')
+        : '';
+
+      const ragPrompt = contextText
+        ? `${systemPrompt}\n\nDocuments RAG:\n${contextText}\n\nQuestion: ${query}\n\nRéponse basée sur les documents:`
+        : `${systemPrompt}\n\nQuestion: ${query}\n\nRéponse:`;
+
+      const result = await this.generateResponse(ragPrompt, {
+        model: this.generationModel,
         temperature: 0.3,
-        maxTokens: 400
+        maxTokens: 500
       });
 
-      return {
-        success: true,
-        answer: result.response,
-        model: result.model,
-        source: 'Ollama Local',
-        icon: '🦙'
-      };
+      if (result.success) {
+        return {
+          success: true,
+          answer: result.response,
+          model: this.generationModel,
+          embedding_model: this.embeddingModel,
+          source: 'RAG + Ollama ONLY',
+          context_used: contextArray.length,
+          gemini_used: false,
+          metadata: {
+            llm_engine: 'ollama',
+            generation_model: this.generationModel,
+            embedding_model: this.embeddingModel,
+            rag_documents: contextArray.length,
+            gemini_excluded: true
+          },
+          icon: '🦙'
+        };
+      } else {
+        throw new Error(result.error || 'Ollama generation failed');
+      }
     } catch (error) {
-      console.error('❌ Erreur réponse ENIAD:', error);
+      console.error('❌ Erreur RAG Ollama:', error);
       return {
         success: false,
-        answer: language === 'ar' ? 
-          'عذراً، حدث خطأ في النموذج المحلي.' : 
-          'Désolé, erreur avec le modèle local.',
-        model: 'error'
+        answer: language === 'ar' ?
+          'عذراً، حدث خطأ في نظام RAG مع Ollama.' :
+          'Désolé, erreur dans le système RAG avec Ollama.',
+        model: 'ollama-error',
+        gemini_used: false,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Vérifier si Ollama est prêt pour RAG
+   */
+  async isReadyForRAG() {
+    try {
+      console.log('🔍 Checking if Ollama is ready for RAG...');
+
+      const response = await axios.get(`${this.baseUrl}/api/tags`, { timeout: 5000 });
+
+      if (response.status === 200) {
+        const models = response.data.models || [];
+        const modelNames = models.map(model => model.name || '');
+
+        const hasGeneration = modelNames.some(name => name.includes('llama3.2:1b'));
+        const hasEmbedding = modelNames.some(name => name.includes('nomic-embed-text'));
+
+        const isReady = hasGeneration && hasEmbedding;
+
+        console.log(`🦙 Ollama RAG readiness: ${isReady ? '✅' : '❌'}`, {
+          models: models.length,
+          hasGeneration,
+          hasEmbedding
+        });
+
+        return isReady;
+      } else {
+        console.log('❌ Ollama not accessible');
+        return false;
+      }
+    } catch (error) {
+      console.error('❌ Error checking Ollama RAG readiness:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Obtenir le statut du service
+   */
+  async getStatus() {
+    try {
+      const response = await axios.get(`${this.baseUrl}/api/tags`);
+
+      if (response.status === 200) {
+        const models = response.data.models || [];
+
+        return {
+          available: true,
+          models: models,
+          currentModel: this.generationModel,
+          embeddingModel: this.embeddingModel,
+          baseUrl: this.baseUrl
+        };
+      } else {
+        return {
+          available: false,
+          error: `HTTP ${response.status}`
+        };
+      }
+    } catch (error) {
+      console.error('❌ Erreur statut Ollama:', error);
+      return {
+        available: false,
+        error: error.message
       };
     }
   }

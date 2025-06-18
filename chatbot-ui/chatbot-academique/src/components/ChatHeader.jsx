@@ -22,6 +22,7 @@ import {
   Person as PersonIcon
 } from '@mui/icons-material';
 import { DRAWER_WIDTH, LANGUAGES, translations } from '../constants/config';
+import UserAvatar from './UserAvatar';
 
 const ChatHeader = ({
   drawerOpen = false,
@@ -171,22 +172,19 @@ const ChatHeader = ({
                   }
                 }}
               >
-                <Avatar
-                  src={user.photoURL}
-                  alt={user.displayName || user.email}
+                <UserAvatar
+                  user={user}
+                  size={36}
+                  darkMode={darkMode}
+                  showBorder={true}
                   sx={{
-                    width: 36,
-                    height: 36,
-                    border: `2px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
                     transition: 'all 0.2s ease',
                     '&:hover': {
                       borderColor: '#10a37f',
                       boxShadow: '0 0 0 2px rgba(16,163,127,0.2)',
                     }
                   }}
-                >
-                  {!user.photoURL && (user.displayName?.[0] || user.email?.[0] || 'U')}
-                </Avatar>
+                />
               </IconButton>
             </Tooltip>
 
