@@ -17,7 +17,10 @@ import {
   Cancel as CancelIcon,
   VolumeUp as VolumeUpIcon,
   ContentCopy as CopyIcon,
-  Check as CheckIcon
+  Check as CheckIcon,
+  Psychology as PsychologyIcon,
+  AutoAwesome as AutoAwesomeIcon,
+  SmartToy as SmartToyIcon
 } from '@mui/icons-material';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -263,8 +266,40 @@ const MessageBubble = ({
               </Zoom>
             )}
 
+            {/* Model Badge for Assistant Messages */}
+            {message.role === 'assistant' && message.metadata?.model && (
+              <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+                mb: 1,
+                opacity: 0.7,
+                fontSize: '0.75rem',
+                color: darkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.5)'
+              }}>
+                {(message.metadata.model === 'gemini' || message.metadata.model === 'gemini-via-sma' || message.metadata.model === 'sma-fallback') && <AutoAwesomeIcon sx={{ fontSize: 14, color: '#4285f4' }} />}
+                {message.metadata.model === 'rag' && <PsychologyIcon sx={{ fontSize: 14, color: '#10a37f' }} />}
+                {(message.metadata.model === 'llama' || message.metadata.model === 'llama3-eniad') && <SmartToyIcon sx={{ fontSize: 14, color: '#ff6b35' }} />}
+                <span>
+                  {(message.metadata.model === 'gemini' || message.metadata.model === 'gemini-via-sma' || message.metadata.model === 'sma-fallback') && (currentLanguage === 'ar' ? 'SMA + جيميني' : 'SMA + Gemini')}
+                  {message.metadata.model === 'rag' && (currentLanguage === 'ar' ? 'RAG + محلي' : 'RAG + Modèle Local')}
+                  {(message.metadata.model === 'llama' || message.metadata.model === 'llama3-eniad') && (currentLanguage === 'ar' ? 'RAG + مشروعنا' : 'RAG + Notre Projet')}
+                </span>
+                {message.metadata.sources && message.metadata.sources.length > 0 && (
+                  <span style={{ marginLeft: '8px', fontSize: '0.7rem' }}>
+                    • {message.metadata.sources.length} {currentLanguage === 'ar' ? 'مصادر' : 'sources'}
+                  </span>
+                )}
+                {message.metadata.smaEnhanced && (
+                  <span style={{ marginLeft: '8px', fontSize: '0.7rem', color: '#4285f4' }}>
+                    🔍 SMA
+                  </span>
+                )}
+              </Box>
+            )}
+
             {/* Message Content */}
-            <Box sx={{ 
+            <Box sx={{
               paddingRight: message.role === 'assistant' ? '48px' : '0',
               paddingLeft: currentLanguage === 'ar' && message.role === 'assistant' ? '48px' : '0',
             }}>

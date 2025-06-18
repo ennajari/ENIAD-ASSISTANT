@@ -31,40 +31,43 @@ const ModelSelector = ({
 
   const models = {
     gemini: {
-      name: currentLanguage === 'ar' ? 'جيميني API' : 'Gemini API',
+      name: currentLanguage === 'ar' ? 'SMA + جيميني' : 'SMA + Gemini',
       description: currentLanguage === 'ar'
-        ? 'نموذج جوجل المتقدم للذكاء الاصطناعي'
-        : 'Modèle IA avancé de Google',
+        ? 'بحث ويب ذكي + جيميني (للـ SMA فقط)'
+        : 'Recherche web intelligente + Gemini (SMA uniquement)',
       icon: <AutoAwesomeIcon />,
       color: '#4285f4',
       features: currentLanguage === 'ar'
-        ? ['سريع', 'دقيق', 'متعدد اللغات']
-        : ['Rapide', 'Précis', 'Multilingue'],
-      status: 'active'
+        ? ['بحث ويب', 'SMA', 'جيميني فقط']
+        : ['Web Search', 'SMA', 'Gemini uniquement'],
+      status: 'active',
+      engine: 'Gemini (SMA only)'
     },
     rag: {
-      name: currentLanguage === 'ar' ? 'RAG + نموذج محلي' : 'RAG + Modèle Local',
+      name: currentLanguage === 'ar' ? 'RAG + أولاما محلي' : 'RAG + Ollama Local',
       description: currentLanguage === 'ar'
-        ? 'نظام RAG مع نموذج ENIAD المحلي'
-        : 'Système RAG avec modèle ENIAD local',
+        ? 'قاعدة معرفة ENIAD + أولاما/لاما (للـ RAG فقط)'
+        : 'Base de connaissances ENIAD + Ollama/Llama (RAG uniquement)',
       icon: <PsychologyIcon />,
       color: '#10a37f',
       features: currentLanguage === 'ar'
-        ? ['قاعدة معرفة', 'محلي', 'متخصص ENIAD']
-        : ['Base de connaissances', 'Local', 'Spécialisé ENIAD'],
-      status: 'active'
+        ? ['قاعدة معرفة', 'أولاما فقط', 'محلي']
+        : ['Base de connaissances', 'Ollama uniquement', 'Local'],
+      status: 'active',
+      engine: 'Ollama/Llama (RAG only)'
     },
     llama: {
-      name: currentLanguage === 'ar' ? 'لاما (مشروعنا)' : 'Llama (Notre Projet)',
+      name: currentLanguage === 'ar' ? 'RAG + مشروعنا' : 'RAG + Notre Projet',
       description: currentLanguage === 'ar'
-        ? 'نموذج مخصص لمشروع ENIAD'
-        : 'Modèle personnalisé pour ENIAD',
+        ? 'نموذج مخصص لمشروع ENIAD (لا تختبر - مدفوع)'
+        : 'Modèle personnalisé ENIAD (ne pas tester - payant)',
       icon: <PsychologyIcon />,
       color: '#ff6b35',
       features: currentLanguage === 'ar'
-        ? ['مخصص', 'محلي', 'متخصص']
-        : ['Personnalisé', 'Local', 'Spécialisé'],
-      status: 'limited'
+        ? ['مخصص', 'مدفوع', 'لا تختبر']
+        : ['Personnalisé', 'Payant', 'Ne pas tester'],
+      status: 'limited',
+      engine: 'Modal API (Custom)'
     }
   };
 
@@ -159,13 +162,36 @@ const ModelSelector = ({
           pb: 2,
           borderTop: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`
         }}>
-          <Typography variant="body2" sx={{ 
-            mb: 2, 
+          <Typography variant="body2" sx={{
+            mb: 2,
             color: darkMode ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)',
             fontStyle: 'italic'
           }}>
             {selectedModelData.description}
           </Typography>
+
+          {/* Engine information */}
+          <Box sx={{
+            mb: 2,
+            p: 1.5,
+            bgcolor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+            borderRadius: '8px',
+            border: `1px solid ${selectedModelData.color}30`
+          }}>
+            <Typography variant="caption" sx={{
+              color: selectedModelData.color,
+              fontWeight: 600,
+              display: 'block',
+              mb: 0.5
+            }}>
+              {currentLanguage === 'ar' ? 'محرك الذكاء الاصطناعي:' : 'Moteur IA:'}
+            </Typography>
+            <Typography variant="caption" sx={{
+              color: darkMode ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.7)'
+            }}>
+              {selectedModelData.engine}
+            </Typography>
+          </Box>
 
           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
             {selectedModelData.features.map((feature, index) => (
