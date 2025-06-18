@@ -11,7 +11,7 @@ class RealRagService {
   constructor() {
     this.ragApiUrl = import.meta.env.VITE_RAG_API_URL || 'http://localhost:8004';
     this.ragApiV1Url = `${this.ragApiUrl}/api/v1`;
-    this.projectId = 'eniadproject';  // Alphanumeric only
+    this.projectId = '1';  // Match RAG backend project ID
     this.isRagAvailable = false;
     this.useDirectOllamaOnly = false; // Use real RAG backend
 

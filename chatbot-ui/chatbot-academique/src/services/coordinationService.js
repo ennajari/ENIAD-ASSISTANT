@@ -8,18 +8,21 @@
 import ollamaService from './ollamaService.js';
 import geminiService from './geminiService.js';
 import realRagService from './realRagService.js';
+import modalService from './modalService.js';
 
 class CoordinationService {
   constructor() {
     this.separationPolicy = {
       rag: 'ollama-only',
       sma: 'gemini-only',
+      modal: 'premium-model',
       strict: true
     };
-    
+
     console.log('🎯 Coordination Service initialized with STRICT separation:');
     console.log('   🦙 RAG = Ollama/Llama UNIQUEMENT');
     console.log('   ✨ SMA = Gemini UNIQUEMENT');
+    console.log('   🚀 Modal = Votre modèle premium Llama3');
   }
 
   /**
@@ -62,6 +65,17 @@ class CoordinationService {
         ragReady = false;
       }
       
+      // Check Modal Service
+      let modalStatus, modalReady;
+      try {
+        modalStatus = await modalService.getStatus();
+        modalReady = modalStatus.available;
+      } catch (error) {
+        console.warn('⚠️ Modal service check failed:', error.message);
+        modalStatus = { available: false, error: error.message };
+        modalReady = false;
+      }
+
       const status = {
         rag: {
           engine: 'ollama',
@@ -75,6 +89,13 @@ class CoordinationService {
           available: geminiReady,
           model: geminiStatus.model || 'gemini-1.5-flash',
           policy: 'Gemini UNIQUEMENT - NO Ollama'
+        },
+        modal: {
+          engine: 'modal-llama3',
+          available: modalReady,
+          model: modalStatus.model || 'llama3',
+          url: modalStatus.url,
+          policy: 'Votre modèle premium - RAG/SMA compatible'
         },
         separation: {
           enforced: true,
@@ -104,7 +125,42 @@ class CoordinationService {
     console.log('✅ Using friend\'s RAG project with uploaded DATA files');
 
     try {
-      // Use Real RAG Service with backend
+      // Check if Modal should be used for generation (if available and requested)
+      const useModal = options.useModal && await modalService.getStatus().then(s => s.available);
+
+      if (useModal) {
+        console.log('🚀 Using Modal Llama3 for RAG generation...');
+
+        // Get RAG context from backend
+        const searchResult = await realRagService.searchDocuments(query, language);
+
+        if (searchResult.success && searchResult.results.length > 0) {
+          const ragContext = searchResult.results
+            .map(doc => doc.text)
+            .join('\n\n');
+
+          const modalResult = await modalService.generateRAGResponse(query, ragContext, language);
+
+          if (modalResult.success) {
+            return {
+              ...modalResult,
+              metadata: {
+                ...modalResult.metadata,
+                coordination_policy: 'rag-modal-premium',
+                gemini_excluded: true,
+                separation_enforced: true,
+                real_rag_backend: true,
+                modal_generation: true,
+                data_files_used: true
+              }
+            };
+          }
+        }
+
+        console.log('🔄 Modal RAG failed, falling back to Ollama...');
+      }
+
+      // Use Real RAG Service with backend (Ollama)
       const result = await realRagService.generateAnswer(query, language);
 
       // Ensure metadata reflects coordination policy
@@ -115,7 +171,8 @@ class CoordinationService {
           gemini_excluded: true,
           separation_enforced: true,
           real_rag_backend: true,
-          data_files_used: true
+          data_files_used: true,
+          modal_attempted: useModal
         };
       }
 
@@ -199,26 +256,130 @@ class CoordinationService {
   }
 
   /**
+   * Générer une réponse combinée SMA + RAG (quand SMA activé)
+   */
+  async generateCombinedSMARAGResponse(query, language = 'fr', smaResults = null) {
+    console.log('🔄 Coordination: Combined SMA + RAG request');
+    console.log('🔍 SMA (Gemini) + 📚 RAG (Ollama) - Hybrid approach');
+
+    try {
+      // 1. First get RAG response with Ollama
+      console.log('📚 Step 1: Getting RAG response with Ollama...');
+      const ragResult = await this.generateRAGResponse(query, language);
+
+      // 2. Then enhance with SMA if available
+      if (smaResults && smaResults.results && smaResults.results.length > 0) {
+        console.log('🔍 Step 2: Enhancing with SMA results using Gemini...');
+
+        // Combine RAG answer with SMA results for Gemini processing
+        const combinedContext = {
+          rag_answer: ragResult.success ? ragResult.answer : null,
+          rag_sources: ragResult.sources || [],
+          sma_results: smaResults.results,
+          query: query
+        };
+
+        const enhancedPrompt = language === 'ar' ?
+          `أنت مساعد ENIAD. لديك إجابة من قاعدة المعرفة المحلية ونتائج بحث ويب حديثة. ادمج المعلومات لتقديم إجابة شاملة.
+
+إجابة قاعدة المعرفة المحلية:
+${ragResult.answer || 'غير متوفرة'}
+
+نتائج البحث الحديثة:
+${JSON.stringify(smaResults.results.slice(0, 3), null, 2)}
+
+السؤال: ${query}
+
+الإجابة المدمجة:` :
+          `Tu es l'assistant ENIAD. Tu as une réponse de la base de connaissances locale et des résultats de recherche web récents. Combine les informations pour une réponse complète.
+
+Réponse base de connaissances locale:
+${ragResult.answer || 'Non disponible'}
+
+Résultats de recherche récents:
+${JSON.stringify(smaResults.results.slice(0, 3), null, 2)}
+
+Question: ${query}
+
+Réponse combinée:`;
+
+        const smaEnhanced = await this.generateSMAResponse(enhancedPrompt, language);
+
+        if (smaEnhanced.success) {
+          return {
+            success: true,
+            answer: smaEnhanced.answer,
+            sources: [...(ragResult.sources || []), ...(smaResults.sources || [])],
+            metadata: {
+              approach: 'combined-sma-rag',
+              rag_used: ragResult.success,
+              sma_used: true,
+              rag_engine: 'ollama',
+              sma_engine: 'gemini',
+              coordination_policy: 'hybrid-when-sma-active',
+              combined_sources: true
+            }
+          };
+        }
+      }
+
+      // Fallback to RAG only if SMA enhancement fails
+      console.log('🔄 SMA enhancement failed, using RAG only...');
+      return {
+        ...ragResult,
+        metadata: {
+          ...ragResult.metadata,
+          approach: 'rag-only-fallback',
+          sma_attempted: true,
+          sma_failed: true
+        }
+      };
+
+    } catch (error) {
+      console.error('❌ Combined SMA+RAG error:', error);
+      return {
+        success: false,
+        answer: language === 'ar' ?
+          'عذراً، فشل النظام المدمج SMA+RAG.' :
+          'Désolé, échec du système combiné SMA+RAG.',
+        metadata: {
+          approach: 'combined-sma-rag',
+          error: error.message
+        }
+      };
+    }
+  }
+
+  /**
    * Router principal qui applique la séparation stricte
    */
   async routeRequest(type, query, language = 'fr', options = {}) {
     console.log(`🎯 Coordination Router: ${type.toUpperCase()} request`);
-    
+
+    // Check if SMA is active and we should combine
+    const isSMAActive = options.isSMAActive || false;
+    const hasSMAResults = options.smaResults && options.smaResults.results && options.smaResults.results.length > 0;
+
     switch (type.toLowerCase()) {
       case 'rag':
-        console.log('📚 Routing to RAG with Ollama ONLY');
-        return await this.generateRAGResponse(query, language, options);
-        
+        if (isSMAActive && hasSMAResults) {
+          console.log('🔄 Routing to Combined SMA+RAG (SMA button active)');
+          return await this.generateCombinedSMARAGResponse(query, language, options.smaResults);
+        } else {
+          console.log('📚 Routing to RAG with Ollama ONLY');
+          return await this.generateRAGResponse(query, language, options);
+        }
+
       case 'sma':
         console.log('🔍 Routing to SMA with Gemini ONLY');
         return await this.generateSMAResponse(query, language, options.smaResults);
-        
+
       default:
         console.error('❌ Unknown request type:', type);
         return {
           success: false,
-          answer: language === 'ar' ? 
-            'نوع طلب غير معروف.' : 
+          answer: language === 'ar' ?
+            'نوع طلب غير معروف.' :
             'Type de requête inconnu.',
           metadata: {
             error: 'Unknown request type',

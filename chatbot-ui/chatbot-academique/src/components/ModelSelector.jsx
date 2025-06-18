@@ -59,15 +59,15 @@ const ModelSelector = ({
     llama: {
       name: currentLanguage === 'ar' ? 'RAG + مشروعنا' : 'RAG + Notre Projet',
       description: currentLanguage === 'ar'
-        ? 'نموذج مخصص لمشروع ENIAD (لا تختبر - مدفوع)'
-        : 'Modèle personnalisé ENIAD (ne pas tester - payant)',
+        ? 'نموذج مخصص لمشروع ENIAD مع دعم SMA (لا تختبر - مدفوع)'
+        : 'Modèle personnalisé ENIAD avec support SMA (ne pas tester - payant)',
       icon: <PsychologyIcon />,
       color: '#ff6b35',
       features: currentLanguage === 'ar'
-        ? ['مخصص', 'مدفوع', 'لا تختبر']
-        : ['Personnalisé', 'Payant', 'Ne pas tester'],
+        ? ['مخصص', 'RAG+SMA', 'مدفوع', 'لا تختبر']
+        : ['Personnalisé', 'RAG+SMA', 'Payant', 'Ne pas tester'],
       status: 'limited',
-      engine: 'Modal API (Custom)'
+      engine: 'Modal API (Custom) + SMA'
     }
   };
 
