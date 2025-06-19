@@ -16,6 +16,8 @@ import {
   Save as SaveIcon,
   Cancel as CancelIcon,
   VolumeUp as VolumeUpIcon,
+  PlayArrow as PlayIcon,
+  Stop as StopIcon,
   ContentCopy as CopyIcon,
   Check as CheckIcon,
   Psychology as PsychologyIcon,
@@ -369,7 +371,14 @@ const MessageBubble = ({
                 )}
                 
                 {message.role === 'assistant' && (
-                  <Tooltip title={t('speak') || 'Read aloud'} arrow>
+                  <Tooltip
+                    title={
+                      isSpeaking
+                        ? (currentLanguage === 'ar' ? 'إيقاف القراءة' : 'Arrêter la lecture')
+                        : (currentLanguage === 'ar' ? 'قراءة النص' : 'Lire le texte')
+                    }
+                    arrow
+                  >
                     <IconButton
                       size="small"
                       onClick={() => onSpeakText(message.content, message.id)}
@@ -377,11 +386,15 @@ const MessageBubble = ({
                       sx={{
                         width: 32,
                         height: 32,
-                        backgroundColor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                        color: isSpeaking ? '#10a37f' : (darkMode ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)'),
+                        backgroundColor: isSpeaking
+                          ? (darkMode ? 'rgba(239,68,68,0.2)' : 'rgba(239,68,68,0.1)')
+                          : (darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'),
+                        color: isSpeaking
+                          ? '#ef4444'
+                          : (darkMode ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)'),
                         transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                         '&:hover:not(:disabled)': {
-                          backgroundColor: '#10a37f',
+                          backgroundColor: isSpeaking ? '#ef4444' : '#10a37f',
                           color: '#fff',
                           transform: 'scale(1.05)',
                         },
@@ -390,7 +403,11 @@ const MessageBubble = ({
                         }
                       }}
                     >
-                      <VolumeUpIcon sx={{ fontSize: 16 }} />
+                      {isSpeaking ? (
+                        <StopIcon sx={{ fontSize: 16 }} />
+                      ) : (
+                        <PlayIcon sx={{ fontSize: 16 }} />
+                      )}
                     </IconButton>
                   </Tooltip>
                 )}

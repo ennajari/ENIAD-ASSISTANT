@@ -23,6 +23,7 @@ import {
 } from '@mui/icons-material';
 import { DRAWER_WIDTH, LANGUAGES, translations } from '../constants/config';
 import UserAvatar from './UserAvatar';
+import TTSSelector from './TTSSelector';
 
 const ChatHeader = ({
   drawerOpen = false,
@@ -155,6 +156,17 @@ const ChatHeader = ({
         >
           {conversationHistory.find(c => c.id === currentChatId)?.title || t('newConversation')}
         </Typography>
+
+        {/* TTS Selector */}
+        <Box sx={{ mr: 2, display: { xs: 'none', sm: 'block' } }}>
+          <TTSSelector
+            currentLanguage={currentLanguage}
+            darkMode={darkMode}
+            onServiceChange={(service) => {
+              console.log('TTS Service changed to:', service);
+            }}
+          />
+        </Box>
 
         {/* User Profile Menu or Login Button */}
         {user ? (
