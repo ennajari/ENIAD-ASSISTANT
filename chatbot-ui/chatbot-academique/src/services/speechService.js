@@ -81,7 +81,11 @@ class SpeechService {
       quality = 'high'
     } = options;
 
-    console.log(`🔊 TTS Request: ${text.substring(0, 50)}... (${finalLanguage}, detected: ${detectedLanguage})`);
+    console.group(`🎙️ TTS REQUEST - ${finalLanguage.toUpperCase()}`);
+    console.log(`📝 Text: ${text.substring(0, 100)}${text.length > 100 ? '...' : ''}`);
+    console.log(`🌐 Language: ${finalLanguage} (detected: ${detectedLanguage})`);
+    console.log(`⚙️ Options:`, { speed, pitch, volume, quality });
+    console.groupEnd();
 
     // Emit loading state if callback provided
     if (options.onStateChange) {
@@ -129,7 +133,9 @@ class SpeechService {
    */
   async elevenLabsTTS(text, language, options = {}) {
     try {
-      console.log(`🎙️ Using ElevenLabs TTS for ${language}`);
+      console.group(`🎙️ ELEVENLABS TTS - ${language.toUpperCase()}`);
+      console.log(`🎤 Voice ID: ${voiceId}`);
+      console.log(`🔧 Model: eleven_multilingual_v2`);
 
       // Configuration des voix par langue
       const voiceConfig = {
@@ -166,28 +172,36 @@ class SpeechService {
         })
       });
 
-      console.log('ElevenLabs response status:', response.status);
+      console.log(`📡 API Response: ${response.status} ${response.statusText}`);
 
       if (!response.ok) {
         const errorBody = await response.text();
-        console.error(`ElevenLabs API Error: ${errorBody}`);
+        console.error(`❌ ElevenLabs API Error: ${errorBody}`);
+        console.groupEnd();
         throw new Error(`ElevenLabs API failed with status ${response.status}`);
       }
 
       const audioBuffer = await response.arrayBuffer();
-      console.log('Received audio buffer. Size:', audioBuffer.byteLength, 'bytes.');
+      const sizeKB = Math.round(audioBuffer.byteLength / 1024);
+      console.log(`📦 Audio received: ${sizeKB}KB (${audioBuffer.byteLength} bytes)`);
 
       if (audioBuffer.byteLength === 0) {
+        console.error('❌ Empty audio buffer received');
+        console.groupEnd();
         throw new Error('Received empty audio buffer from ElevenLabs');
       }
 
       const audioBlob = new Blob([audioBuffer], { type: 'audio/mpeg' });
+      console.log('🔊 Playing audio...');
       await this.playAudioBlob(audioBlob);
 
       console.log('✅ ElevenLabs TTS completed successfully');
+      console.groupEnd();
 
     } catch (error) {
       console.error('❌ ElevenLabs TTS failed:', error.message);
+      console.error('🔍 Error details:', error);
+      console.groupEnd();
       throw error;
     }
   }
