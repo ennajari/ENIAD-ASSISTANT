@@ -1,264 +1,161 @@
 /**
- * Service de modèle local simulé pour les tests RAG
- * Alternative à Ollama pour les démonstrations
+ * Service de modèle local utilisant le vrai système RAG
+ * Connecté au serveur RAG sur le port 8009
  */
+
+import axios from 'axios';
 
 class LocalModelService {
   constructor() {
-    this.isAvailable = true;
-    this.modelName = 'Local-ENIAD-Model';
-    this.responses = this.initializeResponses();
-    
-    console.log('🤖 Local Model Service initialized');
+    this.isAvailable = false;
+    this.modelName = 'RAG-Local-Ollama';
+    this.ragApiUrl = import.meta.env.VITE_RAG_API_URL || 'http://localhost:8009';
+    this.projectId = '1';
+
+    // Tester la connexion au démarrage
+    this.testConnection();
+
+    console.log('🤖 Local Model Service initialized - Using Real RAG');
+    console.log('📡 RAG API URL:', this.ragApiUrl);
   }
 
   /**
-   * Initialiser les réponses prédéfinies pour ENIAD
+   * Tester la connexion au serveur RAG
    */
-  initializeResponses() {
-    return {
-      formations: {
-        keywords: ['formation', 'programme', 'étude', 'cursus', 'diplôme', 'master', 'licence'],
-        responses: {
-          fr: `L'ENIAD propose plusieurs formations spécialisées en intelligence artificielle et sciences des données :
-
-🎓 **Programmes disponibles :**
-• Master en Intelligence Artificielle
-• Master en Science des Données  
-• Licence en Informatique et IA
-• Formation continue en Machine Learning
-
-📚 **Spécialisations :**
-• Deep Learning et réseaux de neurones
-• Traitement du langage naturel
-• Vision par ordinateur
-• IA éthique et explicable
-• Big Data et analyse prédictive
-
-🏆 **Points forts :**
-• Projets pratiques avec l'industrie
-• Laboratoires équipés de GPU
-• Encadrement par des chercheurs reconnus
-• Partenariats internationaux`,
-          ar: `يقدم معهد ENIAD عدة برامج متخصصة في الذكاء الاصطناعي وعلوم البيانات:
-
-🎓 **البرامج المتاحة:**
-• ماجستير في الذكاء الاصطناعي
-• ماجستير في علوم البيانات
-• إجازة في الإعلاميات والذكاء الاصطناعي
-• تكوين مستمر في التعلم الآلي
-
-📚 **التخصصات:**
-• التعلم العميق والشبكات العصبية
-• معالجة اللغة الطبيعية
-• الرؤية الحاسوبية
-• الذكاء الاصطناعي الأخلاقي
-• البيانات الضخمة والتحليل التنبؤي`
-        }
-      },
-      admission: {
-        keywords: ['admission', 'inscription', 'candidature', 'condition', 'requis'],
-        responses: {
-          fr: `**Conditions d'admission à l'ENIAD :**
-
-📋 **Prérequis :**
-• Licence en informatique, mathématiques ou domaine connexe
-• Moyenne minimale de 12/20
-• Maîtrise du français et de l'anglais
-
-📅 **Processus d'admission :**
-1. **Candidature en ligne** (Mars - Juin)
-2. **Examen écrit** (Juillet)
-3. **Entretien oral** (Août)
-4. **Résultats** (Septembre)
-
-💰 **Frais de scolarité :**
-• Étudiants marocains : 15,000 DH/an
-• Étudiants étrangers : 25,000 DH/an
-
-📞 **Contact :** admission@eniad.ump.ma`,
-          ar: `**شروط القبول في معهد ENIAD:**
-
-📋 **المتطلبات:**
-• إجازة في الإعلاميات أو الرياضيات أو مجال ذي صلة
-• معدل لا يقل عن 12/20
-• إتقان الفرنسية والإنجليزية
-
-📅 **عملية القبول:**
-1. **التسجيل عبر الإنترنت** (مارس - يونيو)
-2. **امتحان كتابي** (يوليو)
-3. **مقابلة شفوية** (أغسطس)
-4. **النتائج** (سبتمبر)
-
-💰 **الرسوم الدراسية:**
-• الطلاب المغاربة: 15,000 درهم/سنة
-• الطلاب الأجانب: 25,000 درهم/سنة`
-        }
-      },
-      recherche: {
-        keywords: ['recherche', 'laboratoire', 'projet', 'publication', 'thèse'],
-        responses: {
-          fr: `**Recherche à l'ENIAD :**
-
-🔬 **Laboratoires de recherche :**
-• Lab IA Explicable
-• Lab Vision par Ordinateur
-• Lab Traitement du Langage Naturel
-• Lab IA pour l'Éducation
-
-📊 **Projets en cours :**
-• IA pour le diagnostic médical
-• Systèmes de recommandation intelligents
-• Analyse de sentiments en arabe
-• Robotique éducative
-
-📚 **Publications récentes :**
-• 25+ articles dans des conférences internationales
-• Collaborations avec MIT, Stanford
-• Brevets en IA appliquée
-
-🎯 **Opportunités :**
-• Stages de recherche
-• Thèses de doctorat
-• Projets industriels`,
-          ar: `**البحث في معهد ENIAD:**
-
-🔬 **مختبرات البحث:**
-• مختبر الذكاء الاصطناعي القابل للتفسير
-• مختبر الرؤية الحاسوبية
-• مختبر معالجة اللغة الطبيعية
-• مختبر الذكاء الاصطناعي للتعليم
-
-📊 **المشاريع الجارية:**
-• الذكاء الاصطناعي للتشخيص الطبي
-• أنظمة التوصية الذكية
-• تحليل المشاعر باللغة العربية
-• الروبوتات التعليمية`
-        }
-      },
-      general: {
-        keywords: ['eniad', 'école', 'université', 'ump', 'berkane', 'maroc'],
-        responses: {
-          fr: `**À propos de l'ENIAD :**
-
-🏛️ **École Nationale d'Intelligence Artificielle et Data Science**
-• Établissement public d'enseignement supérieur
-• Rattachée à l'Université Mohammed Premier (UMP)
-• Située à Berkane, Maroc
-
-🎯 **Mission :**
-Former des experts en IA et science des données pour répondre aux besoins du marché national et international.
-
-🌟 **Valeurs :**
-• Excellence académique
-• Innovation technologique
-• Éthique de l'IA
-• Ouverture internationale
-
-📍 **Campus :**
-• Laboratoires modernes
-• Équipements de pointe
-• Bibliothèque numérique
-• Espaces collaboratifs`,
-          ar: `**حول معهد ENIAD:**
-
-🏛️ **المعهد الوطني للذكاء الاصطناعي وعلوم البيانات**
-• مؤسسة عمومية للتعليم العالي
-• تابعة لجامعة محمد الأول (UMP)
-• تقع في بركان، المغرب
-
-🎯 **المهمة:**
-تكوين خبراء في الذكاء الاصطناعي وعلوم البيانات لتلبية احتياجات السوق الوطني والدولي.
-
-🌟 **القيم:**
-• التميز الأكاديمي
-• الابتكار التكنولوجي
-• أخلاقيات الذكاء الاصطناعي
-• الانفتاح الدولي`
-        }
-      }
-    };
-  }
-
-  /**
-   * Analyser la requête et trouver la catégorie appropriée
-   */
-  analyzeQuery(query) {
-    const queryLower = query.toLowerCase();
-    
-    for (const [category, data] of Object.entries(this.responses)) {
-      for (const keyword of data.keywords) {
-        if (queryLower.includes(keyword)) {
-          return category;
-        }
-      }
+  async testConnection() {
+    try {
+      console.log('🔍 Testing RAG connection...');
+      const response = await axios.get(`${this.ragApiUrl}/status`, { timeout: 10000 });
+      this.isAvailable = response.status === 200;
+      console.log('✅ RAG backend available for Local Model Service');
+      return { success: true, message: 'RAG backend connected' };
+    } catch (error) {
+      this.isAvailable = false;
+      console.log('⚠️ RAG backend not available for Local Model Service');
+      console.log(`   Error: ${error.message}`);
+      return { success: false, message: 'RAG backend required', error: error.message };
     }
-    
-    return 'general';
+  }
+
+
+  /**
+   * Appeler le système RAG pour obtenir une réponse
+   */
+  async callRAGSystem(query, language = 'fr') {
+    try {
+      console.log(`🤖 Local Model Service calling RAG for: "${query}"`);
+
+      const response = await axios.post(
+        `${this.ragApiUrl}/api/v1/nlp/index/answer/${this.projectId}`,
+        {
+          query: query,
+          language: language,
+          max_results: 5
+        },
+        {
+          timeout: 30000,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.data && response.data.answer) {
+        return {
+          success: true,
+          answer: response.data.answer,
+          sources: response.data.sources || [],
+          confidence: response.data.confidence || 0.0,
+          timestamp: response.data.timestamp
+        };
+      } else {
+        throw new Error('Invalid RAG response format');
+      }
+    } catch (error) {
+      console.error('❌ RAG call failed:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
   }
 
   /**
-   * Générer une réponse basée sur la requête
+   * Générer une réponse basée sur la requête en utilisant le vrai RAG
    */
   async generateResponse(query, language = 'fr', context = '') {
     try {
-      console.log(`🤖 Génération locale pour: "${query}"`);
-      
-      const category = this.analyzeQuery(query);
-      const categoryData = this.responses[category];
-      
-      let response = categoryData.responses[language] || categoryData.responses.fr;
-      
-      // Ajouter le contexte si disponible
-      if (context && context.trim()) {
-        const contextPrefix = language === 'ar' ? 
-          '\n\n📚 **معلومات إضافية من قاعدة البيانات:**\n' :
-          '\n\n📚 **Informations supplémentaires de la base de données :**\n';
-        response += contextPrefix + context.substring(0, 300) + '...';
+      console.log(`🤖 Local Model Service generating response for: "${query}"`);
+
+      // Vérifier que le RAG est disponible
+      if (!this.isAvailable) {
+        await this.testConnection();
+        if (!this.isAvailable) {
+          throw new Error('RAG backend not available');
+        }
       }
-      
-      // Ajouter une note sur le modèle local
-      const modelNote = language === 'ar' ? 
-        '\n\n🤖 *تم إنتاج هذه الإجابة بواسطة النموذج المحلي لـ ENIAD*' :
-        '\n\n🤖 *Réponse générée par le modèle local ENIAD*';
-      response += modelNote;
-      
-      return {
-        success: true,
-        answer: response,
-        model: this.modelName,
-        category: category,
-        source: 'Modèle Local ENIAD',
-        icon: '🤖'
-      };
+
+      // Appeler le système RAG
+      const ragResult = await this.callRAGSystem(query, language);
+
+      if (ragResult.success) {
+        // Ajouter une note sur le modèle utilisé
+        const modelNote = language === 'ar' ?
+          '\n\n🤖 *تم إنتاج هذه الإجابة بواسطة نظام RAG المحلي مع Ollama*' :
+          '\n\n🤖 *Réponse générée par le système RAG local avec Ollama*';
+
+        return {
+          success: true,
+          answer: ragResult.answer + modelNote,
+          sources: ragResult.sources,
+          confidence: ragResult.confidence,
+          model: this.modelName,
+          source: 'RAG Local + Ollama',
+          icon: '🦙',
+          metadata: {
+            backend: 'rag_local_ollama',
+            sources_count: ragResult.sources?.length || 0,
+            confidence: ragResult.confidence,
+            timestamp: ragResult.timestamp
+          }
+        };
+      } else {
+        throw new Error('RAG generation failed: ' + ragResult.error);
+      }
     } catch (error) {
-      console.error('❌ Erreur génération locale:', error);
+      console.error('❌ Local Model Service error:', error);
       return {
         success: false,
-        answer: language === 'ar' ? 
-          'عذراً، حدث خطأ في النموذج المحلي.' : 
-          'Désolé, erreur avec le modèle local.',
-        model: 'error'
+        answer: language === 'ar' ?
+          'عذراً، حدث خطأ في النموذج المحلي. يرجى المحاولة مرة أخرى.' :
+          'Désolé, erreur avec le modèle local. Veuillez réessayer.',
+        model: 'error',
+        error: error.message
       };
     }
   }
 
   /**
-   * Vérifier la disponibilité
+   * Vérifier la disponibilité du système RAG
    */
   async checkAvailability() {
-    return true; // Toujours disponible
+    const connectionTest = await this.testConnection();
+    return connectionTest.success;
   }
 
   /**
-   * Obtenir le statut
+   * Obtenir le statut du service
    */
   async getStatus() {
+    const connectionTest = await this.testConnection();
+
     return {
-      service: 'Local Model Service',
+      service: 'Local Model Service (RAG)',
       available: this.isAvailable,
       model: this.modelName,
-      categories: Object.keys(this.responses),
+      ragBackend: this.ragApiUrl,
+      projectId: this.projectId,
+      connection: connectionTest,
       lastCheck: new Date().toISOString()
     };
   }
@@ -266,8 +163,8 @@ Former des experts en IA et science des données pour répondre aux besoins du m
   /**
    * Générer une réponse optimisée pour ENIAD
    */
-  async generateENIADResponse(query, language = 'fr', context = '') {
-    return await this.generateResponse(query, language, context);
+  async generateENIADResponse(query, language = 'fr') {
+    return await this.generateResponse(query, language);
   }
 }
 

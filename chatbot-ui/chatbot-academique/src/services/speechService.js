@@ -73,7 +73,27 @@ class SpeechService {
     console.log(`🔊 TTS Request: ${text.substring(0, 50)}... (${language})`);
 
     try {
-      // Try eSpeak NG first for Arabic and French (as per user preference)
+      // Priority 1: Try Google Cloud TTS for best quality (if API key available)
+      if (this.googleCloudApiKey && (language === 'ar' || language === 'fr')) {
+        try {
+          await this.googleTTS(text, language, options);
+          return;
+        } catch (error) {
+          console.warn('⚠️ Google Cloud TTS failed, trying other services:', error.message);
+        }
+      }
+
+      // Priority 2: Try VoiceRSS for simple and free option
+      if (import.meta.env.VITE_VOICERSS_API_KEY && (language === 'ar' || language === 'fr')) {
+        try {
+          await this.voiceRSSTTS(text, language, options);
+          return;
+        } catch (error) {
+          console.warn('⚠️ VoiceRSS TTS failed, trying other services:', error.message);
+        }
+      }
+
+      // Priority 3: Try eSpeak NG as fallback for Arabic and French
       if (language === 'ar' || language === 'fr') {
         try {
           await this.eSpeakTTS(text, language, options);
@@ -277,38 +297,130 @@ class SpeechService {
   }
 
   /**
-   * Google Cloud TTS
+   * Google Cloud TTS (Enhanced with Neural voices)
    */
   async googleTTS(text, language, options = {}) {
-    const voice = this.voiceConfig[language]?.google;
-    if (!voice) {
-      throw new Error(`Google voice not available for ${language}`);
-    }
+    try {
+      console.log(`🌐 Using Google Cloud TTS for ${language}`);
 
-    const response = await axios.post(
-      `https://texttospeech.googleapis.com/v1/text:synthesize?key=${this.googleCloudApiKey}`,
-      {
-        input: { text },
-        voice: {
-          languageCode: language === 'ar' ? 'ar-XA' : language === 'fr' ? 'fr-FR' : 'en-US',
-          name: voice,
+      // Enhanced voice configuration with Neural voices
+      const voiceConfig = {
+        'fr': {
+          languageCode: 'fr-FR',
+          name: 'fr-FR-Neural2-D', // High-quality neural voice
           ssmlGender: 'FEMALE'
         },
-        audioConfig: {
-          audioEncoding: 'MP3',
-          speakingRate: options.speed || 1.0,
-          pitch: (options.pitch || 1.0) * 2 - 2 // Convert to Google's range
+        'ar': {
+          languageCode: 'ar-XA',
+          name: 'ar-XA-Wavenet-D', // Best Arabic voice available
+          ssmlGender: 'FEMALE'
+        },
+        'en': {
+          languageCode: 'en-US',
+          name: 'en-US-Neural2-F',
+          ssmlGender: 'FEMALE'
         }
-      }
-    );
+      };
 
-    const audioContent = response.data.audioContent;
-    const audioBlob = new Blob([
-      Uint8Array.from(atob(audioContent), c => c.charCodeAt(0))
-    ], { type: 'audio/mpeg' });
-    
-    await this.playAudioBlob(audioBlob);
+      const voice = voiceConfig[language] || voiceConfig['en'];
+
+      const response = await axios.post(
+        `https://texttospeech.googleapis.com/v1/text:synthesize?key=${this.googleCloudApiKey}`,
+        {
+          input: { text },
+          voice: voice,
+          audioConfig: {
+            audioEncoding: 'MP3',
+            speakingRate: options.speed || 1.0,
+            pitch: (options.pitch || 1.0) * 2 - 2, // Convert to Google's range
+            volumeGainDb: 0.0,
+            sampleRateHertz: 24000 // High quality sample rate
+          }
+        }
+      );
+
+      const audioContent = response.data.audioContent;
+      const audioBlob = new Blob([
+        Uint8Array.from(atob(audioContent), c => c.charCodeAt(0))
+      ], { type: 'audio/mpeg' });
+
+      await this.playAudioBlob(audioBlob);
+      console.log('✅ Google Cloud TTS completed successfully');
+
+    } catch (error) {
+      console.error('❌ Google Cloud TTS failed:', error.message);
+      throw error;
+    }
   }
+
+  /**
+   * VoiceRSS TTS (Simple and free)
+   */
+  async voiceRSSTTS(text, language, options = {}) {
+    try {
+      const apiKey = import.meta.env.VITE_VOICERSS_API_KEY;
+
+      if (!apiKey) {
+        throw new Error('VoiceRSS API key not configured');
+      }
+
+      console.log(`🎤 Using VoiceRSS TTS for ${language}`);
+
+      // Configuration des langues VoiceRSS
+      const languageMap = {
+        'fr': 'fr-fr',
+        'ar': 'ar-sa',
+        'en': 'en-us'
+      };
+
+      const voiceLang = languageMap[language] || 'fr-fr';
+
+      // Préparer les paramètres
+      const params = new URLSearchParams({
+        key: apiKey,
+        hl: voiceLang,
+        src: text,
+        r: options.speed ? Math.round((options.speed - 1) * 5).toString() : '0', // VoiceRSS utilise -10 à 10
+        c: 'mp3',
+        f: '44khz_16bit_stereo'
+      });
+
+      // Appeler l'API VoiceRSS
+      const response = await fetch(`https://api.voicerss.org/?${params}`, {
+        method: 'GET'
+      });
+
+      if (!response.ok) {
+        throw new Error(`VoiceRSS error: ${response.status}`);
+      }
+
+      const contentType = response.headers.get('content-type');
+
+      if (contentType && contentType.includes('text')) {
+        // Erreur retournée en texte
+        const errorText = await response.text();
+        throw new Error(`VoiceRSS API error: ${errorText}`);
+      }
+
+      // Obtenir l'audio
+      const audioBlob = await response.blob();
+
+      if (audioBlob.size === 0) {
+        throw new Error('Empty audio response from VoiceRSS');
+      }
+
+      // Jouer l'audio
+      await this.playAudioBlob(audioBlob);
+
+      console.log('✅ VoiceRSS TTS completed successfully');
+
+    } catch (error) {
+      console.error('❌ VoiceRSS TTS failed:', error.message);
+      throw error;
+    }
+  }
+
+
 
   /**
    * Browser built-in TTS (fallback)
