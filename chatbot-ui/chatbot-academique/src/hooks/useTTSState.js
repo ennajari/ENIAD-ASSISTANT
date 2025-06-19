@@ -107,7 +107,10 @@ export const useTTSState = (currentLanguage = 'fr') => {
       // Définir l'état de chargement
       setIsLoading(prev => ({ ...prev, [messageId]: true }));
 
-      console.log(`🎙️ Starting ElevenLabs TTS for language: ${finalLanguage}`);
+      console.group(`🎙️ TTS STATE MANAGER - ${finalLanguage.toUpperCase()}`);
+      console.log(`📝 Message ID: ${messageId}`);
+      console.log(`🌐 Language: ${finalLanguage}`);
+      console.log(`⏱️ Estimated duration: ${duration}s`);
 
       // Utiliser ElevenLabs TTS avec callbacks d'état
       await speechService.textToSpeech(text, finalLanguage, {
@@ -149,10 +152,12 @@ export const useTTSState = (currentLanguage = 'fr') => {
       });
 
       console.log('✅ ElevenLabs TTS completed successfully');
+      console.groupEnd();
       
     } catch (error) {
       console.error('❌ ElevenLabs TTS error:', error);
-      
+      console.error('🔍 Error stack:', error.stack);
+
       // Nettoyer les états en cas d'erreur
       setIsLoading(prev => ({ ...prev, [messageId]: false }));
       setIsSpeaking(prev => ({ ...prev, [messageId]: false }));
@@ -161,11 +166,12 @@ export const useTTSState = (currentLanguage = 'fr') => {
       stopProgressTracking();
 
       // Message d'erreur localisé
-      const errorMessage = finalLanguage === 'ar' 
+      const errorMessage = finalLanguage === 'ar'
         ? 'خطأ في تشغيل الصوت - تحقق من الاتصال بالإنترنت'
         : 'Erreur de synthèse vocale - vérifiez votre connexion internet';
-      
-      console.log(`⚠️ ${errorMessage}`);
+
+      console.warn(`⚠️ ${errorMessage}`);
+      console.groupEnd();
     }
   }, [isSpeaking, currentLanguage, detectLanguage, estimateReadingDuration, startProgressTracking, stopProgressTracking]);
 
