@@ -3,7 +3,7 @@ import { API_URL } from '../constants/config';
 import staticSuggestionsService from '../services/staticSuggestionsService';
 import ragApiService from '../services/ragApiService';
 import realRagService from '../services/realRagService';
-import speechService from '../services/speechService';
+
 import smaService from '../services/smaService';
 import translationService from '../services/translationService';
 import autoCorrectionService from '../services/autoCorrectionService';
@@ -70,8 +70,6 @@ export const createChatHandlers = (
 
     const {
       useRAG = true,
-      autoSpeak = false,
-      speechQuality = 'high',
       isSMAActive = false,
       autoCorrect = true,
       selectedModel = 'gemini',
@@ -687,18 +685,7 @@ export const createChatHandlers = (
 
       setMessages(prev => [...prev, botMessage]);
 
-      // Auto-speak response if enabled
-      if (autoSpeak && botMessage.content) {
-        try {
-          await speechService.textToSpeech(
-            botMessage.content,
-            currentLanguage,
-            { quality: speechQuality }
-          );
-        } catch (speechError) {
-          console.warn('⚠️ Auto-speak failed:', speechError.message);
-        }
-      }
+      // Auto-speak is now handled by the TTS system in App.jsx via useEffect
 
       // Always update conversation history using the state manager
       await updateConversationHistory([...messages, userMessage, botMessage]);

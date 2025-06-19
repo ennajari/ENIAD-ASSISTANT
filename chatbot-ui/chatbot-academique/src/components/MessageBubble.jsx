@@ -15,9 +15,6 @@ import {
   Edit as EditIcon,
   Save as SaveIcon,
   Cancel as CancelIcon,
-  VolumeUp as VolumeUpIcon,
-  PlayArrow as PlayIcon,
-  Stop as StopIcon,
   ContentCopy as CopyIcon,
   Check as CheckIcon,
   Psychology as PsychologyIcon,
@@ -26,6 +23,7 @@ import {
 } from '@mui/icons-material';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import TTSButton from './TTSButton';
 
 const MessageBubble = ({
   message,
@@ -39,6 +37,7 @@ const MessageBubble = ({
   onEditChange = () => {},
   onSpeakText = () => {},
   isSpeaking = false,
+  isLoading = false,
   supported = false,
   t = (key) => key
 }) => {
@@ -284,7 +283,7 @@ const MessageBubble = ({
                 {(message.metadata.model === 'llama' || message.metadata.model === 'llama3-eniad') && <SmartToyIcon sx={{ fontSize: 14, color: '#ff6b35' }} />}
                 <span>
                   {(message.metadata.model === 'gemini' || message.metadata.model === 'gemini-via-sma' || message.metadata.model === 'sma-fallback') && (currentLanguage === 'ar' ? 'SMA + جيميني' : 'SMA + Gemini')}
-                  {message.metadata.model === 'rag' && (currentLanguage === 'ar' ? 'RAG + محلي' : 'RAG + Modèle Local')}
+                  {message.metadata.model === 'rag' && (currentLanguage === 'ar' ? 'RAG' : 'RAG')}
                   {(message.metadata.model === 'llama' || message.metadata.model === 'llama3-eniad') && (currentLanguage === 'ar' ? 'RAG + مشروعنا' : 'RAG + Notre Projet')}
                 </span>
                 {message.metadata.sources && message.metadata.sources.length > 0 && (
@@ -371,45 +370,19 @@ const MessageBubble = ({
                 )}
                 
                 {message.role === 'assistant' && (
-                  <Tooltip
-                    title={
-                      isSpeaking
-                        ? (currentLanguage === 'ar' ? 'إيقاف القراءة' : 'Arrêter la lecture')
-                        : (currentLanguage === 'ar' ? 'قراءة النص' : 'Lire le texte')
-                    }
-                    arrow
-                  >
-                    <IconButton
-                      size="small"
-                      onClick={() => onSpeakText(message.content, message.id)}
-                      disabled={!supported}
-                      sx={{
-                        width: 32,
-                        height: 32,
-                        backgroundColor: isSpeaking
-                          ? (darkMode ? 'rgba(239,68,68,0.2)' : 'rgba(239,68,68,0.1)')
-                          : (darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'),
-                        color: isSpeaking
-                          ? '#ef4444'
-                          : (darkMode ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)'),
-                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                        '&:hover:not(:disabled)': {
-                          backgroundColor: isSpeaking ? '#ef4444' : '#10a37f',
-                          color: '#fff',
-                          transform: 'scale(1.05)',
-                        },
-                        '&:disabled': {
-                          opacity: 0.3,
-                        }
-                      }}
-                    >
-                      {isSpeaking ? (
-                        <StopIcon sx={{ fontSize: 16 }} />
-                      ) : (
-                        <PlayIcon sx={{ fontSize: 16 }} />
-                      )}
-                    </IconButton>
-                  </Tooltip>
+                  <TTSButton
+                    text={message.content}
+                    messageId={message.id}
+                    language={currentLanguage}
+                    darkMode={darkMode}
+                    onSpeakText={onSpeakText}
+                    isSpeaking={isSpeaking}
+                    isLoading={isLoading}
+                    supported={supported}
+                    size="small"
+                    variant="premium"
+                    showLabel={false}
+                  />
                 )}
               </Box>
             </Fade>
