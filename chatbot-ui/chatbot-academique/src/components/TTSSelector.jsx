@@ -29,10 +29,7 @@ import {
 const TTSSelector = ({ currentLanguage, onServiceChange, darkMode }) => {
   const [selectedService, setSelectedService] = useState('auto');
   const [configOpen, setConfigOpen] = useState(false);
-  const [apiKeys, setApiKeys] = useState({
-    googleCloud: '',
-    voiceRSS: ''
-  });
+  // Plus besoin de gérer les clés API car ElevenLabs est intégré
   const [serviceStatus, setServiceStatus] = useState({});
 
   // Configuration des services TTS
@@ -43,39 +40,24 @@ const TTSSelector = ({ currentLanguage, onServiceChange, darkMode }) => {
       description: currentLanguage === 'ar' ? 'يختار أفضل خدمة متاحة' : 'Choisit le meilleur service disponible',
       priority: 1
     },
-    googleCloud: {
-      name: 'Google Cloud TTS',
-      icon: '🌐',
-      description: currentLanguage === 'ar' ? 'جودة عالية، أصوات عصبية' : 'Haute qualité, voix neurales',
+    elevenlabs: {
+      name: 'ElevenLabs',
+      icon: '🎙️',
+      description: currentLanguage === 'ar' ? 'جودة ممتازة، أصوات طبيعية' : 'Qualité excellente, voix naturelles',
       priority: 2,
-      requiresKey: true,
-      free: '4M chars/mois'
-    },
-    voiceRSS: {
-      name: 'VoiceRSS',
-      icon: '🎤',
-      description: currentLanguage === 'ar' ? 'مجاني، بسيط' : 'Gratuit, simple',
-      priority: 3,
-      requiresKey: true,
-      free: '350 req/jour'
+      configured: true,
+      free: 'Inclus'
     },
     browser: {
       name: currentLanguage === 'ar' ? 'متصفح' : 'Navigateur',
       icon: '🔊',
       description: currentLanguage === 'ar' ? 'مدمج، دائماً متاح' : 'Intégré, toujours disponible',
-      priority: 4,
+      priority: 3,
       fallback: true
     }
   };
 
   useEffect(() => {
-    // Charger les clés API sauvegardées
-    const savedKeys = {
-      googleCloud: localStorage.getItem('tts_google_cloud_key') || '',
-      voiceRSS: localStorage.getItem('tts_voicerss_key') || ''
-    };
-    setApiKeys(savedKeys);
-
     // Charger le service sélectionné
     const savedService = localStorage.getItem('tts_selected_service') || 'auto';
     setSelectedService(savedService);
@@ -87,9 +69,8 @@ const TTSSelector = ({ currentLanguage, onServiceChange, darkMode }) => {
   const checkServicesStatus = async () => {
     const status = {};
 
-    // Vérifier les clés API
-    status.googleCloud = !!apiKeys.googleCloud;
-    status.voiceRSS = !!apiKeys.voiceRSS;
+    // ElevenLabs est toujours disponible (clé intégrée)
+    status.elevenlabs = true;
     status.browser = 'speechSynthesis' in window;
 
     setServiceStatus(status);
@@ -106,18 +87,6 @@ const TTSSelector = ({ currentLanguage, onServiceChange, darkMode }) => {
   };
 
   const handleSaveConfig = () => {
-    // Sauvegarder les clés API
-    localStorage.setItem('tts_google_cloud_key', apiKeys.googleCloud);
-    localStorage.setItem('tts_voicerss_key', apiKeys.voiceRSS);
-    
-    // Mettre à jour les variables d'environnement (simulation)
-    if (apiKeys.googleCloud) {
-      window.VITE_GOOGLE_CLOUD_TTS_API_KEY = apiKeys.googleCloud;
-    }
-    if (apiKeys.voiceRSS) {
-      window.VITE_VOICERSS_API_KEY = apiKeys.voiceRSS;
-    }
-
     setConfigOpen(false);
     checkServicesStatus();
   };
@@ -126,9 +95,8 @@ const TTSSelector = ({ currentLanguage, onServiceChange, darkMode }) => {
     const service = ttsServices[serviceKey];
     if (!service) return null;
 
-    if (service.requiresKey) {
-      const hasKey = serviceKey === 'googleCloud' ? !!apiKeys.googleCloud : !!apiKeys.voiceRSS;
-      return hasKey ? 'configured' : 'needs_key';
+    if (service.configured) {
+      return 'configured';
     }
 
     return 'available';
@@ -228,53 +196,39 @@ const TTSSelector = ({ currentLanguage, onServiceChange, darkMode }) => {
         </DialogTitle>
         <DialogContent>
           <Box sx={{ mt: 2 }}>
-            <Alert severity="info" sx={{ mb: 3 }}>
-              {currentLanguage === 'ar' 
-                ? 'قم بتكوين مفاتيح API للحصول على جودة صوت أفضل'
-                : 'Configurez les clés API pour une meilleure qualité audio'
+            <Alert severity="success" sx={{ mb: 3 }}>
+              {currentLanguage === 'ar'
+                ? 'ElevenLabs مُكوّن ومُدمج بالفعل - جودة صوت ممتازة'
+                : 'ElevenLabs est déjà configuré et intégré - Qualité audio excellente'
               }
             </Alert>
 
             <Box sx={{ mb: 3 }}>
               <Typography variant="h6" gutterBottom>
-                🌐 Google Cloud TTS
+                🎙️ ElevenLabs TTS
               </Typography>
               <Typography variant="body2" color="text.secondary" gutterBottom>
-                {currentLanguage === 'ar' 
-                  ? 'أفضل جودة، 4 مليون حرف مجاناً شهرياً'
-                  : 'Meilleure qualité, 4M caractères gratuits/mois'
+                {currentLanguage === 'ar'
+                  ? 'خدمة TTS متميزة مع أصوات طبيعية عالية الجودة'
+                  : 'Service TTS premium avec des voix naturelles de haute qualité'
                 }
               </Typography>
-              <TextField
-                fullWidth
-                label="Clé API Google Cloud"
-                type="password"
-                value={apiKeys.googleCloud}
-                onChange={(e) => setApiKeys(prev => ({ ...prev, googleCloud: e.target.value }))}
-                placeholder="AIzaSy..."
-                helperText="Obtenez votre clé sur: console.cloud.google.com"
-              />
-            </Box>
-
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="h6" gutterBottom>
-                🎤 VoiceRSS
-              </Typography>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                {currentLanguage === 'ar' 
-                  ? 'مجاني وبسيط، 350 طلب يومياً'
-                  : 'Gratuit et simple, 350 requêtes/jour'
-                }
-              </Typography>
-              <TextField
-                fullWidth
-                label="Clé API VoiceRSS"
-                type="password"
-                value={apiKeys.voiceRSS}
-                onChange={(e) => setApiKeys(prev => ({ ...prev, voiceRSS: e.target.value }))}
-                placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                helperText="Obtenez votre clé sur: voicerss.org/registration.aspx"
-              />
+              <Box sx={{
+                p: 2,
+                bgcolor: 'success.light',
+                borderRadius: 1,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1
+              }}>
+                <CheckIcon sx={{ color: 'success.dark' }} />
+                <Typography variant="body2" sx={{ color: 'success.dark' }}>
+                  {currentLanguage === 'ar'
+                    ? 'مُكوّن ومُفعّل - جاهز للاستخدام'
+                    : 'Configuré et activé - Prêt à utiliser'
+                  }
+                </Typography>
+              </Box>
             </Box>
 
             <Box sx={{ mb: 2 }}>

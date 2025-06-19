@@ -9,7 +9,7 @@ import GeminiTest from './components/GeminiTest';
 import { useLanguage } from './contexts/LanguageContext';
 import { createAppTheme } from './theme/theme';
 import { useChatState } from './hooks/useChatState';
-import { useSpeechSynthesis } from './hooks/useSpeechSynthesis';
+
 import { useThemeMode } from './hooks/useThemeMode';
 import ChatSidebar from './components/ChatSidebar';
 import ChatHeader from './components/ChatHeader';
@@ -28,6 +28,8 @@ import { auth } from './firebase';
 import staticSuggestionsService from './services/staticSuggestionsService';
 import conversationStateManager from './services/conversationStateManager';
 import speechService from './services/speechService';
+import { useTTSState } from './hooks/useTTSState';
+import TTSFloatingPanel from './components/TTSFloatingPanel';
 import ApiConnectionTest from './components/Debug/ApiConnectionTest';
 import InterfaceTest from './components/Debug/InterfaceTest';
 import FirebaseTest from './components/Debug/FirebaseTest';
@@ -41,8 +43,10 @@ function App() {
   // Custom hooks
   const { darkMode, toggleDarkMode, prefersDarkMode } = useThemeMode();
   const chatState = useChatState();
-  const { speak, speaking, supported } = useSpeechSynthesis();
   const { t } = useTranslation(currentLanguage);
+
+  // TTS State avec ElevenLabs
+  const ttsState = useTTSState(currentLanguage);
 
   // SMA (Smart Multi-Agent) state - using research button
   const [isSMAActive, setIsSMAActive] = useState(false);
@@ -90,8 +94,6 @@ function App() {
     user,
     {
       useRAG: true,
-      autoSpeak: false,
-      speechQuality: 'high',
       isSMAActive: isSMAActive,
       autoCorrect: true,
       selectedModel: selectedModel,
@@ -211,19 +213,17 @@ function App() {
   // Auto-scroll and auto-read
   useEffect(() => {
     chatHandlers.scrollToBottom();
-    if (chatState.autoRead && chatState.messages.length > 0 && supported) {
+    if (chatState.autoRead && chatState.messages.length > 0 && ttsState.isSupported()) {
       const lastMessage = chatState.messages[chatState.messages.length - 1];
-      if (lastMessage.role === 'assistant' && !chatState.isLoading && !speaking) {
+      if (lastMessage.role === 'assistant' && !chatState.isLoading && !ttsState.currentSpeakingId) {
         speakText(lastMessage.content, lastMessage.id);
       }
     }
-  }, [chatState.messages, chatState.autoRead, chatState.isLoading, speaking, supported]);
+  }, [chatState.messages, chatState.autoRead, chatState.isLoading, ttsState.currentSpeakingId, ttsState.isSupported]);
 
-  // Load voices
+  // ElevenLabs TTS initialization (no voice loading needed)
   useEffect(() => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.getVoices();
-    }
+    console.log('🎙️ ElevenLabs TTS initialized and ready');
   }, []);
 
   // Save current chat ID to localStorage (conversation saving is handled by conversation state manager)
@@ -280,37 +280,9 @@ function App() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [chatState.currentChatId, chatState.messages]);
 
-  // Speech synthesis using enhanced speech service
-  const speakText = async (text, id) => {
-    if (chatState.isSpeaking[id]) {
-      speechService.stopSpeech();
-      chatState.setIsSpeaking(prev => ({ ...prev, [id]: false }));
-      return;
-    }
-
-    try {
-      console.log('🔊 Starting TTS for language:', currentLanguage);
-      chatState.setIsSpeaking(prev => ({ ...prev, [id]: true }));
-
-      await speechService.textToSpeech(text, currentLanguage, {
-        speed: 0.9,
-        pitch: 1.0,
-        volume: 1.0
-      });
-
-      console.log('✅ TTS completed successfully');
-      chatState.setIsSpeaking(prev => ({ ...prev, [id]: false }));
-    } catch (error) {
-      console.error('❌ TTS error:', error);
-      chatState.setIsSpeaking(prev => ({ ...prev, [id]: false }));
-
-      // Show user-friendly error message
-      if (currentLanguage === 'ar') {
-        console.log('⚠️ خطأ في تشغيل الصوت - تأكد من دعم المتصفح للغة العربية');
-      } else {
-        console.log('⚠️ Erreur de synthèse vocale - vérifiez le support du navigateur');
-      }
-    }
+  // Speech synthesis using enhanced ElevenLabs TTS
+  const speakText = async (text, id, language = null) => {
+    await ttsState.speakText(text, id, language);
   };
 
   // Input handlers
@@ -578,8 +550,9 @@ function App() {
                     onCancelEdit={chatHandlers.handleCancelEdit}
                     onQuestionClick={chatHandlers.handleQuestionClick}
                     onSpeakText={speakText}
-                    isSpeaking={chatState.isSpeaking}
-                    supported={supported}
+                    isSpeaking={ttsState.isSpeaking}
+                    isLoading={ttsState.isLoading}
+                    supported={ttsState.isSupported()}
                     messagesEndRef={messagesEndRef}
                     refreshTrigger={suggestionsRefreshTrigger}
                     user={user}
@@ -635,7 +608,7 @@ function App() {
         onToggleAutoRead={chatState.setAutoRead}
         currentLanguage={currentLanguage}
         onChangeLanguage={changeLanguage}
-        supported={supported}
+        supported={ttsState.isSupported()}
       />
 
       <RenameDialog
@@ -657,6 +630,27 @@ function App() {
         conversationHistory={chatState.conversationHistory}
         onEditTitle={chatHandlers.handleEditTitle}
         onDeleteChat={chatHandlers.handleDeleteChat}
+      />
+
+      {/* Panneau TTS flottant ElevenLabs */}
+      <TTSFloatingPanel
+        isVisible={ttsState.getCurrentTTSInfo().isActive}
+        isPlaying={!!ttsState.currentSpeakingId}
+        isLoading={Object.values(ttsState.isLoading).some(loading => loading)}
+        currentText={ttsState.currentText}
+        currentLanguage={ttsState.detectedLanguage}
+        darkMode={darkMode}
+        onPlay={() => {
+          const info = ttsState.getCurrentTTSInfo();
+          if (info.messageId && info.text) {
+            speakText(info.text, info.messageId, info.language);
+          }
+        }}
+        onStop={ttsState.stopSpeech}
+        onClose={ttsState.stopSpeech}
+        progress={ttsState.progress}
+        estimatedDuration={ttsState.estimatedDuration}
+        currentTime={ttsState.currentTime}
       />
     </ThemeProvider>
   );

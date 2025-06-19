@@ -7,32 +7,13 @@ import axios from 'axios';
 
 class SpeechService {
   constructor() {
-    // API Configuration
-    this.elevenLabsApiKey = import.meta.env.VITE_ELEVENLABS_API_KEY;
-    this.azureSpeechKey = import.meta.env.VITE_AZURE_SPEECH_KEY;
-    this.azureSpeechRegion = import.meta.env.VITE_AZURE_SPEECH_REGION || 'eastus';
-    this.googleCloudApiKey = import.meta.env.VITE_GOOGLE_CLOUD_API_KEY;
-    this.openaiApiKey = import.meta.env.VITE_OPENAI_API_KEY;
-    
-    // Voice configurations for different languages
-    this.voiceConfig = {
-      fr: {
-        elevenlabs: 'pNInz6obpgDQGcFmaJgB', // French voice ID
-        azure: 'fr-FR-DeniseNeural',
-        google: 'fr-FR-Wavenet-C',
-        fallback: 'fr-FR'
-      },
+    // API Configuration - ElevenLabs only
+    this.elevenLabsApiKey = 'sk_d8fc9625fbfd20f51143215781f41238b0f80986af1648ef';
 
-      ar: {
-        elevenlabs: 'pNInz6obpgDQGcFmaJgB', // Multilingual voice that supports Arabic
-        azure: 'ar-SA-ZariyahNeural', // Best Arabic female voice
-        google: 'ar-XA-Wavenet-A', // High quality Arabic voice
-        openai: 'nova', // OpenAI's multilingual voice
-        fallback: 'ar-SA'
-      }
-    };
+    // Audio state
+    this.currentAudio = null;
 
-    // Initialize speech recognition
+    // Initialize speech recognition for STT
     this.recognition = null;
     this.initializeSpeechRecognition();
   }
@@ -56,6 +37,28 @@ class SpeechService {
   }
 
   /**
+   * Detect language from text content
+   */
+  detectLanguage(text) {
+    if (!text) return 'fr';
+
+    // Arabic detection
+    const arabicRegex = /[\u0600-\u06FF\u0750-\u077F]/;
+    if (arabicRegex.test(text)) {
+      return 'ar';
+    }
+
+    // French detection (common French words and accents)
+    const frenchRegex = /[àâäéèêëïîôöùûüÿç]|(\b(le|la|les|un|une|des|et|ou|est|sont|avec|pour|dans|sur|par|de|du|que|qui|quoi|comment|pourquoi|où|quand)\b)/i;
+    if (frenchRegex.test(text)) {
+      return 'fr';
+    }
+
+    // Default to French
+    return 'fr';
+  }
+
+  /**
    * Convert text to speech using the best available service
    * @param {string} text - Text to convert
    * @param {string} language - Language code (fr, en, ar)
@@ -63,6 +66,14 @@ class SpeechService {
    * @returns {Promise<void>}
    */
   async textToSpeech(text, language = 'fr', options = {}) {
+    if (!text || text.trim().length === 0) {
+      throw new Error('No text provided for speech synthesis');
+    }
+
+    // Auto-detect language if not specified or if detection is enabled
+    const detectedLanguage = options.autoDetect !== false ? this.detectLanguage(text) : language;
+    const finalLanguage = detectedLanguage || language;
+
     const {
       speed = 1.0,
       pitch = 1.0,
@@ -70,127 +81,42 @@ class SpeechService {
       quality = 'high'
     } = options;
 
-    console.log(`🔊 TTS Request: ${text.substring(0, 50)}... (${language})`);
+    console.log(`🔊 TTS Request: ${text.substring(0, 50)}... (${finalLanguage}, detected: ${detectedLanguage})`);
+
+    // Emit loading state if callback provided
+    if (options.onStateChange) {
+      options.onStateChange('loading');
+    }
 
     try {
-      // Priority 1: Try Google Cloud TTS for best quality (if API key available)
-      if (this.googleCloudApiKey && (language === 'ar' || language === 'fr')) {
+      // Priority 1: Try ElevenLabs TTS for best quality (if API key available)
+      if (this.elevenLabsApiKey && (finalLanguage === 'ar' || finalLanguage === 'fr' || finalLanguage === 'en')) {
         try {
-          await this.googleTTS(text, language, options);
+          if (options.onStateChange) {
+            options.onStateChange('speaking');
+          }
+          await this.elevenLabsTTS(text, finalLanguage, options);
+          if (options.onStateChange) {
+            options.onStateChange('completed');
+          }
           return;
         } catch (error) {
-          console.warn('⚠️ Google Cloud TTS failed, trying other services:', error.message);
-        }
-      }
-
-      // Priority 2: Try VoiceRSS for simple and free option
-      if (import.meta.env.VITE_VOICERSS_API_KEY && (language === 'ar' || language === 'fr')) {
-        try {
-          await this.voiceRSSTTS(text, language, options);
-          return;
-        } catch (error) {
-          console.warn('⚠️ VoiceRSS TTS failed, trying other services:', error.message);
-        }
-      }
-
-      // Priority 3: Try eSpeak NG as fallback for Arabic and French
-      if (language === 'ar' || language === 'fr') {
-        try {
-          await this.eSpeakTTS(text, language, options);
-          return;
-        } catch (error) {
-          console.warn('⚠️ eSpeak NG failed, trying premium services:', error.message);
-        }
-      }
-
-      // Try premium services for high quality
-      if (quality === 'high') {
-        // For Arabic, prioritize Azure and OpenAI
-        if (language === 'ar') {
-          // Try Azure first (best Arabic support)
-          if (this.azureSpeechKey) {
-            try {
-              await this.azureTTS(text, language, options);
-              return;
-            } catch (error) {
-              console.warn('⚠️ Azure TTS failed, trying OpenAI:', error.message);
-            }
-          }
-
-          // Try OpenAI TTS (excellent multilingual support)
-          if (this.openaiApiKey) {
-            try {
-              await this.openaiTTS(text, language, options);
-              return;
-            } catch (error) {
-              console.warn('⚠️ OpenAI TTS failed, trying Google:', error.message);
-            }
-          }
-
-          // Try Google Cloud TTS
-          if (this.googleCloudApiKey) {
-            try {
-              await this.googleTTS(text, language, options);
-              return;
-            } catch (error) {
-              console.warn('⚠️ Google TTS failed, trying ElevenLabs:', error.message);
-            }
-          }
-
-          // Try ElevenLabs as last resort for Arabic
-          if (this.elevenLabsApiKey) {
-            try {
-              await this.elevenLabsTTS(text, language, options);
-              return;
-            } catch (error) {
-              console.warn('⚠️ ElevenLabs TTS failed, using browser TTS:', error.message);
-            }
-          }
-        } else {
-          // For French and English, prioritize ElevenLabs
-          if (this.elevenLabsApiKey) {
-            try {
-              await this.elevenLabsTTS(text, language, options);
-              return;
-            } catch (error) {
-              console.warn('⚠️ ElevenLabs TTS failed, trying Azure:', error.message);
-            }
-          }
-
-          // Try Azure Cognitive Services
-          if (this.azureSpeechKey) {
-            try {
-              await this.azureTTS(text, language, options);
-              return;
-            } catch (error) {
-              console.warn('⚠️ Azure TTS failed, trying OpenAI:', error.message);
-            }
-          }
-
-          // Try OpenAI TTS
-          if (this.openaiApiKey) {
-            try {
-              await this.openaiTTS(text, language, options);
-              return;
-            } catch (error) {
-              console.warn('⚠️ OpenAI TTS failed, trying Google:', error.message);
-            }
-          }
-
-          // Try Google Cloud TTS
-          if (this.googleCloudApiKey) {
-            try {
-              await this.googleTTS(text, language, options);
-              return;
-            } catch (error) {
-              console.warn('⚠️ Google TTS failed, using browser TTS:', error.message);
-            }
+          console.warn('⚠️ ElevenLabs TTS failed, trying other services:', error.message);
+          if (options.onStateChange) {
+            options.onStateChange('error', error.message);
           }
         }
       }
 
-      // Fallback to browser's built-in TTS
-      await this.browserTTS(text, language, { speed, pitch, volume });
+      // Priority 2: Fallback to browser's built-in TTS
+      console.log('🔄 Falling back to browser TTS');
+      if (options.onStateChange) {
+        options.onStateChange('speaking');
+      }
+      await this.browserTTS(text, finalLanguage, { speed, pitch, volume });
+      if (options.onStateChange) {
+        options.onStateChange('completed');
+      }
       
     } catch (error) {
       console.error('❌ All TTS services failed:', error);
@@ -199,226 +125,76 @@ class SpeechService {
   }
 
   /**
-   * ElevenLabs TTS (Premium quality for English and French)
+   * ElevenLabs TTS (Premium quality for multilingual)
    */
   async elevenLabsTTS(text, language, options = {}) {
-    const voiceId = this.voiceConfig[language]?.elevenlabs;
-    if (!voiceId) {
-      throw new Error(`ElevenLabs voice not available for ${language}`);
-    }
+    try {
+      console.log(`🎙️ Using ElevenLabs TTS for ${language}`);
 
-    const response = await axios.post(
-      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
-      {
-        text,
-        model_id: 'eleven_multilingual_v2',
-        voice_settings: {
-          stability: 0.5,
-          similarity_boost: 0.75,
-          style: 0.0,
-          use_speaker_boost: true
-        }
-      },
-      {
+      // Configuration des voix par langue
+      const voiceConfig = {
+        'fr': 'JBFqnCBsd6RMkjVDRZzb', // Voix française de qualité
+        'ar': 'JBFqnCBsd6RMkjVDRZzb', // Même voix multilingue pour l'arabe
+        'en': 'JBFqnCBsd6RMkjVDRZzb'  // Voix anglaise
+      };
+
+      const voiceId = voiceConfig[language] || voiceConfig['en'];
+
+      // Nettoyer le texte (supprimer les astérisques et autres caractères de formatage)
+      const cleanText = text.replace(/\*/g, '').replace(/[#*_`]/g, '').trim();
+
+      if (!cleanText) {
+        throw new Error('No text to synthesize after cleaning');
+      }
+
+      const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+        method: 'POST',
         headers: {
           'Accept': 'audio/mpeg',
           'Content-Type': 'application/json',
-          'xi-api-key': this.elevenLabsApiKey
+          'xi-api-key': 'sk_d8fc9625fbfd20f51143215781f41238b0f80986af1648ef'
         },
-        responseType: 'arraybuffer'
-      }
-    );
-
-    const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
-    await this.playAudioBlob(audioBlob);
-  }
-
-  /**
-   * Azure Cognitive Services TTS
-   */
-  async azureTTS(text, language, options = {}) {
-    const voice = this.voiceConfig[language]?.azure;
-    if (!voice) {
-      throw new Error(`Azure voice not available for ${language}`);
-    }
-
-    const ssml = `
-      <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="${language}">
-        <voice name="${voice}">
-          <prosody rate="${options.speed || 1.0}" pitch="${options.pitch || 1.0}">
-            ${text}
-          </prosody>
-        </voice>
-      </speak>
-    `;
-
-    const response = await axios.post(
-      `https://${this.azureSpeechRegion}.tts.speech.microsoft.com/cognitiveservices/v1`,
-      ssml,
-      {
-        headers: {
-          'Ocp-Apim-Subscription-Key': this.azureSpeechKey,
-          'Content-Type': 'application/ssml+xml',
-          'X-Microsoft-OutputFormat': 'audio-16khz-128kbitrate-mono-mp3'
-        },
-        responseType: 'arraybuffer'
-      }
-    );
-
-    const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
-    await this.playAudioBlob(audioBlob);
-  }
-
-  /**
-   * OpenAI TTS (Excellent for Arabic and multilingual)
-   */
-  async openaiTTS(text, language, options = {}) {
-    const voice = this.voiceConfig[language]?.openai || 'nova';
-
-    const response = await axios.post(
-      'https://api.openai.com/v1/audio/speech',
-      {
-        model: 'tts-1-hd', // High quality model
-        input: text,
-        voice: voice,
-        speed: options.speed || 0.9 // Slightly slower for better clarity
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${this.openaiApiKey}`,
-          'Content-Type': 'application/json'
-        },
-        responseType: 'arraybuffer'
-      }
-    );
-
-    const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
-    await this.playAudioBlob(audioBlob);
-  }
-
-  /**
-   * Google Cloud TTS (Enhanced with Neural voices)
-   */
-  async googleTTS(text, language, options = {}) {
-    try {
-      console.log(`🌐 Using Google Cloud TTS for ${language}`);
-
-      // Enhanced voice configuration with Neural voices
-      const voiceConfig = {
-        'fr': {
-          languageCode: 'fr-FR',
-          name: 'fr-FR-Neural2-D', // High-quality neural voice
-          ssmlGender: 'FEMALE'
-        },
-        'ar': {
-          languageCode: 'ar-XA',
-          name: 'ar-XA-Wavenet-D', // Best Arabic voice available
-          ssmlGender: 'FEMALE'
-        },
-        'en': {
-          languageCode: 'en-US',
-          name: 'en-US-Neural2-F',
-          ssmlGender: 'FEMALE'
-        }
-      };
-
-      const voice = voiceConfig[language] || voiceConfig['en'];
-
-      const response = await axios.post(
-        `https://texttospeech.googleapis.com/v1/text:synthesize?key=${this.googleCloudApiKey}`,
-        {
-          input: { text },
-          voice: voice,
-          audioConfig: {
-            audioEncoding: 'MP3',
-            speakingRate: options.speed || 1.0,
-            pitch: (options.pitch || 1.0) * 2 - 2, // Convert to Google's range
-            volumeGainDb: 0.0,
-            sampleRateHertz: 24000 // High quality sample rate
+        body: JSON.stringify({
+          text: cleanText,
+          model_id: 'eleven_multilingual_v2',
+          voice_settings: {
+            stability: 0.5,
+            similarity_boost: 0.75,
+            style: 0.0,
+            use_speaker_boost: true
           }
-        }
-      );
-
-      const audioContent = response.data.audioContent;
-      const audioBlob = new Blob([
-        Uint8Array.from(atob(audioContent), c => c.charCodeAt(0))
-      ], { type: 'audio/mpeg' });
-
-      await this.playAudioBlob(audioBlob);
-      console.log('✅ Google Cloud TTS completed successfully');
-
-    } catch (error) {
-      console.error('❌ Google Cloud TTS failed:', error.message);
-      throw error;
-    }
-  }
-
-  /**
-   * VoiceRSS TTS (Simple and free)
-   */
-  async voiceRSSTTS(text, language, options = {}) {
-    try {
-      const apiKey = import.meta.env.VITE_VOICERSS_API_KEY;
-
-      if (!apiKey) {
-        throw new Error('VoiceRSS API key not configured');
-      }
-
-      console.log(`🎤 Using VoiceRSS TTS for ${language}`);
-
-      // Configuration des langues VoiceRSS
-      const languageMap = {
-        'fr': 'fr-fr',
-        'ar': 'ar-sa',
-        'en': 'en-us'
-      };
-
-      const voiceLang = languageMap[language] || 'fr-fr';
-
-      // Préparer les paramètres
-      const params = new URLSearchParams({
-        key: apiKey,
-        hl: voiceLang,
-        src: text,
-        r: options.speed ? Math.round((options.speed - 1) * 5).toString() : '0', // VoiceRSS utilise -10 à 10
-        c: 'mp3',
-        f: '44khz_16bit_stereo'
+        })
       });
 
-      // Appeler l'API VoiceRSS
-      const response = await fetch(`https://api.voicerss.org/?${params}`, {
-        method: 'GET'
-      });
+      console.log('ElevenLabs response status:', response.status);
 
       if (!response.ok) {
-        throw new Error(`VoiceRSS error: ${response.status}`);
+        const errorBody = await response.text();
+        console.error(`ElevenLabs API Error: ${errorBody}`);
+        throw new Error(`ElevenLabs API failed with status ${response.status}`);
       }
 
-      const contentType = response.headers.get('content-type');
+      const audioBuffer = await response.arrayBuffer();
+      console.log('Received audio buffer. Size:', audioBuffer.byteLength, 'bytes.');
 
-      if (contentType && contentType.includes('text')) {
-        // Erreur retournée en texte
-        const errorText = await response.text();
-        throw new Error(`VoiceRSS API error: ${errorText}`);
+      if (audioBuffer.byteLength === 0) {
+        throw new Error('Received empty audio buffer from ElevenLabs');
       }
 
-      // Obtenir l'audio
-      const audioBlob = await response.blob();
-
-      if (audioBlob.size === 0) {
-        throw new Error('Empty audio response from VoiceRSS');
-      }
-
-      // Jouer l'audio
+      const audioBlob = new Blob([audioBuffer], { type: 'audio/mpeg' });
       await this.playAudioBlob(audioBlob);
 
-      console.log('✅ VoiceRSS TTS completed successfully');
+      console.log('✅ ElevenLabs TTS completed successfully');
 
     } catch (error) {
-      console.error('❌ VoiceRSS TTS failed:', error.message);
+      console.error('❌ ElevenLabs TTS failed:', error.message);
       throw error;
     }
   }
+
+
+
+
 
 
 
@@ -442,7 +218,7 @@ class SpeechService {
         } else if (language === 'fr') {
           utterance.lang = 'fr-FR'; // French
         } else {
-          utterance.lang = this.voiceConfig[language]?.fallback || language;
+          utterance.lang = language;
         }
 
         // Language-specific TTS optimization for better quality
@@ -566,76 +342,7 @@ class SpeechService {
     });
   }
 
-  /**
-   * eSpeak NG TTS (User preferred for Arabic and French)
-   */
-  async eSpeakTTS(text, language, options = {}) {
-    try {
-      // Check if eSpeak NG is available (requires server-side implementation)
-      const eSpeakEndpoint = import.meta.env.VITE_ESPEAK_API_URL || 'http://localhost:8002/espeak';
 
-      const response = await axios.post(eSpeakEndpoint, {
-        text: text,
-        language: language,
-        speed: options.speed || 1.0,
-        pitch: options.pitch || 1.0,
-        volume: options.volume || 1.0,
-        voice: language === 'ar' ? 'ar' : language === 'fr' ? 'fr' : 'en'
-      }, {
-        responseType: 'arraybuffer',
-        timeout: 10000
-      });
-
-      const audioBlob = new Blob([response.data], { type: 'audio/wav' });
-      await this.playAudioBlob(audioBlob);
-
-      console.log('✅ eSpeak NG TTS completed successfully');
-
-    } catch (error) {
-      console.error('❌ eSpeak NG TTS failed:', error.message);
-
-      // Fallback to browser TTS with eSpeak-like settings
-      console.log('🔄 Falling back to browser TTS with eSpeak-like configuration');
-      await this.browserTTSWitheSpeakConfig(text, language, options);
-    }
-  }
-
-  /**
-   * Browser TTS with eSpeak-like configuration
-   */
-  async browserTTSWitheSpeakConfig(text, language, options = {}) {
-    return new Promise((resolve, reject) => {
-      if (!('speechSynthesis' in window)) {
-        reject(new Error('Speech synthesis not supported'));
-        return;
-      }
-
-      const utterance = new SpeechSynthesisUtterance(text);
-
-      // eSpeak-like configuration
-      if (language === 'ar') {
-        utterance.lang = 'ar-SA';
-        utterance.rate = options.speed || 0.7; // Slower for Arabic clarity
-        utterance.pitch = options.pitch || 0.9; // Lower pitch for Arabic
-      } else if (language === 'fr') {
-        utterance.lang = 'fr-FR';
-        utterance.rate = options.speed || 0.8; // Moderate speed for French
-        utterance.pitch = options.pitch || 1.0; // Standard pitch for French
-      } else {
-        utterance.lang = language;
-        utterance.rate = options.speed || 0.9;
-        utterance.pitch = options.pitch || 1.0;
-      }
-
-      utterance.volume = options.volume || 1.0;
-
-      utterance.onend = () => resolve();
-      utterance.onerror = (error) => reject(error);
-
-      speechSynthesis.cancel();
-      setTimeout(() => speechSynthesis.speak(utterance), 100);
-    });
-  }
 
   /**
    * Play audio blob
@@ -645,17 +352,25 @@ class SpeechService {
       const audio = new Audio();
       const url = URL.createObjectURL(blob);
 
+      // Stocker la référence audio pour pouvoir l'arrêter
+      this.currentAudio = audio;
+
       audio.src = url;
       audio.onended = () => {
         URL.revokeObjectURL(url);
+        this.currentAudio = null;
         resolve();
       };
       audio.onerror = (error) => {
         URL.revokeObjectURL(url);
+        this.currentAudio = null;
         reject(error);
       };
 
-      audio.play().catch(reject);
+      audio.play().catch((error) => {
+        this.currentAudio = null;
+        reject(error);
+      });
     });
   }
 
@@ -679,7 +394,7 @@ class SpeechService {
         timeout = 10000
       } = options;
 
-      this.recognition.lang = this.voiceConfig[language]?.fallback || language;
+      this.recognition.lang = language === 'ar' ? 'ar-SA' : language === 'fr' ? 'fr-FR' : language;
       this.recognition.continuous = continuous;
       this.recognition.interimResults = interimResults;
       this.recognition.maxAlternatives = maxAlternatives;
@@ -733,8 +448,24 @@ class SpeechService {
    * Stop current speech synthesis
    */
   stopSpeech() {
-    if ('speechSynthesis' in window) {
-      speechSynthesis.cancel();
+    try {
+      // Arrêter le TTS du navigateur
+      if ('speechSynthesis' in window) {
+        speechSynthesis.cancel();
+        console.log('🛑 Browser TTS stopped');
+      }
+
+      // Arrêter l'audio ElevenLabs si en cours
+      if (this.currentAudio) {
+        this.currentAudio.pause();
+        this.currentAudio.currentTime = 0;
+        this.currentAudio = null;
+        console.log('🛑 ElevenLabs audio stopped');
+      }
+
+      console.log('🛑 All TTS services stopped');
+    } catch (error) {
+      console.error('❌ Error stopping TTS:', error);
     }
   }
 
@@ -745,8 +476,6 @@ class SpeechService {
     return {
       tts: {
         elevenlabs: !!this.elevenLabsApiKey,
-        azure: !!this.azureSpeechKey,
-        google: !!this.googleCloudApiKey,
         browser: 'speechSynthesis' in window
       },
       stt: {

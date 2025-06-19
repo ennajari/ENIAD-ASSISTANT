@@ -31,6 +31,7 @@ const ChatContent = ({
   onQuestionClick,
   onSpeakText,
   isSpeaking,
+  isLoading: ttsLoading = {},
   supported,
   messagesEndRef,
   refreshTrigger, // New prop to trigger suggestions refresh
@@ -517,6 +518,7 @@ const ChatContent = ({
                 onEditChange={setEditedMessageContent}
                 onSpeakText={onSpeakText}
                 isSpeaking={isSpeaking[msg.id]}
+                isLoading={ttsLoading[msg.id]}
                 supported={supported}
                 t={t}
               />

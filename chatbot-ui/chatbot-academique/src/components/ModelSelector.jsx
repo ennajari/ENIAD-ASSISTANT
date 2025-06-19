@@ -44,7 +44,7 @@ const ModelSelector = ({
       engine: 'Gemini (SMA only)'
     },
     rag: {
-      name: currentLanguage === 'ar' ? 'RAG + أولاما محلي' : 'RAG + Ollama Local',
+      name: currentLanguage === 'ar' ? 'RAG' : 'RAG',
       description: currentLanguage === 'ar'
         ? 'قاعدة معرفة ENIAD + أولاما/لاما (للـ RAG فقط)'
         : 'Base de connaissances ENIAD + Ollama/Llama (RAG uniquement)',
