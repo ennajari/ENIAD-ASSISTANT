@@ -235,34 +235,36 @@ const TTSFloatingPanel = ({
             {/* Controls */}
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
               <Tooltip title={isPlaying ? "Arrêter" : "Lire"}>
-                <IconButton
-                  onClick={isPlaying ? onStop : onPlay}
-                  disabled={isLoading}
-                  sx={{
-                    bgcolor: 'rgba(255,255,255,0.2)',
-                    color: '#fff',
-                    width: 48,
-                    height: 48,
-                    '&:hover': {
-                      bgcolor: 'rgba(255,255,255,0.3)',
-                      transform: 'scale(1.05)'
-                    },
-                    '&:disabled': {
-                      bgcolor: 'rgba(255,255,255,0.1)',
-                      color: 'rgba(255,255,255,0.5)'
-                    }
-                  }}
-                >
-                  {isLoading ? (
-                    <Box sx={{ position: 'relative' }}>
-                      <MicIcon sx={{ fontSize: 24 }} />
-                    </Box>
-                  ) : isPlaying ? (
-                    <StopIcon sx={{ fontSize: 24 }} />
-                  ) : (
-                    <PlayIcon sx={{ fontSize: 24 }} />
-                  )}
-                </IconButton>
+                <span>
+                  <IconButton
+                    onClick={isPlaying ? onStop : onPlay}
+                    disabled={isLoading}
+                    sx={{
+                      bgcolor: 'rgba(255,255,255,0.2)',
+                      color: '#fff',
+                      width: 48,
+                      height: 48,
+                      '&:hover': {
+                        bgcolor: 'rgba(255,255,255,0.3)',
+                        transform: 'scale(1.05)'
+                      },
+                      '&:disabled': {
+                        bgcolor: 'rgba(255,255,255,0.1)',
+                        color: 'rgba(255,255,255,0.5)'
+                      }
+                    }}
+                  >
+                    {isLoading ? (
+                      <Box sx={{ position: 'relative' }}>
+                        <MicIcon sx={{ fontSize: 24 }} />
+                      </Box>
+                    ) : isPlaying ? (
+                      <StopIcon sx={{ fontSize: 24 }} />
+                    ) : (
+                      <PlayIcon sx={{ fontSize: 24 }} />
+                    )}
+                  </IconButton>
+                </span>
               </Tooltip>
             </Box>
 

@@ -539,7 +539,7 @@ function App() {
                 >
                   <ChatContent
                     messages={chatState.messages}
-                    isLoading={chatState.isLoading}
+                    isLoading={chatState.isLoading || Object.values(ttsState.isLoading).some(Boolean)}
                     currentLanguage={currentLanguage}
                     darkMode={darkMode}
                     editingMessageId={chatState.editingMessageId}
@@ -551,7 +551,6 @@ function App() {
                     onQuestionClick={chatHandlers.handleQuestionClick}
                     onSpeakText={speakText}
                     isSpeaking={ttsState.isSpeaking}
-                    isLoading={ttsState.isLoading}
                     supported={ttsState.isSupported()}
                     messagesEndRef={messagesEndRef}
                     refreshTrigger={suggestionsRefreshTrigger}

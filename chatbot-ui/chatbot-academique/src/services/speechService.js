@@ -8,7 +8,7 @@ import axios from 'axios';
 class SpeechService {
   constructor() {
     // API Configuration - ElevenLabs only
-    this.elevenLabsApiKey = 'sk_d8fc9625fbfd20f51143215781f41238b0f80986af1648ef';
+    this.elevenLabsApiKey = import.meta.env.VITE_ELEVENLABS_API_KEY;
 
     // Audio state
     this.currentAudio = null;
@@ -92,39 +92,19 @@ class SpeechService {
       options.onStateChange('loading');
     }
 
+    // Forcer ElevenLabs uniquement
+    if (!this.elevenLabsApiKey) {
+      const errMsg = 'Aucune clé API ElevenLabs trouvée. Veuillez configurer VITE_ELEVENLABS_API_KEY.';
+      if (options.onStateChange) options.onStateChange('error', errMsg);
+      throw new Error(errMsg);
+    }
     try {
-      // Priority 1: Try ElevenLabs TTS for best quality (if API key available)
-      if (this.elevenLabsApiKey && (finalLanguage === 'ar' || finalLanguage === 'fr' || finalLanguage === 'en')) {
-        try {
-          if (options.onStateChange) {
-            options.onStateChange('speaking');
-          }
-          await this.elevenLabsTTS(text, finalLanguage, options);
-          if (options.onStateChange) {
-            options.onStateChange('completed');
-          }
-          return;
-        } catch (error) {
-          console.warn('⚠️ ElevenLabs TTS failed, trying other services:', error.message);
-          if (options.onStateChange) {
-            options.onStateChange('error', error.message);
-          }
-        }
-      }
-
-      // Priority 2: Fallback to browser's built-in TTS
-      console.log('🔄 Falling back to browser TTS');
-      if (options.onStateChange) {
-        options.onStateChange('speaking');
-      }
-      await this.browserTTS(text, finalLanguage, { speed, pitch, volume });
-      if (options.onStateChange) {
-        options.onStateChange('completed');
-      }
-      
+      await this.elevenLabsTTS(text, finalLanguage, options);
+      if (options.onStateChange) options.onStateChange('completed');
+      return;
     } catch (error) {
-      console.error('❌ All TTS services failed:', error);
-      throw new Error('Text-to-speech service unavailable');
+      if (options.onStateChange) options.onStateChange('error', error.message);
+      throw new Error('Text-to-speech ElevenLabs indisponible : ' + error.message);
     }
   }
 
@@ -134,17 +114,15 @@ class SpeechService {
   async elevenLabsTTS(text, language, options = {}) {
     try {
       console.group(`🎙️ ELEVENLABS TTS - ${language.toUpperCase()}`);
-      console.log(`🎤 Voice ID: ${voiceId}`);
-      console.log(`🔧 Model: eleven_multilingual_v2`);
-
       // Configuration des voix par langue
       const voiceConfig = {
         'fr': 'JBFqnCBsd6RMkjVDRZzb', // Voix française de qualité
         'ar': 'JBFqnCBsd6RMkjVDRZzb', // Même voix multilingue pour l'arabe
         'en': 'JBFqnCBsd6RMkjVDRZzb'  // Voix anglaise
       };
-
       const voiceId = voiceConfig[language] || voiceConfig['en'];
+      console.log(`🎤 Voice ID: ${voiceId}`);
+      console.log(`🔧 Model: eleven_multilingual_v2`);
 
       // Nettoyer le texte (supprimer les astérisques et autres caractères de formatage)
       const cleanText = text.replace(/\*/g, '').replace(/[#*_`]/g, '').trim();
@@ -153,24 +131,26 @@ class SpeechService {
         throw new Error('No text to synthesize after cleaning');
       }
 
-      const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
-        method: 'POST',
-        headers: {
-          'Accept': 'audio/mpeg',
-          'Content-Type': 'application/json',
-          'xi-api-key': 'sk_d8fc9625fbfd20f51143215781f41238b0f80986af1648ef'
-        },
-        body: JSON.stringify({
-          text: cleanText,
-          model_id: 'eleven_multilingual_v2',
-          voice_settings: {
-            stability: 0.5,
-            similarity_boost: 0.75,
-            style: 0.0,
-            use_speaker_boost: true
-          }
-        })
-      });
+      const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
+        {
+          method: 'POST',
+          headers: {
+            'Accept': 'audio/mpeg',
+            'Content-Type': 'application/json',
+            'xi-api-key': this.elevenLabsApiKey
+          },
+          body: JSON.stringify({
+            text: cleanText,
+            model_id: 'eleven_multilingual_v2',
+            voice_settings: {
+              stability: 0.5,
+              similarity_boost: 0.75,
+              style: 0.0,
+              use_speaker_boost: true
+            }
+          })
+        }
+      );
 
       console.log(`📡 API Response: ${response.status} ${response.statusText}`);
 
@@ -205,158 +185,6 @@ class SpeechService {
       throw error;
     }
   }
-
-
-
-
-
-
-
-  /**
-   * Browser built-in TTS (fallback)
-   */
-  async browserTTS(text, language, options = {}) {
-    return new Promise((resolve, reject) => {
-      if (!('speechSynthesis' in window)) {
-        reject(new Error('Speech synthesis not supported'));
-        return;
-      }
-
-      // Wait for voices to load if they haven't already
-      const loadVoices = () => {
-        const utterance = new SpeechSynthesisUtterance(text);
-
-        // Set language based on the language parameter
-        if (language === 'ar') {
-          utterance.lang = 'ar-SA'; // Saudi Arabic
-        } else if (language === 'fr') {
-          utterance.lang = 'fr-FR'; // French
-        } else {
-          utterance.lang = language;
-        }
-
-        // Language-specific TTS optimization for better quality
-        if (language === 'ar') {
-          utterance.rate = options.speed || 0.8; // Slower for Arabic pronunciation
-          utterance.pitch = options.pitch || 0.95; // Slightly lower pitch for Arabic
-        } else if (language === 'fr') {
-          utterance.rate = options.speed || 0.85; // Optimal speed for French
-          utterance.pitch = options.pitch || 1.0; // Standard pitch for French
-        } else {
-          utterance.rate = options.speed || 0.9; // Default speed
-          utterance.pitch = options.pitch || 1.0; // Default pitch
-        }
-        utterance.volume = options.volume || 1.0;
-
-        // Try to find the best voice for the language
-        const voices = speechSynthesis.getVoices();
-        console.log('🔊 Available voices:', voices.map(v => ({ name: v.name, lang: v.lang })));
-
-        let selectedVoice = null;
-
-        if (language === 'ar') {
-          // Debug: Log all available voices to understand what's available
-          console.log('🔊 Available voices for Arabic detection:', voices.map(v => ({
-            name: v.name,
-            lang: v.lang,
-            localService: v.localService
-          })));
-
-          // Look for Arabic voices with multiple patterns
-          selectedVoice = voices.find(v =>
-            v.lang.toLowerCase().includes('ar') ||
-            v.name.toLowerCase().includes('arabic') ||
-            v.lang.toLowerCase().startsWith('ar-') ||
-            v.name.toLowerCase().includes('عربي') ||
-            v.lang.includes('SA') || // Saudi Arabic
-            v.lang.includes('EG') || // Egyptian Arabic
-            v.lang.includes('AE') || // UAE Arabic
-            v.lang.includes('MA') || // Moroccan Arabic
-            v.name.toLowerCase().includes('zira') || // Microsoft Zira (often supports Arabic)
-            v.name.toLowerCase().includes('naayf') // Microsoft Naayf (Arabic voice)
-          );
-
-          if (selectedVoice) {
-            console.log('✅ Selected Arabic voice:', selectedVoice.name, '(', selectedVoice.lang, ')');
-          } else {
-            // Try to find any voice that might work with Arabic
-            const fallbackVoice = voices.find(v =>
-              v.lang.includes('en-US') || v.lang.includes('en-GB')
-            );
-            if (fallbackVoice) {
-              selectedVoice = fallbackVoice;
-              console.log('🔊 Using fallback voice for Arabic:', fallbackVoice.name);
-            } else {
-              console.log('🔊 No suitable voice found, using browser default for Arabic text');
-            }
-          }
-        } else if (language === 'fr') {
-          // Look for French voices with priority for high-quality voices
-          selectedVoice = voices.find(v =>
-            v.lang.toLowerCase().includes('fr') ||
-            v.name.toLowerCase().includes('french') ||
-            v.lang.toLowerCase().startsWith('fr-') ||
-            v.name.toLowerCase().includes('marie') || // Microsoft Marie (French)
-            v.name.toLowerCase().includes('hortense') || // Microsoft Hortense (French)
-            v.name.toLowerCase().includes('paul') || // Microsoft Paul (French)
-            v.lang.includes('FR') || // French France
-            v.lang.includes('CA') // French Canada
-          );
-
-          if (selectedVoice) {
-            console.log('✅ Selected French voice:', selectedVoice.name, '(', selectedVoice.lang, ')');
-          } else {
-            console.log('🔊 No French voice found, using default voice for French text');
-          }
-        } else {
-          // Generic language matching
-          selectedVoice = voices.find(v =>
-            v.lang.toLowerCase().startsWith(language.toLowerCase())
-          );
-        }
-
-        if (selectedVoice) {
-          utterance.voice = selectedVoice;
-          console.log('✅ Using voice:', selectedVoice.name, 'for language:', language);
-        }
-
-        utterance.onstart = () => {
-          console.log('🔊 TTS started for language:', language);
-        };
-
-        utterance.onend = () => {
-          console.log('✅ TTS completed for language:', language);
-          resolve();
-        };
-
-        utterance.onerror = (error) => {
-          console.error('❌ TTS error:', error);
-          reject(error);
-        };
-
-        // Cancel any ongoing speech before starting new one
-        speechSynthesis.cancel();
-
-        // Small delay to ensure cancellation is complete
-        setTimeout(() => {
-          speechSynthesis.speak(utterance);
-        }, 100);
-      };
-
-      // Check if voices are already loaded
-      const voices = speechSynthesis.getVoices();
-      if (voices.length > 0) {
-        loadVoices();
-      } else {
-        // Wait for voices to load
-        speechSynthesis.onvoiceschanged = loadVoices;
-        // Fallback timeout in case onvoiceschanged doesn't fire
-        setTimeout(loadVoices, 1000);
-      }
-    });
-  }
-
-
 
   /**
    * Play audio blob
