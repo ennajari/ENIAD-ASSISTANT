@@ -531,7 +531,7 @@ export const createChatHandlers = (
             }).join('\n\n---\n\n');
 
             const smaAnswer = currentLanguage === 'ar'
-              ? `بناءً على المعلومات الحديثة من موقع ENIAD:\n\n${smaContent}\n\nهذه المعلومات مستخرجة مباشرة من الموقع الرسمي لـ ENIAD.`
+              ? `بناءً على المعلومات الحديثة من موقع ENيAD:\n\n${smaContent}\n\nهذه المعلومات مستخرجة مباشرة من الموقع الرسمي لـ ENIAD.`
               : `Basé sur les informations récentes du site ENIAD :\n\n${smaContent}\n\nCes informations sont extraites directement du site officiel d'ENIAD.`;
 
             botMessage = {
@@ -905,14 +905,30 @@ export const createChatHandlers = (
           newTitle.trim(),
           setConversationHistory
         );
+        // Forcer le rafraîchissement depuis Firebase après renommage
+        if (conversationStateManager.currentUser?.uid) {
+          await conversationStateManager.loadConversations(setConversationHistory);
+        }
         console.log('✅ Conversation renamed with Firebase sync');
       } catch (error) {
         console.error('❌ Error renaming conversation:', error);
+        alert(
+          currentLanguage === 'ar'
+            ? 'حدث خطأ أثناء إعادة تسمية المحادثة. يرجى المحاولة مرة أخرى.'
+            : currentLanguage === 'fr'
+            ? 'Une erreur est survenue lors du renommage de la conversation. Veuillez réessayer.'
+            : 'An error occurred while renaming the conversation. Please try again.'
+        );
+      } finally {
+        setRenameDialogOpen(false);
+        setRenameChatId(null);
+        setNewChatTitle('');
       }
+    } else {
+      setRenameDialogOpen(false);
+      setRenameChatId(null);
+      setNewChatTitle('');
     }
-    setRenameDialogOpen(false);
-    setRenameChatId(null);
-    setNewChatTitle('');
   };
 
   const handleChatMenuOpen = (event, chatId) => {
