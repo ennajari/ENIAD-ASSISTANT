@@ -533,7 +533,7 @@ const ChatContent = ({
             </Box>
           ))}
 
-          {isLoading && (
+          {isLoading && !Object.values(isSpeaking).some(Boolean) && (
             <Box sx={{
               width: '100%',
               display: 'flex',
