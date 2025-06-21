@@ -152,23 +152,63 @@ ENIAD-ASSISTANT/
 ├── 📁 chatbot-ui/
 │   └── 📁 chatbot-academique/          # React Frontend Application
 │       ├── 📁 src/
-│       │   ├── 📁 components/          # React Components
-│       │   ├── 📁 services/            # API Services
-│       │   ├── 📁 contexts/            # React Contexts
-│       │   └── 📁 constants/           # Configuration
-│       ├── 📁 public/                  # Static Assets
-│       └── 📄 package.json             # Dependencies
-├── 📁 RAG_Project/
-│   └── 📁 src/                         # FastAPI Backend
-│       ├── 📁 routes/                  # API Routes
-│       ├── 📁 models/                  # Data Models
-│       ├── 📁 controllers/             # Business Logic
-│       └── 📁 helpers/                 # Utilities
-├── 📁 data/                            # Training Data & Knowledge Base
-│   ├── 📄 questions_fr.json           # French Q&A Dataset
-│   ├── 📄 questions_en.json           # English Q&A Dataset
-│   └── 📄 questions_ar.json           # Arabic Q&A Dataset
-└── 📄 README.md                       # This File
+│       │   ├── 📁 components/          # React UI Components
+│       │   │   ├── Chat.jsx            # Main chat interface
+│       │   │   ├── ChatInput.jsx       # Message input with voice
+│       │   │   ├── ChatSidebar.jsx     # Conversation history
+│       │   │   ├── ModelSelector.jsx   # AI model selection
+│       │   │   └── TTSFloatingPanel.jsx # Voice controls
+│       │   ├── 📁 services/            # API Integration Services
+│       │   │   ├── geminiService.js    # Google Gemini AI
+│       │   │   ├── realRagService.js   # RAG system integration
+│       │   │   ├── realSmaService.js   # SMA system integration
+│       │   │   └── modalApiService.js  # Custom Llama3 model
+│       │   ├── 📁 contexts/            # React State Management
+│       │   │   ├── AuthContext.jsx     # Firebase authentication
+│       │   │   └── LanguageContext.jsx # Multilingual support
+│       │   ├── 📁 hooks/               # Custom React Hooks
+│       │   │   ├── useChatState.js     # Chat state management
+│       │   │   ├── useTTSState.js      # Text-to-speech
+│       │   │   └── useThemeMode.js     # Dark/light theme
+│       │   ├── 📁 theme/               # Material-UI Theme
+│       │   └── 📁 utils/               # Helper Functions
+│       ├── 📁 public/                  # Static Assets & Icons
+│       ├── 📄 package.json             # Frontend Dependencies
+│       ├── 📄 vite.config.js           # Build Configuration
+│       └── 📄 tailwind.config.js       # CSS Framework Config
+├── 📁 RAG_Project/                     # Retrieval-Augmented Generation
+│   ├── 📁 src/                         # FastAPI Backend
+│   │   ├── 📁 routes/                  # API Endpoints
+│   │   ├── 📁 models/                  # Data Models
+│   │   ├── 📁 controllers/             # Business Logic
+│   │   ├── 📁 services/                # Core Services
+│   │   ├── 📁 helpers/                 # Utility Functions
+│   │   └── 📄 main.py                  # FastAPI Application
+│   ├── 📁 docker/                      # Docker Configuration
+│   │   ├── 📄 docker.compose.yml       # MongoDB & Qdrant setup
+│   │   └── 📄 init-mongo.js            # Database initialization
+│   ├── 📁 data/                        # Knowledge Base
+│   └── 📄 requirements.txt             # Python Dependencies
+├── 📁 SMA_Service/                     # Smart Multi-Agent System
+│   ├── 📁 agents/                      # Specialized AI Agents
+│   │   ├── web_scraper_agent.py        # Web content extraction
+│   │   ├── content_analyzer_agent.py   # Content analysis
+│   │   ├── coordinator_agent.py        # Agent orchestration
+│   │   └── rag_agent.py                # RAG integration
+│   ├── 📁 crew/                        # CrewAI Framework
+│   ├── 📁 utils/                       # Utility Functions
+│   ├── 📄 main.py                      # FastAPI SMA Server
+│   └── 📄 requirements.txt             # SMA Dependencies
+├── 📁 DATA/                            # Training Data & Documents
+│   ├── 📄 ENIAD_COMPLET_FR.txt         # French knowledge base
+│   ├── 📄 ENIAD_COMPLET_AR.txt         # Arabic knowledge base
+│   ├── 📄 CNPN_Cycle-ingenieur_2024.pdf # Academic regulations
+│   └── 📄 reglement_int_étudiants_ENIADB.pdf # Student handbook
+├── 📁 chroma_db/                       # Vector Database Storage
+├── 📄 requirements.txt                 # Main Python Dependencies
+├── 📄 package.json                     # Node.js Dependencies
+├── 📄 firestore.rules                  # Firebase Security Rules
+└── 📄 README.md                        # This Documentation
 ```
 
 ---
@@ -208,22 +248,41 @@ Our interface follows modern design principles inspired by leading AI platforms 
 ## 🔧 **Technical Architecture**
 
 ### **Frontend Stack**
-- **React 18** - Modern functional components with hooks
-- **Material-UI (MUI)** - Professional component library
-- **Vite** - Fast development and optimized builds
-- **Firebase** - Authentication and real-time features
+- **React 18.3.1** - Modern functional components with hooks and concurrent features
+- **Material-UI (MUI) 5.15.15** - Complete component library with custom theming
+- **Tailwind CSS 3.4.3** - Utility-first CSS framework with custom design tokens
+- **Vite 5.2.11** - Ultra-fast build tool with Hot Module Replacement
+- **React Router DOM 6.23.1** - Client-side routing and navigation
+- **Firebase 10.12.2** - Authentication, Firestore database, and real-time features
+- **Emotion** - CSS-in-JS styling solution for dynamic theming
 
 ### **Backend Stack**
-- **FastAPI** - High-performance Python web framework
-- **RAG System** - Custom retrieval-augmented generation
-- **Vector Database** - Efficient document search and retrieval
-- **MongoDB** - Scalable document storage
+- **FastAPI 0.115.12** - High-performance async Python web framework
+- **MongoDB 7.0** - Document database with Docker containerization
+- **Qdrant** - Vector database for semantic search and embeddings
+- **ChromaDB** - Alternative vector storage for document embeddings
+- **Motor** - Async MongoDB driver for Python
+- **Uvicorn** - ASGI server for FastAPI applications
 
-### **AI & Speech Services**
-- **Custom RAG Model** - Domain-specific knowledge retrieval
-- **ElevenLabs** - Premium text-to-speech
-- **Azure Speech** - Enterprise speech services
-- **Google Cloud** - Multilingual speech support
+### **AI & Machine Learning**
+- **Google Gemini 1.5 Flash** - Primary conversational AI model
+- **Custom Llama3 8B** - Fine-tuned model hosted on Modal platform
+- **Ollama** - Local LLM inference engine for RAG operations
+- **Sentence Transformers** - Text embeddings for semantic search
+- **CrewAI** - Multi-agent orchestration framework
+- **LangChain** - LLM application development framework
+
+### **Multi-Agent System (SMA)**
+- **Web Scraping Agents** - BeautifulSoup4, Selenium for content extraction
+- **Content Analysis Agents** - NLTK, TextBlob for text processing
+- **Coordination Agents** - CrewAI for agent orchestration
+- **RAG Integration Agents** - Vector search and document retrieval
+
+### **Speech & Audio Services**
+- **ElevenLabs API** - Premium text-to-speech synthesis
+- **Web Speech API** - Browser-native speech recognition
+- **Multi-language Support** - French, Arabic, English voice synthesis
+- **Real-time Audio Processing** - Streaming audio with progress tracking
 
 ---
 

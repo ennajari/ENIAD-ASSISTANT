@@ -27,21 +27,32 @@ scikit-learn==1.5.1
 pydantic-settings==2.8.1
 python-dotenv==1.1.0
 
-# File Handling
+# File Handling & Document Processing
 aiofiles==24.1.0
 PyMuPDF==1.25.5
+PyPDF2==3.0.1
+python-docx==1.1.2
+pdfplumber==0.11.4
+Pillow==10.4.0
+pytesseract==0.3.13
+opencv-python==4.10.0.84
 file-saver==2.0.5
 
 # AI & Language Models
+google-generativeai==0.8.3
 langchain==0.3.23
 langchain-community==0.3.21
 openai==1.78.1
 cohere==5.15.0
+sentence-transformers==3.3.1
+transformers==4.46.3
+torch==2.5.1
 
 # Database & Storage
 motor==3.7.0
 qdrant-client==1.14.2
 pymongo==4.8.0
+chromadb==0.5.23
 
 # Speech Services (Optional)
 # Uncomment if using speech features
@@ -64,11 +75,20 @@ python-json-logger==2.0.7
 cryptography==42.0.8
 python-jose[cryptography]==3.3.0
 
-# SMA Service Dependencies
-crewai==0.86.0
+# Web Scraping & SMA Dependencies
 beautifulsoup4==4.12.3
 aiohttp==3.10.11
 selenium==4.27.1
+lxml==5.3.0
+urllib3==2.1.0
+chardet==5.2.0
+certifi==2023.11.17
+idna==3.6
+
+# Multi-Agent Framework
+crewai==0.86.0
+
+# Text Processing & NLP
 nltk==3.9.1
 textblob==0.18.0
 python-dateutil==2.9.0
@@ -76,3 +96,6 @@ python-dateutil==2.9.0
 # Additional Utilities
 tqdm==4.66.4
 colorama==0.4.6
+loguru==0.7.2
+schedule==1.2.2
+faiss-cpu==1.9.0
