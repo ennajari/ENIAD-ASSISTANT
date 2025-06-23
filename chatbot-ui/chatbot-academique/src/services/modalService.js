@@ -7,7 +7,7 @@ import axios from 'axios';
 
 class ModalService {
   constructor() {
-    this.modalApiUrl = 'https://abdellahennajari2018--llama3-openai-compatible-serve.modal.run';
+    this.modalApiUrl = 'https://ai-ennajari--llama3-openai-compatible-serve.modal.run';
     this.isAvailable = false;
 
     // Schéma de réponse structuré pour votre modèle
