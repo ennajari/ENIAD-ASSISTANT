@@ -8,7 +8,7 @@ import axios from 'axios';
 
 class ModalApiService {
   constructor() {
-    this.baseURL = import.meta.env.VITE_MODAL_API_URL || 'https://abdellahennajari2018--llama3-openai-compatible-serve.modal.run';
+    this.baseURL = import.meta.env.VITE_MODAL_API_URL || 'https://ai-ennajari--llama3-openai-compatible-serve.modal.run';
     this.modelName = import.meta.env.VITE_MODAL_MODEL_NAME || 'llama3-8b-eniad-merged-32bit';
     this.timeout = 60000; // 60 seconds timeout
 
