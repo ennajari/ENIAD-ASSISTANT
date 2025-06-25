@@ -20,15 +20,15 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api/llama': {
-        target: 'https://abdellah-ennajari-23--llama3-openai-compatible-serve.modal.run',
+        target: 'https://testermodal--llama3-openai-compatible-serve.modal.run',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/llama/, ''),
         secure: true,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-        }
+        // headers: {
+        //   'Access-Control-Allow-Origin': '*',
+        //   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        //   'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+        // }
       },
       '/api/rag': {
         target: 'http://localhost:8000',

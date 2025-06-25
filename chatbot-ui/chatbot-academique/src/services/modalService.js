@@ -7,8 +7,12 @@ import axios from 'axios';
 
 class ModalService {
   constructor() {
-    this.modalApiUrl = 'https://ai-ennajari--llama3-openai-compatible-serve.modal.run';
-    this.isAvailable = false;
+    this.modalApiUrl = 'https://testermodal--llama3-openai-compatible-serve.modal.run';
+    // Utilisation stricte de la variable d'environnement pour le token
+    this.modalApiToken = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_MODAL_API_TOKEN)
+      ? import.meta.env.VITE_MODAL_API_TOKEN
+      : '';
+    this.isAvailable = true; // Toujours disponible pour usage réel
 
     // Schéma de réponse structuré pour votre modèle
     this.chatBotResponseSchema = {
@@ -144,7 +148,7 @@ class ModalService {
       console.log('🚀 Using Modal Llama3 model with structured schema...');
 
       const payload = {
-        model: 'llama3',
+        model: 'llama3-8b-eniad-merged-32bit', // Use the correct model name
         messages: [
           {
             role: 'system',
@@ -167,9 +171,9 @@ class ModalService {
         {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer dummy' // Modal peut nécessiter un token
-          },
-          timeout: 60000
+            ...(this.modalApiToken ? { 'Authorization': `Bearer ${this.modalApiToken}` } : {})
+          }
+          // timeout: 60000 // Désactivé pour laisser le modèle répondre sans limite côté frontend
         }
       );
 
