@@ -8,9 +8,11 @@ import axios from 'axios';
 
 class ModalApiService {
   constructor() {
-    this.baseURL = import.meta.env.VITE_MODAL_API_URL || 'https://ai-ennajari--llama3-openai-compatible-serve.modal.run';
-    this.modelName = import.meta.env.VITE_MODAL_MODEL_NAME || 'llama3-8b-eniad-merged-32bit';
-    this.timeout = 60000; // 60 seconds timeout
+    this.baseURL = import.meta.env.VITE_MODAL_API_URL || 'https://testermodal--llama3-openai-compatible-serve.modal.run';
+    this.modelName = 'llama3-8b-eniad-merged-32bit'; // Use the correct model name
+    // timeout: 60000 // Désactivé pour laisser le modèle répondre sans limite côté frontend
+    // Utilisation stricte de la variable d'environnement pour le token
+    this.token = import.meta.env.VITE_MODAL_API_TOKEN;
 
     console.log('🚀 Modal API Service Configuration:', {
       baseURL: this.baseURL,
@@ -21,10 +23,11 @@ class ModalApiService {
     // Initialize axios instance
     this.api = axios.create({
       baseURL: this.baseURL,
-      timeout: this.timeout,
+      // timeout: this.timeout,
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        ...(this.token ? { 'Authorization': `Bearer ${this.token}` } : {})
       }
     });
 
@@ -123,7 +126,7 @@ Réponds en français en te basant sur le contexte fourni:`;
         temperature,
         maxTokens
       });
-
+      console.log('🔑 Modal API Token used:', this.token);
       // Appel à votre API Modal
       const response = await this.api.post('/v1/chat/completions', payload);
 
