@@ -61,8 +61,8 @@ class Settings(BaseSettings):
     log_format: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     
     # AI Service Keys
-    # gemini_api_key: str = "AIzaSyDIDbm8CcUxtTTW3omJcOHQj1BWcmRWeYc"
-    gemini_api_key: str = "AIzaSyA-fUd_KyFGir1ohW3rPYh4wqGAs1Z6lB8"
+    
+    gemini_api_key: str = ""
     openai_api_key: Optional[str] = None
     anthropic_api_key: Optional[str] = None
     cohere_api_key: Optional[str] = None
