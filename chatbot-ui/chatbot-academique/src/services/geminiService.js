@@ -5,7 +5,7 @@
 
 class GeminiService {
   constructor() {
-    this.apiKey = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyA-fUd_KyFGir1ohW3rPYh4wqGAs1Z6lB8';
+    this.apiKey = import.meta.env.VITE_GEMINI_API_KEY || '';
     this.modelName = import.meta.env.VITE_MODEL_NAME || 'gemini-1.5-flash';
     this.baseURL = 'https://generativelanguage.googleapis.com/v1beta';
     this.maxTokens = parseInt(import.meta.env.VITE_MAX_TOKENS) || 400;

@@ -117,7 +117,7 @@ npm install --legacy-peer-deps
 cp chatbot-ui/chatbot-academique/.env.example chatbot-ui/chatbot-academique/.env
 
 # Edit .env with your settings:
-VITE_GEMINI_API_KEY=AIzaSyDIDbm8CcUxtTTW3omJcOHQj1BWcmRWeYc
+VITE_GEMINI_API_KEY=
 VITE_RAG_API_BASE_URL=http://localhost:8000
 VITE_SMA_API_URL=http://localhost:8001
 ```
