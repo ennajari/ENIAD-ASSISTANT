@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 class EnhancedSMAAgent:
     def __init__(self):
-        # self.gemini_api_key = "AIzaSyDIDbm8CcUxtTTW3omJcOHQj1BWcmRWeYc"
+        
         self.gemini_api_key = ""
         self.gemini_model = "gemini-1.5-flash"
         self.web_scraper = EnhancedWebScraper()

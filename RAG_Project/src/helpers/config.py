@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     # AI Model Settings - FORCE OLLAMA
     GENERATION_BACKEND: str = "OLLAMA"
     EMBEDDING_BACKEND: str = "OLLAMA"
-    # GEMINI_API_KEY: str = "AIzaSyDIDbm8CcUxtTTW3omJcOHQj1BWcmRWeYc"
+    
     GEMINI_API_KEY: str = ""
 
     # Ollama Settings
