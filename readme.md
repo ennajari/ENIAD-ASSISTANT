@@ -107,14 +107,14 @@ docker ps
 pip install fastapi uvicorn pydantic PyPDF2 PyMuPDF pillow pytesseract python-docx beautifulsoup4 requests aiohttp
 
 # Frontend dependencies
-cd chatbot-ui/chatbot-academique
+cd chatbot-ui
 npm install --legacy-peer-deps
 ```
 
 #### **2. Environment Configuration**
 ```bash
 # Copy and configure environment
-cp chatbot-ui/chatbot-academique/.env.example chatbot-ui/chatbot-academique/.env
+cp chatbot-ui/.env.example chatbot-ui/.env
 
 # Edit .env with your settings:
 VITE_GEMINI_API_KEY=
@@ -134,7 +134,7 @@ cd RAG_Project/src && python main.py
 cd SMA_Service && python main.py
 
 # Terminal 4: Start Frontend
-cd chatbot-ui/chatbot-academique && npm run dev
+cd chatbot-ui && npm run dev
 ```
 
 ### **🌐 Access Points**
@@ -149,9 +149,8 @@ cd chatbot-ui/chatbot-academique && npm run dev
 
 ```
 ENIAD-ASSISTANT/
-├── 📁 chatbot-ui/
-│   └── 📁 chatbot-academique/          # React Frontend Application
-│       ├── 📁 src/
+├── 📁 chatbot-ui/          # React Frontend Application
+│   ├── 📁 src/
 │       │   ├── 📁 components/          # React UI Components
 │       │   │   ├── Chat.jsx            # Main chat interface
 │       │   │   ├── ChatInput.jsx       # Message input with voice
