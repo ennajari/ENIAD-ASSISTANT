@@ -62,7 +62,7 @@ class Settings(BaseSettings):
     
     # AI Service Keys
     
-    gemini_api_key: str = ""
+    gemini_api_key: str = os.getenv("GEMINI_API_KEY", "")
     openai_api_key: Optional[str] = None
     anthropic_api_key: Optional[str] = None
     cohere_api_key: Optional[str] = None

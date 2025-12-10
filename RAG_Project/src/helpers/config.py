@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     GENERATION_BACKEND: str = "OLLAMA"
     EMBEDDING_BACKEND: str = "OLLAMA"
     
-    GEMINI_API_KEY: str = ""
+    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
 
     # Ollama Settings
     OLLAMA_BASE_URL: str = "http://localhost:11434"

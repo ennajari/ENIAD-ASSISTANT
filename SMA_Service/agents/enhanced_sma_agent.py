@@ -24,7 +24,9 @@ logger = logging.getLogger(__name__)
 class EnhancedSMAAgent:
     def __init__(self):
         
-        self.gemini_api_key = ""
+        # Import settings to get API key from .env
+        from config.settings import settings
+        self.gemini_api_key = settings.gemini_api_key
         self.gemini_model = "gemini-1.5-flash"
         self.web_scraper = EnhancedWebScraper()
         

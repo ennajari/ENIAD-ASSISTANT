@@ -41,8 +41,9 @@ app.add_middleware(
 )
 
 # Configure Gemini AI
-# GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", )
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+# Configure Gemini AI using settings (handles .env loading)
+from config.settings import settings
+GEMINI_API_KEY = settings.gemini_api_key
 genai.configure(api_key=GEMINI_API_KEY)
 
 # Global variables for SMA system
