@@ -4,7 +4,7 @@ python-multipart==0.0.26
 pandas==2.2.3
 pydantic-settings==2.8.1
 numpy == 2.2.4
-python-dotenv == 1.1.0
+python-dotenv == 1.2.2
 aiofiles == 24.1.0
 langchain == 0.3.23
 PyMuPDF == 1.25.5
