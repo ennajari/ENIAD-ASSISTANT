@@ -1,0 +1,14 @@
+{
+  "python.defaultInterpreterPath": "C:\\anaconda3\\python.exe",
+  "python.analysis.extraPaths": [
+    "./services/rag-service/src",
+    "./services/sma-service",
+    "./frontend"
+  ],
+  "python.autoComplete.extraPaths": [
+    "./services/rag-service/src",
+    "./services/sma-service",
+    "./frontend"
+  ],
+  "pyrefly.pythonPath": "C:\\anaconda3\\python.exe"
+}
