@@ -16,6 +16,7 @@ security_scheme = HTTPBearer(auto_error=False)
 
 async def verify_jwt_token(credentials: HTTPAuthorizationCredentials = Security(security_scheme)):
     """Lightweight JWT token verification dependency for secure endpoints"""
+    await asyncio.sleep(0)
     if credentials is None:
         return {"user": "anonymous", "authenticated": False}
     token = credentials.credentials
@@ -321,7 +322,7 @@ Veuillez fournir une réponse complète et précise en français."""
             if generated_answer:
                 print(f"✅ Réponse générée: {len(generated_answer)} caractères")
             else:
-                raise Exception("Generation returned None")
+                raise RuntimeError("Generation returned None")
         except Exception as e:
             print(f"❌ Erreur génération: {str(e)}")
             # Fallback: réponse générique si la génération échoue
@@ -519,17 +520,21 @@ async def upload_and_index_documents(project_id: str):
                     })
 
                 elif filename.endswith('.pdf'):
-                    # Traiter les fichiers PDF avec PyPDF2
+                    # Traiter les fichiers PDF avec PyPDF2 de manière asynchrone
                     try:
                         import PyPDF2
+                        import io
+                        import aiofiles
 
-                        with open(file_path, 'rb') as f:
-                            pdf_reader = PyPDF2.PdfReader(f)
-                            content = ""
+                        async with aiofiles.open(file_path, 'rb') as f:
+                            pdf_bytes = await f.read()
 
-                            for page_num in range(len(pdf_reader.pages)):
-                                page = pdf_reader.pages[page_num]
-                                content += page.extract_text() + "\n"
+                        pdf_reader = PyPDF2.PdfReader(io.BytesIO(pdf_bytes))
+                        content = ""
+
+                        for page_num in range(len(pdf_reader.pages)):
+                            page = pdf_reader.pages[page_num]
+                            content += page.extract_text() + "\n"
 
                         if len(content.strip()) > 50:  # Vérifier qu'il y a du contenu
                             # Générer l'embedding

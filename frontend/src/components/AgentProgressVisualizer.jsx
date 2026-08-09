@@ -7,6 +7,26 @@ const AGENT_STEPS = [
   { id: 'summarizer', name: 'Summarizer Agent', desc: 'Synthesizing response with citations...', icon: FileText },
 ];
 
+function getCardStyle(status) {
+  if (status === 'completed') {
+    return 'bg-emerald-950/20 border-emerald-500/40 text-emerald-300';
+  }
+  if (status === 'active') {
+    return 'bg-blue-950/40 border-blue-500/60 text-blue-300 animate-pulse';
+  }
+  return 'bg-slate-800/20 border-slate-700/40 text-slate-500';
+}
+
+function renderStatusIcon(status, IconComponent) {
+  if (status === 'completed') {
+    return <CheckCircle2 className="w-4 h-4 text-emerald-400" />;
+  }
+  if (status === 'active') {
+    return <Loader2 className="w-4 h-4 text-blue-400 animate-spin" />;
+  }
+  return <IconComponent className="w-4 h-4 opacity-50" />;
+}
+
 export function AgentProgressVisualizer({ currentStep = 'scraping', isComplete = false }) {
   const getStepStatus = (stepId) => {
     if (isComplete) return 'completed';
@@ -23,8 +43,8 @@ export function AgentProgressVisualizer({ currentStep = 'scraping', isComplete =
     <div className="my-4 p-4 rounded-xl bg-slate-900/80 border border-emerald-500/30 backdrop-blur-md shadow-lg transition-all duration-300">
       <div className="flex items-center justify-between mb-3 border-b border-slate-700/50 pb-2">
         <h4 className="text-xs font-semibold uppercase tracking-wider text-emerald-400 flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-          Smart Multi-Agent Workflow Engine
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>Smart Multi-Agent Workflow Engine</span>
         </h4>
         <span className="text-[10px] text-slate-400 font-mono">ENIAD SMA v2.0</span>
       </div>
@@ -37,22 +57,10 @@ export function AgentProgressVisualizer({ currentStep = 'scraping', isComplete =
           return (
             <div
               key={step.id}
-              className={`p-3 rounded-lg border transition-all duration-200 flex items-start gap-3 ${
-                status === 'completed'
-                  ? 'bg-emerald-950/20 border-emerald-500/40 text-emerald-300'
-                  : status === 'active'
-                  ? 'bg-blue-950/40 border-blue-500/60 text-blue-300 animate-pulse'
-                  : 'bg-slate-800/20 border-slate-700/40 text-slate-500'
-              }`}
+              className={`p-3 rounded-lg border transition-all duration-200 flex items-start gap-3 ${getCardStyle(status)}`}
             >
               <div className="mt-0.5">
-                {status === 'completed' ? (
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                ) : status === 'active' ? (
-                  <Loader2 className="w-4 h-4 text-blue-400 animate-spin" />
-                ) : (
-                  <Icon className="w-4 h-4 opacity-50" />
-                )}
+                {renderStatusIcon(status, Icon)}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-xs font-medium leading-none mb-1 flex items-center justify-between">
