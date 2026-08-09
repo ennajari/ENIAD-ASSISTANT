@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: eniad_frontend
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_RAG_API_URL=http://localhost:8009
+      - VITE_SMA_API_URL=http://localhost:8002
+    depends_on:
+      - rag-service
+      - sma-service
+    restart: always
+
+  rag-service:
+    build:
+      context: .
+      dockerfile: RAG_Project/Dockerfile
+    container_name: eniad_rag_service
+    ports:
+      - "8009:8009"
+    environment:
+      - MONGODB_URL=mongodb://mongodb:27017
+      - MONGODB_DATABASE=eniad_rag_db
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    depends_on:
+      - mongodb
+    restart: always
+
+  sma-service:
+    build:
+      context: .
+      dockerfile: SMA_Service/Dockerfile
+    container_name: eniad_sma_service
+    ports:
+      - "8002:8002"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    restart: always
+
+  mongodb:
+    image: mongo:7.0
+    container_name: eniad_mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: always
+
+volumes:
+  mongo_data:
