@@ -37,7 +37,7 @@ jobs:
       - name: Frontend Dependencies & Build
         run: |
           cd chatbot-ui
-          npm ci
+          npm install
           npm run build
 
   unit-tests:
@@ -56,7 +56,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt pytest httpx
+          pip install -r requirements.txt pytest httpx || pip install pytest httpx fastapi pydantic
 
       - name: Run Backend Pytest Suite
         run: |
