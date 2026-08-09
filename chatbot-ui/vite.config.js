@@ -16,39 +16,34 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000
   },
   server: {
-    port: 5173,
+    port: 3000,
     host: true,
     proxy: {
       '/api/llama': {
         target: 'https://testermodal--llama3-openai-compatible-serve.modal.run',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/llama/, ''),
-        secure: true,
-        // headers: {
-        //   'Access-Control-Allow-Origin': '*',
-        //   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        //   'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-        // }
+        secure: true
       },
       '/api/rag': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:8009',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/rag/, ''),
         secure: false
       },
       '/api/sma': {
-        target: 'http://localhost:8001',
+        target: 'http://localhost:8002',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/sma/, ''),
         secure: false
       },
       '/health': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:8009',
         changeOrigin: true,
         secure: false
       },
       '/sma': {
-        target: 'http://localhost:8001',
+        target: 'http://localhost:8002',
         changeOrigin: true,
         secure: false
       }
