@@ -14,7 +14,10 @@ import logging
 from datetime import datetime, timedelta
 import requests
 from bs4 import BeautifulSoup
-import google.generativeai as genai
+try:
+    import google.generativeai as genai
+except ImportError:
+    genai = None
 import json
 import os
 import re
@@ -59,7 +62,11 @@ app.add_middleware(
 # Configure Gemini AI using settings (handles .env loading)
 from config.settings import settings
 GEMINI_API_KEY = settings.gemini_api_key
-genai.configure(api_key=GEMINI_API_KEY)
+if genai and GEMINI_API_KEY:
+    try:
+        genai.configure(api_key=GEMINI_API_KEY)
+    except Exception as e:
+        logger.warning(f"Failed to configure Gemini AI: {e}")
 
 # Global variables for SMA system
 scraped_data_cache = {}
@@ -140,7 +147,7 @@ class WebScraperAgent:
 # Content analyzer agent using Gemini
 class ContentAnalyzerAgent:
     def __init__(self):
-        self.model = genai.GenerativeModel('gemini-1.5-flash')
+        self.model = genai.GenerativeModel('gemini-1.5-flash') if genai else None
 
     async def analyze_content(self, content: Dict[str, Any], language: str = "fr") -> Dict[str, Any]:
         """Analyze scraped content using Gemini AI"""
@@ -979,6 +986,8 @@ async def get_monitoring_status(monitoring_id: str):
             "timestamp": datetime.now().isoformat()
         }
         
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"❌ Get monitoring status failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))

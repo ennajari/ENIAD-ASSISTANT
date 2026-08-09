@@ -11,6 +11,18 @@ from contextlib import asynccontextmanager
 # Cache pour requêtes RAG fréquentes (LRU cache avec TTL)
 rag_query_cache: Dict[str, Any] = {}
 
+# Variables globales pour l'initialisation
+initialization_status = {
+    "completed": True,
+    "error": None,
+    "mongo": True,
+    "llm_factory": True,
+    "generation_client": True,
+    "embedding_client": True,
+    "vectordb_client": True,
+    "template_parser": True
+}
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Modern async lifespan manager for FastAPI RAG service"""
