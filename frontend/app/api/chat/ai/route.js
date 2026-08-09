@@ -5,10 +5,15 @@ import { getAuth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-    baseURL: 'https://abdellahennajari2018--llama3-openai-compatible-serve.modal.run/v1',
-    apiKey: process.env.MODAL_API_KEY || "super-secret-key"
-});
+const getOpenAIClient = () => {
+    const baseURL = process.env.MODAL_API_URL || process.env.VITE_MODAL_API_URL || 'https://abdellahennajari2018--llama3-openai-compatible-serve.modal.run/v1';
+    const apiKey = process.env.MODAL_API_KEY || process.env.VITE_MODAL_API_TOKEN || "super-secret-key";
+    
+    return new OpenAI({
+        baseURL: baseURL.endsWith('/v1') ? baseURL : `${baseURL.replace(/\/$/, '')}/v1`,
+        apiKey: apiKey
+    });
+};
 
 export async function POST(req) {
     try {
@@ -50,11 +55,11 @@ export async function POST(req) {
         const messages = [
             {
                 role: "system",
-                content: `Vous êtes l'assistant de l'ENIAD (École Nationale de l'Intelligence Artificielle et Digitale) de Berkane.
+                content: `Vous êtes l'assistant de l'ENIAD (École Nationale de l'Intelligence Artificielle et du Digital) de Oujda / Berkane.
                 Répondez toujours en texte brut directement, sans format JSON.
                 Pour les salutations, utilisez ce format exact :
                 
-                "Bonjour ! Bienvenue à l'École Nationale de l'Intelligence Artificielle et Digitale de Berkane. Je suis ravi de vous aider aujourd'hui.
+                "Bonjour ! Bienvenue à l'École Nationale de l'Intelligence Artificielle et du Digital. Je suis ravi de vous aider aujourd'hui.
 
                 Je suis l'assistant virtuel de l'ENIAD et je peux vous renseigner sur divers sujets concernant notre école :
 
@@ -79,6 +84,7 @@ export async function POST(req) {
         ];
 
         // Get AI response
+        const openai = getOpenAIClient();
         const completion = await openai.chat.completions.create({
             model: "ahmed-ouka/llama3-8b-eniad-merged-32bit",
             messages,
@@ -88,7 +94,7 @@ export async function POST(req) {
 
         const aiMessage = {
             role: "assistant",
-            content: completion.choices[0].message.content,
+            content: completion.choices[0].message?.content || "",
             timestamp: Date.now()
         };
 
