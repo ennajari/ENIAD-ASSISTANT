@@ -1,7 +1,7 @@
 # FastAPI et serveur
 fastapi==0.115.12
 uvicorn[standard]==0.34.0
-python-multipart==0.0.20
+python-multipart==0.0.32
 
 # Pydantic et configuration
 pydantic==2.8.2
