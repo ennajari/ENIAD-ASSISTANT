@@ -6,10 +6,10 @@ Thank you for your interest in contributing to **ENIAD-ASSISTANT**! This project
 
 ## 👥 Core AI Engineering Team
 
-- **Oussama ENNAJARI** – Lead AI & MLOps Engineer (*Architecture, SMA Multi-Agent, CI/CD Pipeline*)
-- **Ahmed OUKAL** – AI Systems & Fine-Tuning Specialist (*Fine-tuned Llama-3 8B, Model API Server*)
-- **AI Engineering Specialist** – Vector Indexing & RAG Engineer (*LanceDB / Qdrant RAG Pipeline*)
-- **AI Engineering Specialist** – Full-Stack AI Interface Developer (*React 18 + Vite Conversational UI*)
+- **Abdellah ENNAJARI** – Lead AI & MLOps Engineer (*Architecture, SMA Multi-Agent, CI/CD Pipeline*)
+- **Ahmed OUKACHA** – AI Systems & Fine-Tuning Specialist (*Fine-tuned Llama-3 8B, Model API Server*)
+- **Oussama ELHADJI** – Vector Indexing & RAG Engineer (*LanceDB / Qdrant RAG Pipeline*)
+- **Abdelilah OURTI** – Full-Stack AI Interface Developer (*React 18 + Vite Conversational UI*)
 
 ---
 

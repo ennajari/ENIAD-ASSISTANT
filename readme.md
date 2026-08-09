@@ -20,10 +20,10 @@ This project was engineered as part of the **Projet de Fin d'Année (PFA)** by a
 
 | AI Engineer | Role & Engineering Domain | Core Contributions |
 | :--- | :--- | :--- |
-| **Oussama ENNAJARI** | **Lead AI & MLOps Engineer** | System Architecture, SMA Multi-Agent Service design, CI/CD Pipeline Automation, System Integration & Service Port Harmonization |
-| **Ahmed OUKAL** | **AI Systems & Fine-Tuning Specialist** | Custom Fine-Tuned Llama-3 8B Model (`ahmed-ouka/llama3-8b-eniad-merged-32bit`), Model Server & Modal Platform API Integration |
-| **AI Engineering Specialist** | **Vector DB & RAG Pipeline Engineer** | LanceDB / Qdrant Vector DB indexing, Academic Document Embeddings, RAG Query Optimizations |
-| **AI Engineering Specialist** | **Full-Stack AI Interface Developer** | React 18 + Vite Conversational UI, Real-time Agent Streaming, Multi-lingual State Management |
+| **Abdellah ENNAJARI** | **Lead AI & MLOps Engineer** | System Architecture, SMA Multi-Agent Service design, CI/CD Pipeline Automation, System Integration & Service Port Harmonization |
+| **Ahmed OUKACHA** | **AI Systems & Fine-Tuning Specialist** | Custom Fine-Tuned Llama-3 8B Model (`ahmed-ouka/llama3-8b-eniad-merged-32bit`), Model Server & Modal Platform API Integration |
+| **Oussama ELHADJI** | **Vector DB & RAG Pipeline Engineer** | LanceDB / Qdrant Vector DB indexing, Academic Document Embeddings, RAG Query Optimizations |
+| **Abdelilah OURTI** | **Full-Stack AI Interface Developer** | React 18 + Vite Conversational UI, Real-time Agent Streaming, Multi-lingual State Management |
 
 ---
 
