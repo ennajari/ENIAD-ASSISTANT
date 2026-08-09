@@ -5,7 +5,6 @@
  */
 
 import axios from 'axios';
-import geminiService from './geminiService';
 
 class RAGApiService {
   constructor() {
@@ -113,7 +112,7 @@ class RAGApiService {
 
       // Enhance query with SMA results if available
       let enhancedQuery = query.trim();
-      if (smaResults && smaResults.results && smaResults.results.length > 0) {
+      if (smaResults?.results?.length > 0) {
         console.log('🧠 Enhancing query with SMA results');
         const smaContext = smaResults.results.slice(0, 3).map(result =>
           `${result.title}: ${result.content || result.summary || ''}`
@@ -124,16 +123,18 @@ class RAGApiService {
 
       // Prepare payload for your custom model API
       const payload = {
-        chatId: chatId,
-        prompt: query, // Use original query, let server handle enhancement
-        enableSMA: !!smaResults, // Enable SMA if we have results
-        enableRAG: true, // Always enable RAG
-        language: language
+        chatId,
+        prompt: enhancedQuery,
+        enableSMA: !!smaResults,
+        enableRAG: true,
+        language,
+        userId,
+        context
       };
 
       console.log('📝 Sending query to custom Llama3 model:', {
         endpoint: '/api/chat',
-        query: query.substring(0, 100) + '...',
+        query: enhancedQuery.substring(0, 100) + '...',
         language,
         chatId,
         hasSMAResults: !!smaResults
@@ -164,6 +165,8 @@ class RAGApiService {
 
       const payload = {
         query: query.trim(),
+        language,
+        limit,
         llm_type: "ollama",
         mode: "hybrid"
       };
@@ -171,15 +174,16 @@ class RAGApiService {
       console.log('🔍 Searching documents in your RAG system:', {
         endpoint: `/search/${pid}`,
         query: query.substring(0, 50) + '...',
+        language,
         limit
       });
 
       const response = await this.ragApi.post(`/search/${pid}`, payload);
 
-      if (response.data.signal === 'vectordb_search_success') {
+      if (response.data?.signal === 'vectordb_search_success') {
         return response.data.results || [];
       } else {
-        console.warn('⚠️ Search returned non-success signal:', response.data.signal);
+        console.warn('⚠️ Search returned non-success signal:', response.data?.signal);
         return [];
       }
     } catch (error) {
@@ -205,7 +209,7 @@ class RAGApiService {
 
       const response = await this.ragApi.get(`/status`);
 
-      if (response.data && response.data.status === 'operational') {
+      if (response.data?.status === 'operational') {
         return {
           status: 'success',
           info: {
@@ -246,7 +250,7 @@ class RAGApiService {
           error: 'RAG system URL not configured',
           projectId: this.projectId,
           baseURL: this.ragSystemURL || 'Not configured',
-          message: 'Please set VITE_RAG_SYSTEM_BASE_URL=http://localhost:5000/api/v1 in your .env file'
+          message: 'Please set VITE_RAG_SYSTEM_BASE_URL=http://localhost:8009 in your .env file'
         };
       }
 
@@ -282,13 +286,13 @@ class RAGApiService {
       let helpMessage = 'RAG service is optional. The chatbot will work without it.';
 
       if (error.code === 'ECONNREFUSED' || error.message.includes('ECONNREFUSED')) {
-        errorMessage = 'RAG service not running on port 8003';
+        errorMessage = 'RAG service not running on port 8009';
         helpMessage = 'To start RAG: cd RAG_Project/src && python main.py. Service is optional - chatbot works without it.';
       } else if (error.code === 'ENOTFOUND' || error.message.includes('ENOTFOUND')) {
         errorMessage = 'RAG service host not found';
         helpMessage = 'Check VITE_RAG_SYSTEM_BASE_URL in .env file. Service is optional.';
       } else if (error.message.includes('timeout')) {
-        errorMessage = 'RAG service timeout (port 8003)';
+        errorMessage = 'RAG service timeout (port 8009)';
         helpMessage = 'Service may be starting up. Check if python main.py is running in RAG_Project/src.';
       } else if (error.message.includes('Network Error')) {
         errorMessage = 'Network error connecting to RAG service';
@@ -327,19 +331,19 @@ class RAGApiService {
     // Parse JSON response if the content contains structured data
     let parsedContent = null;
     try {
-      // Try to extract JSON from the response content
-      const jsonMatch = messageData.content.match(/\{[\s\S]*\}/);
+      // Try to extract JSON from the response content safely (non-greedy)
+      const jsonMatch = messageData.content.match(/\{[\s\S]*?\}/);
       if (jsonMatch) {
         parsedContent = JSON.parse(jsonMatch[0]);
       }
-    } catch (error) {
-      console.log('📝 Response is not structured JSON, treating as plain text');
+    } catch (err) {
+      console.log('📝 Response is not structured JSON, treating as plain text:', err?.message);
     }
 
     // Format the response based on whether it's structured or plain text
     let formattedContent = messageData.content;
     let intent = 'general';
-    let relatedQuestions = [];
+    const relatedQuestions = [];
 
     if (parsedContent) {
       // Structured response from your model
@@ -397,7 +401,7 @@ class RAGApiService {
    * @returns {Array} Formatted sources
    */
   formatSMASources(smaResults) {
-    if (!smaResults || !smaResults.results) return [];
+    if (!smaResults?.results) return [];
 
     return smaResults.results.slice(0, 5).map((result, index) => ({
       title: result.title || `SMA Result ${index + 1}`,
@@ -414,7 +418,7 @@ class RAGApiService {
    * @returns {string} Chat ID
    */
   generateChatId() {
-    return `chat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `chat_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
   }
 
   /**
@@ -423,15 +427,13 @@ class RAGApiService {
    * @returns {Array} Extracted sources
    */
   extractSourcesFromPrompt(fullPrompt) {
-    // This is a simple implementation - you can enhance it based on your prompt structure
     if (!fullPrompt) return [];
 
     try {
-      // Look for patterns that might indicate sources in the prompt
       const sourcePatterns = [
-        /Source:\s*(.+?)(?:\n|$)/gi,
-        /Reference:\s*(.+?)(?:\n|$)/gi,
-        /Document:\s*(.+?)(?:\n|$)/gi
+        /Source:\s*([^\n]+)/gi,
+        /Reference:\s*([^\n]+)/gi,
+        /Document:\s*([^\n]+)/gi
       ];
 
       const sources = [];

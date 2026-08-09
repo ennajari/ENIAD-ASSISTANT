@@ -29,10 +29,10 @@ class RealSmaService {
       this.isSmaAvailable = response.status === 200;
       console.log('✅ SMA backend is available');
       return { success: true, message: 'SMA backend connected' };
-    } catch (error) {
+    } catch (err) {
       this.isSmaAvailable = false;
-      console.log('⚠️ SMA backend not available, using local simulation');
-      return { success: false, message: 'Using local simulation' };
+      console.log('⚠️ SMA backend not available:', err?.message || err);
+      return { success: false, message: 'SMA backend unavailable' };
     }
   }
 
@@ -47,7 +47,7 @@ class RealSmaService {
         maxResults = 10
       } = options;
 
-      console.log(`🚀 Starting SMA workflow for: "${query}"`);
+      console.log(`🚀 Starting SMA workflow for: "${query}" (lang: ${language}, translate: ${includeTranslation}, max: ${maxResults})`);
 
       // If SMA backend is available, use it
       if (this.isSmaAvailable) {
@@ -179,84 +179,80 @@ class RealSmaService {
   /**
    * REMOVED - No fake simulation allowed
    */
-  async executeWithLocalSimulation(query, options) {
+  async executeWithLocalSimulation(_query, _options) {
     console.error('🚫 FAKE SIMULATION REMOVED - Use only real SMA backend');
     return {
       success: false,
       error: 'Fake simulation removed - use real SMA backend only',
       agents: this.agents
     };
-    try {
-      const { language = 'fr', includeTranslation = true } = options;
-      const startTime = Date.now();
+  }
 
-      // Step 1: Web Scraper Agent
-      console.log('🕷️ Step 1: Web Scraper Agent');
-      this.agents.webScraper.status = 'running';
-      const scrapedData = []; // No fake scraping
-      this.agents.webScraper.status = 'completed';
-      this.agents.webScraper.lastRun = new Date().toISOString();
-      this.agents.webScraper.results = scrapedData;
+  /**
+   * Transform enhanced SMA backend response to component expected format
+   */
+  transformEnhancedResults(data) {
+    const results = [];
 
-      // Step 2: Content Analyzer Agent
-      console.log('🔍 Step 2: Content Analyzer Agent');
-      this.agents.contentAnalyzer.status = 'running';
-      const analyzedContent = await this.analyzeContent(scrapedData, query);
-      this.agents.contentAnalyzer.status = 'completed';
-      this.agents.contentAnalyzer.lastRun = new Date().toISOString();
-      this.agents.contentAnalyzer.results = analyzedContent;
-
-      // Step 3: Translation Agent (if needed)
-      let translatedContent = analyzedContent;
-      if (includeTranslation && language !== 'fr') {
-        console.log('🌐 Step 3: Translation Agent');
-        this.agents.translator.status = 'running';
-        translatedContent = await this.translateContent(analyzedContent, language);
-        this.agents.translator.status = 'completed';
-        this.agents.translator.lastRun = new Date().toISOString();
-        this.agents.translator.results = translatedContent;
-      } else {
-        this.agents.translator.status = 'skipped';
-      }
-
-      // Step 4: RAG Integrator Agent
-      console.log('🧮 Step 4: RAG Integrator Agent');
-      this.agents.ragIntegrator.status = 'running';
-      const ragResults = await this.integrateWithRag(translatedContent, query);
-      this.agents.ragIntegrator.status = 'completed';
-      this.agents.ragIntegrator.lastRun = new Date().toISOString();
-      this.agents.ragIntegrator.results = ragResults;
-
-      const executionTime = Date.now() - startTime;
-      console.log(`✅ SMA workflow completed in ${executionTime}ms`);
-
-      return {
-        success: true,
-        results: ragResults,
-        agents: this.agents,
-        metadata: {
-          executionTime,
-          query,
-          language,
-          totalDocuments: scrapedData.length,
-          processedDocuments: analyzedContent.length
-        }
-      };
-
-    } catch (error) {
-      console.error('❌ Local SMA simulation failed:', error);
-      return {
-        success: false,
-        error: error.message,
-        agents: this.agents
-      };
+    // Add main answer as primary result
+    if (data.final_answer) {
+      results.push({
+        id: 'sma-final-answer',
+        title: 'Résumé de l\'intelligence web SMA',
+        summary: data.final_answer,
+        content: data.final_answer,
+        url: 'https://eniad.ump.ma',
+        source: 'SMA Intelligence Engine',
+        importance: 5,
+        relevanceScore: data.confidence || 0.9,
+        type: 'summary',
+        timestamp: data.timestamp
+      });
     }
+
+    // Add sources
+    if (data.sources && Array.isArray(data.sources)) {
+      data.sources.forEach((source, index) => {
+        results.push({
+          id: `sma-source-${index}`,
+          title: source.title || source.name || `Source ${index + 1}`,
+          summary: source.snippet || source.description || source.summary || '',
+          content: source.content || source.snippet || '',
+          url: source.url || source.link || 'https://eniad.ump.ma',
+          source: source.source || source.domain || 'Web Search',
+          importance: source.importance || 3,
+          relevanceScore: source.relevance || source.score || 0.8,
+          type: source.type || 'web_page',
+          timestamp: source.timestamp || data.timestamp
+        });
+      });
+    }
+
+    // Add news results if available
+    if (data.news_results && data.news_results.articles) {
+      data.news_results.articles.forEach((article, index) => {
+        results.push({
+          id: `sma-news-${index}`,
+          title: article.title,
+          summary: article.description || article.snippet || '',
+          content: article.content || article.description || '',
+          url: article.url || article.link,
+          source: article.source?.name || 'ENIAD News',
+          importance: 4,
+          relevanceScore: 0.85,
+          type: 'news_article',
+          publishedAt: article.publishedAt || article.date
+        });
+      });
+    }
+
+    return results;
   }
 
   /**
    * REMOVED - No fake web scraping simulation
    */
-  async simulateWebScraping(query) {
+  async simulateWebScraping(_query) {
     console.error('🚫 FAKE WEB SCRAPING REMOVED - Use only real SMA backend');
     return [];
   }
@@ -269,160 +265,142 @@ class RealSmaService {
       const analyzedResults = [];
 
       for (const item of scrapedData) {
-        // Use Gemini to analyze each piece of content
-        const analysis = await this.analyzeWithGemini(item.content, query);
-        
-        const analyzedItem = {
-          ...item,
-          analysis: {
-            summary: analysis.summary,
-            keywords: analysis.keywords,
-            relevanceScore: analysis.relevanceScore,
-            category: analysis.category,
-            sentiment: analysis.sentiment || 'neutral',
-            importance: analysis.importance || 3
+        console.log(`🤖 Analyzing item: ${item.title}`);
+
+        const prompt = `
+En tant qu'assistant académique de l'ENIAD (École Nationale d'Intelligence Artificielle et du Digital), analysez ce contenu web par rapport à la question de l'utilisateur:
+
+Question: "${query}"
+Titre: "${item.title}"
+Contenu: "${item.content}"
+
+Fournissez une analyse structurée en format JSON:
+{
+  "summary": "Résumé concis (2-3 phrases)",
+  "relevanceScore": score de 0.0 à 1.0,
+  "keyPoints": ["point 1", "point 2"],
+  "category": "catégorie du contenu",
+  "importance": score de 1 à 5
+}
+        `;
+
+        try {
+          const analysisText = await geminiService.generateContent(prompt);
+          let analysis;
+
+          try {
+            const jsonMatch = analysisText.match(/\{[\s\S]*\}/);
+            analysis = jsonMatch ? JSON.parse(jsonMatch[0]) : this.fallbackAnalysis(analysisText);
+          } catch (e) {
+            console.warn('Analysis text parsing error:', e?.message);
+            analysis = this.fallbackAnalysis(analysisText);
           }
-        };
 
-        analyzedResults.push(analyzedItem);
+          analyzedResults.push({
+            ...item,
+            analysis
+          });
+        } catch (itemError) {
+          console.warn(`Failed to analyze item ${item.title}:`, itemError);
+          analyzedResults.push({
+            ...item,
+            analysis: {
+              summary: item.summary || item.content.substring(0, 150) + '...',
+              relevanceScore: 0.5,
+              keyPoints: ['Contenu non analysé'],
+              category: 'general',
+              importance: 3
+            }
+          });
+        }
       }
 
-      console.log(`🔍 Content analyzer processed ${analyzedResults.length} documents`);
       return analyzedResults;
-
     } catch (error) {
-      console.error('❌ Error in content analysis:', error);
-      return scrapedData; // Return original data on error
+      console.error('❌ Content analysis failed:', error);
+      return scrapedData.map(item => ({
+        ...item,
+        analysis: {
+          summary: item.summary,
+          relevanceScore: 0.5,
+          keyPoints: [],
+          category: 'general',
+          importance: 3
+        }
+      }));
     }
   }
 
   /**
-   * Analyze content with Gemini AI
+   * Fallback parsing when Gemini JSON is malformed
    */
-  async analyzeWithGemini(content, query) {
-    try {
-      const prompt = `Analysez le contenu suivant par rapport à la requête "${query}":
-
-Contenu: ${content}
-
-Fournissez une analyse structurée avec:
-1. Résumé (max 100 mots)
-2. Mots-clés principaux (5 maximum)
-3. Score de pertinence (0-1)
-4. Catégorie (news, research, events, academic, administrative)
-5. Importance (1-5)
-
-Réponse:`;
-
-      const response = await geminiService.generateChatCompletion([
-        {
-          role: 'user',
-          content: prompt
-        }
-      ], {
-        maxTokens: 300,
-        temperature: 0.3
-      });
-
-      const analysisText = response.choices?.[0]?.message?.content || '';
-      
-      // Parse the analysis (simple parsing)
-      return {
-        summary: this.extractFromAnalysis(analysisText, 'résumé') || content.substring(0, 100) + '...',
-        keywords: this.extractKeywords(analysisText) || [],
-        relevanceScore: this.extractScore(analysisText) || 0.7,
-        category: this.extractCategory(analysisText) || 'general',
-        importance: this.extractImportance(analysisText) || 3
-      };
-
-    } catch (error) {
-      console.error('❌ Error analyzing with Gemini:', error);
-      return {
-        summary: content.substring(0, 100) + '...',
-        keywords: [],
-        relevanceScore: 0.5,
-        category: 'general',
-        importance: 3
-      };
-    }
+  fallbackAnalysis(text) {
+    return {
+      summary: this.extractFromAnalysis(text, 'summary') || 'Contenu analysé par l\'assistant ENIAD',
+      relevanceScore: this.extractScore(text),
+      keyPoints: this.extractKeywords(text),
+      category: this.extractCategory(text),
+      importance: this.extractImportance(text)
+    };
   }
 
   /**
-   * Translate content using Gemini
+   * Translate content to requested language
    */
-  async translateContent(analyzedContent, targetLanguage) {
+  async translateContent(content, targetLanguage) {
     try {
-      const translatedResults = [];
+      console.log(`🌐 Translating ${content.length} items to ${targetLanguage}`);
+      const translated = [];
 
-      for (const item of analyzedContent) {
-        if (item.language === targetLanguage) {
-          translatedResults.push(item);
-          continue;
+      for (const item of content) {
+        const prompt = `
+Traduisez les informations suivantes en ${targetLanguage === 'ar' ? 'arabe' : 'français'}:
+
+Titre: "${item.title}"
+Résumé: "${item.analysis.summary}"
+
+Format JSON:
+{
+  "translatedTitle": "Titre traduit",
+  "translatedSummary": "Résumé traduit"
+}
+        `;
+
+        try {
+          const translationText = await geminiService.generateContent(prompt);
+          const jsonMatch = translationText.match(/\{[\s\S]*\}/);
+          const translation = jsonMatch ? JSON.parse(jsonMatch[0]) : {
+            translatedTitle: item.title,
+            translatedSummary: item.analysis.summary
+          };
+
+          translated.push({
+            ...item,
+            title: translation.translatedTitle,
+            analysis: {
+              ...item.analysis,
+              summary: translation.translatedSummary
+            },
+            originalLanguage: 'fr',
+            translatedTo: targetLanguage
+          });
+        } catch (e) {
+          console.warn('Item translation failed:', e?.message);
+          translated.push(item);
         }
-
-        const translatedTitle = await this.translateWithGemini(item.title, targetLanguage);
-        const translatedContent = await this.translateWithGemini(item.content, targetLanguage);
-        const translatedSummary = await this.translateWithGemini(item.analysis.summary, targetLanguage);
-
-        const translatedItem = {
-          ...item,
-          title: translatedTitle || item.title,
-          content: translatedContent || item.content,
-          language: targetLanguage,
-          analysis: {
-            ...item.analysis,
-            summary: translatedSummary || item.analysis.summary
-          },
-          originalLanguage: item.language
-        };
-
-        translatedResults.push(translatedItem);
       }
 
-      console.log(`🌐 Translator processed ${translatedResults.length} documents`);
-      return translatedResults;
-
+      return translated;
     } catch (error) {
-      console.error('❌ Error in translation:', error);
-      return analyzedContent; // Return original data on error
-    }
-  }
-
-  /**
-   * Translate text using Gemini
-   */
-  async translateWithGemini(text, targetLanguage) {
-    try {
-      const langMap = {
-        'ar': 'arabe',
-        'fr': 'français',
-        'en': 'anglais'
-      };
-
-      const targetLang = langMap[targetLanguage] || targetLanguage;
-
-      const response = await geminiService.generateChatCompletion([
-        {
-          role: 'user',
-          content: `Traduisez le texte suivant en ${targetLang}:\n\n${text}`
-        }
-      ], {
-        maxTokens: 200,
-        temperature: 0.1
-      });
-
-      return response.choices?.[0]?.message?.content || text;
-
-    } catch (error) {
-      console.error('❌ Error translating with Gemini:', error);
-      return text;
+      console.error('❌ Translation failed:', error);
+      return content;
     }
   }
 
   /**
    * Integrate results with RAG system
    */
-  async integrateWithRag(translatedContent, query) {
+  async integrateWithRag(translatedContent, _query) {
     try {
       // Sort by relevance and importance
       const sortedContent = translatedContent.sort((a, b) => {
@@ -434,160 +412,127 @@ Réponse:`;
       // Take top results
       const topResults = sortedContent.slice(0, 5);
 
-      console.log(`🧮 RAG integrator selected ${topResults.length} top results`);
-      return topResults;
-
+      return topResults.map(item => ({
+        id: item.id,
+        title: item.title,
+        content: item.content,
+        summary: item.analysis.summary,
+        url: item.url,
+        source: item.source,
+        relevanceScore: item.analysis.relevanceScore,
+        importance: item.analysis.importance,
+        keyPoints: item.analysis.keyPoints,
+        category: item.analysis.category,
+        timestamp: item.timestamp,
+        metadata: {
+          agent: 'SMA-WebScraper',
+          processedAt: new Date().toISOString(),
+          translated: !!item.translatedTo
+        }
+      }));
     } catch (error) {
-      console.error('❌ Error in RAG integration:', error);
+      console.error('❌ RAG integration failed:', error);
       return translatedContent;
     }
   }
 
   /**
-   * Transform enhanced SMA results to expected format
+   * Monitor ENIAD website for updates
    */
-  transformEnhancedResults(data) {
+  async monitorEniadWebsite(category = 'all') {
+    console.log(`📡 Monitoring ENIAD website for category: ${category}`);
+
     try {
-      const results = [];
+      // If SMA backend is available, call its monitoring endpoint
+      if (this.isSmaAvailable) {
+        const response = await axios.get(`${this.smaApiUrl}/sma/monitor?category=${category}`, { timeout: 15000 });
+        if (response.data) {
+          return response.data;
+        }
+      }
 
-      // Add web content results
-      const webContent = data.comprehensive_search?.results?.web_content || [];
-      webContent.forEach((item, index) => {
-        results.push({
-          id: `web_${index}`,
-          url: item.url || '',
-          title: item.title || 'Contenu Web',
-          content: item.content || '',
-          timestamp: item.timestamp || new Date().toISOString(),
-          language: data.language || 'fr',
-          category: 'web',
-          analysis: {
-            summary: item.content?.substring(0, 150) + '...' || '',
-            keywords: this.extractKeywordsFromContent(item.content || ''),
-            relevanceScore: (item.relevance || 1) / 10, // Normalize to 0-1
-            category: 'web',
-            importance: Math.min(item.relevance || 1, 5)
-          },
-          source: 'enhanced_sma',
-          type: 'web_content'
-        });
-      });
-
-      // Add document results
-      const documents = data.comprehensive_search?.results?.documents || [];
-      documents.forEach((item, index) => {
-        results.push({
-          id: `doc_${index}`,
-          url: item.url || '',
-          title: item.title || 'Document',
-          content: item.text || '',
-          timestamp: item.processed_timestamp || new Date().toISOString(),
-          language: data.language || 'fr',
-          category: 'document',
-          analysis: {
-            summary: item.text?.substring(0, 150) + '...' || '',
-            keywords: this.extractKeywordsFromContent(item.text || ''),
-            relevanceScore: 0.8, // High relevance for documents
-            category: 'document',
-            importance: 4
-          },
-          source: 'enhanced_sma',
-          type: 'document'
-        });
-      });
-
-      // Add image results
-      const images = data.comprehensive_search?.results?.images || [];
-      images.forEach((item, index) => {
-        results.push({
-          id: `img_${index}`,
-          url: item.url || '',
-          title: item.alt_text || 'Image',
-          content: item.text || item.alt_text || '',
-          timestamp: item.processed_timestamp || new Date().toISOString(),
-          language: data.language || 'fr',
-          category: 'image',
-          analysis: {
-            summary: item.text?.substring(0, 100) + '...' || 'Contenu d\'image extrait',
-            keywords: this.extractKeywordsFromContent(item.text || ''),
-            relevanceScore: item.confidence || 0.6,
-            category: 'image',
-            importance: 3
-          },
-          source: 'enhanced_sma',
-          type: 'image_ocr'
-        });
-      });
-
-      // Add news results if available
-      const newsResults = data.news_results?.results || [];
-      newsResults.forEach((item, index) => {
-        results.push({
-          id: `news_${index}`,
-          url: item.link || '',
-          title: item.title || 'Actualité',
-          content: item.snippet || '',
-          timestamp: item.date || new Date().toISOString(),
-          language: data.language || 'fr',
-          category: 'news',
-          analysis: {
-            summary: item.snippet?.substring(0, 150) + '...' || '',
-            keywords: this.extractKeywordsFromContent(item.snippet || ''),
-            relevanceScore: item.relevance_score || 0.7,
-            category: 'news',
-            importance: 4
-          },
-          source: 'enhanced_sma',
-          type: 'news'
-        });
-      });
-
-      console.log(`🔄 Transformed ${results.length} enhanced SMA results`);
-      return results;
-
+      // No fake simulation
+      return {
+        success: false,
+        error: 'SMA backend required for monitoring',
+        timestamp: new Date().toISOString()
+      };
     } catch (error) {
-      console.error('❌ Error transforming enhanced results:', error);
-      return [];
+      console.error('❌ Website monitoring failed:', error);
+      return {
+        success: false,
+        error: error.message,
+        timestamp: new Date().toISOString()
+      };
     }
   }
 
   /**
-   * Extract keywords from content
+   * Get fresh documents from ENIAD/UMP websites
    */
-  extractKeywordsFromContent(content) {
+  async getFreshDocuments(topic = '') {
+    console.log(`📚 Searching fresh documents for topic: ${topic}`);
+
     try {
-      if (!content) return [];
+      if (this.isSmaAvailable) {
+        const response = await axios.post(`${this.smaApiUrl}/sma/documents`, {
+          topic,
+          limit: 10
+        }, { timeout: 20000 });
 
-      // Simple keyword extraction
-      const words = content.toLowerCase()
-        .replace(/[^\w\s]/g, ' ')
-        .split(/\s+/)
-        .filter(word => word.length > 3)
-        .filter(word => !['dans', 'avec', 'pour', 'cette', 'sont', 'plus', 'tout', 'tous', 'leur', 'leurs'].includes(word));
+        if (response.data) {
+          return response.data;
+        }
+      }
 
-      // Count frequency and return top 5
-      const wordCount = {};
-      words.forEach(word => {
-        wordCount[word] = (wordCount[word] || 0) + 1;
-      });
-
-      return Object.entries(wordCount)
-        .sort(([,a], [,b]) => b - a)
-        .slice(0, 5)
-        .map(([word]) => word);
-
+      return {
+        success: false,
+        documents: [],
+        error: 'SMA backend required'
+      };
     } catch (error) {
-      return [];
+      console.error('❌ Fresh documents search failed:', error);
+      return {
+        success: false,
+        documents: [],
+        error: error.message
+      };
     }
+  }
+
+  /**
+   * Extract key concepts from search results
+   */
+  extractKeyConcepts(results) {
+    const text = results.map(r => `${r.title} ${r.summary}`).join(' ');
+    const words = text.toLowerCase()
+      .replace(/[^\w\sàâäéèêëîïôöùûüç]/gi, '')
+      .split(/\s+/)
+      .filter(w => w.length > 4);
+
+    const wordCount = {};
+    words.forEach(word => {
+      wordCount[word] = (wordCount[word] || 0) + 1;
+    });
+
+    return Object.entries(wordCount)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 5)
+      .map(([word]) => word);
   }
 
   /**
    * Helper methods for parsing Gemini responses
    */
   extractFromAnalysis(text, field) {
-    const regex = new RegExp(`${field}[:\\s]*([^\\n]+)`, 'i');
-    const match = text.match(regex);
-    return match ? match[1].trim() : null;
+    try {
+      const regex = new RegExp(String.raw`${field}[:\s]*([^\n]+)`, 'i');
+      const match = text.match(regex);
+      return match ? match[1].trim() : null;
+    } catch (err) {
+      console.warn('Extraction failed:', err?.message);
+      return null;
+    }
   }
 
   extractKeywords(text) {
@@ -600,7 +545,7 @@ Réponse:`;
 
   extractScore(text) {
     const match = text.match(/score[:\s]*([0-9.]+)/i);
-    return match ? parseFloat(match[1]) : 0.7;
+    return match ? Number.parseFloat(match[1]) : 0.7;
   }
 
   extractCategory(text) {
@@ -615,36 +560,31 @@ Réponse:`;
 
   extractImportance(text) {
     const match = text.match(/importance[:\s]*([1-5])/i);
-    return match ? parseInt(match[1]) : 3;
+    return match ? Number.parseInt(match[1], 10) : 3;
   }
 
   /**
    * Get SMA system status
    */
   async getStatus() {
-    const connectionTest = await this.testConnection();
+    await this.testConnection();
     
     return {
       service: 'Real SMA Service',
       backendAvailable: this.isSmaAvailable,
       agents: this.agents,
-      geminiConfigured: !!geminiService.apiKey,
-      lastUpdate: new Date().toISOString(),
-      connection: connectionTest
+      backendUrl: this.smaApiUrl,
+      capabilities: [
+        'Real-time Web Scraping',
+        'Gemini AI Content Analysis',
+        'Automatic Translation',
+        'RAG Integration',
+        'Intelligent Query Engine',
+        'News & Document Search'
+      ]
     };
-  }
-
-  /**
-   * Reset all agents status
-   */
-  resetAgents() {
-    Object.keys(this.agents).forEach(agentKey => {
-      this.agents[agentKey].status = 'idle';
-      this.agents[agentKey].results = [];
-    });
   }
 }
 
 // Export singleton instance
-const realSmaService = new RealSmaService();
-export default realSmaService;
+export default new RealSmaService();
