@@ -1,176 +1,60 @@
-# Welcome to the ENIAD-ASSISTANT wiki! 🤖
+# 📚 ENIAD-ASSISTANT: Official Technical Wiki & System Documentation
 
-Bienvenue dans la documentation complète d'ENIAD-ASSISTANT, votre chatbot intelligent pour l'École Nationale d'Informatique et d'Analyse des Données.
-
-## 📚 Table des matières
-
-### 🚀 Démarrage rapide
-- [Installation et configuration](Installation-et-Configuration)
-- [Premier démarrage](Premier-Demarrage)
-- [Guide de démarrage rapide](Guide-Demarrage-Rapide)
-
-### 🏗️ Architecture et développement
-- [Architecture du système](Architecture-Systeme)
-- [Composants RAG](Composants-RAG)
-- [API Documentation](API-Documentation)
-- [Structure du projet](Structure-Projet)
-
-### 🛠️ Configuration avancée
-- [Variables d'environnement](Variables-Environnement)
-- [Configuration des modèles LLM](Configuration-LLM)
-- [Base de données vectorielle](Base-Donnees-Vectorielle)
-- [Personnalisation des données](Personnalisation-Donnees)
-
-### 🎨 Interface utilisateur
-- [Interface web Next.js](Interface-Web)
-- [Interface console](Interface-Console)
-- [API REST](API-REST)
-- [Intégrations tierces](Integrations-Tierces)
-
-### 🔧 Administration
-- [Gestion des utilisateurs](Gestion-Utilisateurs)
-- [Monitoring et logs](Monitoring-Logs)
-- [Sauvegarde et restauration](Sauvegarde-Restauration)
-- [Maintenance](Maintenance)
-
-### 🚀 Déploiement
-- [Déploiement local](Deploiement-Local)
-- [Déploiement Docker](Deploiement-Docker)
-- [Déploiement en production](Deploiement-Production)
-- [CI/CD avec Jenkins](CICD-Jenkins)
-
-### 🧪 Tests et qualité
-- [Tests unitaires](Tests-Unitaires)
-- [Tests d'intégration](Tests-Integration)
-- [Tests de performance](Tests-Performance)
-- [Assurance qualité](Assurance-Qualite)
-
-### 🔐 Sécurité
-- [Authentification et autorisation](Authentification-Autorisation)
-- [Sécurité des données](Securite-Donnees)
-- [Bonnes pratiques](Bonnes-Pratiques-Securite)
-- [Audit de sécurité](Audit-Securite)
-
-### 🤝 Contribution
-- [Guide de contribution](Guide-Contribution)
-- [Standards de code](Standards-Code)
-- [Processus de review](Processus-Review)
-- [Roadmap du projet](Roadmap-Projet)
-
-### 📞 Support et dépannage
-- [FAQ](FAQ)
-- [Dépannage courant](Depannage-Courant)
-- [Problèmes connus](Problemes-Connus)
-- [Contact support](Contact-Support)
-
-## 🎯 À propos d'ENIAD-ASSISTANT
-
-ENIAD-ASSISTANT est un chatbot intelligent développé spécifiquement pour l'École Nationale d'Informatique et d'Analyse des Données (ENIAD). Il utilise des technologies de pointe en intelligence artificielle pour fournir des réponses précises et contextuelles aux questions des étudiants, enseignants et personnel administratif.
-
-### 🌟 Fonctionnalités clés
-
-- **RAG (Retrieval-Augmented Generation)** : Recherche et génération de réponses basées sur les documents officiels
-- **Interface multimodale** : Support texte et voix
-- **Multilingue** : Français et anglais
-- **Recherche vectorielle** : Indexation intelligente des documents
-- **Interface moderne** : Application web responsive
-- **API REST** : Intégration facile avec d'autres systèmes
-
-### 🏛️ Architecture technique
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │   Backend API   │    │   RAG Engine    │
-│                 │◄──►│   (Python)      │◄──►│   (LlamaIndex)  │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         │                       │                       │
-         ▼                       ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Interface     │    │   Base de       │    │   Documents     │
-│   Utilisateur   │    │   données       │    │   & Index       │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-```
-
-### 📊 Métriques de performance
-
-| Métrique | Objectif | Statut actuel |
-|----------|----------|---------------|
-| Précision des réponses | >90% | ✅ 92% |
-| Temps de réponse | <2s | ✅ 1.3s |
-| Disponibilité | 99.9% | ✅ 99.95% |
-| Support multilingue | FR/EN | ✅ Actif |
-
-### 🔄 Phases de développement
-
-- [x] **Phase 1** : Collecte des données et analyse des besoins
-- [x] **Phase 2** : Conception du prototype et développement de la base de données
-- [x] **Phase 3** : Développement de l'interface utilisateur et intégration avec le modèle
-- [ ] **Phase 4** : Tests et optimisation des performances
-- [ ] **Phase 5** : Livraison finale et documentation complète
-
-## 🚀 Démarrage rapide
-
-### Prérequis
-- Python 3.10+
-- Node.js 18+
-- Docker (recommandé)
-- Git
-
-### Installation en 3 étapes
-
-1. **Cloner le projet**
-   ```bash
-   git clone https://github.com/votre-username/ENIAD-ASSISTANT.git
-   cd ENIAD-ASSISTANT
-   ```
-
-2. **Démarrer avec Docker**
-   ```bash
-   docker-compose up -d
-   ```
-
-3. **Accéder à l'application**
-   - Interface web : http://localhost:3000
-   - API : http://localhost:8501
-   - Console RAG : `cd RAG && python app.py`
-
-## 📖 Guides essentiels
-
-### Pour les développeurs
-- [Guide de développement](Guide-Developpement)
-- [Architecture détaillée](Architecture-Detaillee)
-- [API Reference](API-Reference)
-
-### Pour les administrateurs
-- [Guide d'administration](Guide-Administration)
-- [Configuration système](Configuration-Systeme)
-- [Monitoring](Guide-Monitoring)
-
-### Pour les utilisateurs finaux
-- [Guide utilisateur](Guide-Utilisateur)
-- [FAQ utilisateur](FAQ-Utilisateur)
-- [Tutoriels](Tutoriels)
-
-## 🤝 Communauté et support
-
-- **Issues GitHub** : [Signaler un bug](https://github.com/votre-username/ENIAD-ASSISTANT/issues)
-- **Discussions** : [Forum communautaire](https://github.com/votre-username/ENIAD-ASSISTANT/discussions)
-- **Email** : support@eniad.ma
-- **Documentation** : Cette wiki
-
-## 📝 Dernières mises à jour
-
-- **v1.2.0** (2024-01-15) : Amélioration de l'interface utilisateur
-- **v1.1.0** (2024-01-01) : Support multilingue complet
-- **v1.0.0** (2023-12-15) : Version initiale stable
+Welcome to the official technical wiki for **ENIAD-ASSISTANT**, the enterprise conversational AI platform developed for **École Nationale d'Intelligence Artificielle et du Digital (ENIAD)** at Université Mohammed Premier (UMP), Oujda, Morocco.
 
 ---
 
-<div align="center">
-  <strong>📚 Explorez la documentation pour tirer le meilleur parti d'ENIAD-ASSISTANT</strong>
-</div>
+## 🧭 Wiki Navigation Hub
 
-<div align="center">
-  <em>Développé pour la communauté ENIAD</em>
-</div>
+| Section | Content & Focus Area | Link |
+| :--- | :--- | :--- |
+| **🏠 Home & Overview** | Platform mission, architecture overview, AI Engineering team roster | [Home](home.md) |
+| **🏗️ System Architecture** | Topology, microservices interaction, sequence diagrams, port map | [System Architecture](architecture.md) |
+| **💻 Frontend Application** | React 18 + Vite components, state management, API services, UI themes | [Frontend Guide](frontend-ui.md) |
+| **🧮 RAG Microservice** | Vector DB (LanceDB/Qdrant), document processing, FastAPI endpoints (8009) | [RAG Service](rag-service.md) |
+| **🤖 SMA Multi-Agent System** | Autonomous web scrapers, Gemini AI analysis, crew orchestration (8002) | [SMA Service](sma-service.md) |
+| **🧠 Model Deployment** | Fine-tuned Llama-3 8B model (`ahmed-ouka`), Modal platform vLLM serving | [Model Deployment](model-deployment.md) |
+| **⚙️ DevOps & CI/CD** | GitHub Actions pipeline, multi-stage Docker Compose, environment secrets | [DevOps & CI/CD](devops-cicd.md) |
+| **🧪 Testing & Quality** | Pytest test suite, ESLint & SonarLint code quality, security controls | [Testing & Quality](testing-quality.md) |
+| **❓ Troubleshooting & FAQ** | Port conflict resolution, startup diagnostics, error fixes | [FAQ & Troubleshooting](faq.md) |
+
+---
+
+## 👥 The ENIAD AI Engineering Team
+
+This system was engineered as part of the **Projet de Fin d'Année (PFA)** by a team of **4 AI Engineers** from **ENIAD - Université Mohammed Premier (UMP)**:
+
+| AI Engineer | Official Role | Core Technical Responsibilities |
+| :--- | :--- | :--- |
+| **Abdellah ENNAJARI** | **Lead AI & MLOps Engineer** | Microservice System Architecture, CI/CD Pipeline Automation, Multi-stage Docker Containerization, System Integration & Service Port Harmonization |
+| **Ahmed OUKACHA** | **AI Systems & Fine-Tuning Specialist** | Custom Fine-Tuned Llama-3 8B Academic Model (`ahmed-ouka/llama3-8b-eniad-merged-32bit`), Model Server & Modal Platform API Integration |
+| **Oussama ELHADJI** | **Full-Stack AI UI & SMA Multi-Agent Engineer** | React 18 + Vite Conversational Frontend UI, Real-Time Agent Streaming, SMA Multi-Agent Web Intelligence Service & Web Scrapers |
+| **Abdelilah OURTI** | **Vector DB & RAG Pipeline Engineer** | LanceDB / Qdrant Vector Store Indexing, Academic Document Embedding Pipelines, RAG Query Optimizations & Fast Search Backend |
+
+---
+
+## 🏛️ High-Level System Architecture Overview
+
+```mermaid
+graph TD
+    User([User / Browser]) <--> UI[React 18 + Vite Frontend - Port 3000]
+    UI <--> RAG[RAG Service FastAPI - Port 8009]
+    UI <--> SMA[SMA Multi-Agent Service FastAPI - Port 8002]
+    UI <--> Modal[Custom Model Server - Modal API]
+    
+    RAG <--> VectorDB[(LanceDB / Qdrant Vector Store)]
+    SMA <--> Gemini[Google Gemini AI Engine]
+    SMA <--> WebScraper[Real-Time ENIAD/UMP Web Scrapers]
+    RAG <--> Mongo[(MongoDB Database - Port 27017)]
+```
+
+---
+
+## 🌐 Network Ports & Microservices Summary
+
+| Service | Technology Stack | Network Port | Service Purpose |
+| :--- | :--- | :--- | :--- |
+| `eniad-assistant-ui` | React 18 + Vite + Nginx | **3000** (Local) / **80** (Docker) | Conversational Web Interface |
+| `SMA_Service` | FastAPI + Gemini AI + Scrapers | **8002** | Multi-Agent Web Intelligence API |
+| `RAG_Project` | FastAPI + LanceDB / Qdrant | **8009** | Vector Search & Document Ingestion API |
+| `MongoDB` | MongoDB | **27017** | Chat History & Session Storage |
