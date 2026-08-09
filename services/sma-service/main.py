@@ -26,6 +26,10 @@ import time
 from contextlib import asynccontextmanager
 from concurrent.futures import ThreadPoolExecutor
 
+# Constants
+SERVICE_NAME = "ENIAD SMA Service"
+GEMINI_MODEL_NAME = "gemini-1.5-flash"
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -43,7 +47,7 @@ async def lifespan(app: FastAPI):
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="ENIAD SMA Service",
+    title=SERVICE_NAME,
     description="High-Performance Smart Multi-Agent system for web intelligence and monitoring",
     version="2.0.0",
     lifespan=lifespan
@@ -147,7 +151,7 @@ class WebScraperAgent:
 # Content analyzer agent using Gemini
 class ContentAnalyzerAgent:
     def __init__(self):
-        self.model = genai.GenerativeModel('gemini-1.5-flash') if genai else None
+        self.model = genai.GenerativeModel(GEMINI_MODEL_NAME) if genai else None
 
     async def analyze_content(self, content: Dict[str, Any], language: str = "fr") -> Dict[str, Any]:
         """Analyze scraped content using Gemini AI"""
@@ -1285,7 +1289,7 @@ Utilise ces informations pour enrichir ta réponse si elles sont pertinentes à 
             "provider": "gemini-via-sma"
         }
 
-        logger.info(f"✅ Chat response generated with SMA context")
+        logger.info("✅ Chat response generated with SMA context")
         return response_data
 
     except Exception as e:
