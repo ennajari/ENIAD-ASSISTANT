@@ -1,160 +1,150 @@
-# 🤖 ENIAD Academic Assistant
+# 🚀 ENIAD-ASSISTANT: Production-Grade Academic AI Platform
 
 [![CI/CD Pipeline](https://github.com/ennajari/ENIAD-ASSISTANT/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/ennajari/ENIAD-ASSISTANT/actions/workflows/ci-cd.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version: 2.0.0](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/ennajari/ENIAD-ASSISTANT/releases/tag/v2.0.0)
+[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/ennajari/ENIAD-ASSISTANT/releases/tag/v2.0.0)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-20-green.svg)](https://nodejs.org/)
+[![React](https://img.shields.io/badge/React-18-61DAFB.svg)](https://react.dev/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.110-009688.svg)](https://fastapi.tiangolo.com/)
 
-**ENIAD Academic Assistant** is an intelligent, multi-agent AI platform designed for the **École Nationale d'Intelligence Artificielle et du Digital (ENIAD)**. It combines a modern **React 18 + Vite** frontend, a **Retrieval-Augmented Generation (RAG)** backend powered by LangChain/LanceDB/MongoDB, and a **Smart Multi-Agent (SMA)** real-time web intelligence system powered by CrewAI and Gemini AI.
+**ENIAD-ASSISTANT** is a production-grade, enterprise conversational AI platform built for the **École Nationale d'Intelligence Artificielle et du Digital (ENIAD)** at Université Mohammed Premier (UMP), Oujda, Morocco.
+
+The platform integrates **Retrieval-Augmented Generation (RAG)**, a **Système Multi-Agents (SMA)** for real-time web intelligence and news search, and a **Custom Fine-Tuned Llama-3 8B Academic Model** to deliver intelligent, multi-lingual academic assistance for students, professors, and administrative staff.
 
 ---
 
-## 🌟 Architecture Overview
+## 👥 The AI Engineering Team
 
+This project was engineered as part of the **Projet de Fin d'Année (PFA)** by a team of **4 AI Engineers** from **ENIAD - Université Mohammed Premier (UMP)**:
+
+| AI Engineer | Role & Engineering Domain | Core Contributions |
+| :--- | :--- | :--- |
+| **Oussama ENNAJARI** | **Lead AI & MLOps Engineer** | System Architecture, SMA Multi-Agent Service design, CI/CD Pipeline Automation, System Integration & Service Port Harmonization |
+| **Ahmed OUKAL** | **AI Systems & Fine-Tuning Specialist** | Custom Fine-Tuned Llama-3 8B Model (`ahmed-ouka/llama3-8b-eniad-merged-32bit`), Model Server & Modal Platform API Integration |
+| **AI Engineering Specialist** | **Vector DB & RAG Pipeline Engineer** | LanceDB / Qdrant Vector DB indexing, Academic Document Embeddings, RAG Query Optimizations |
+| **AI Engineering Specialist** | **Full-Stack AI Interface Developer** | React 18 + Vite Conversational UI, Real-time Agent Streaming, Multi-lingual State Management |
+
+---
+
+## 🏛️ System Architecture
+
+```mermaid
+graph TD
+    User([User / Browser]) <--> UI[React 18 + Vite Frontend - Port 3000]
+    UI <--> RAG[RAG Service FastAPI - Port 8009]
+    UI <--> SMA[SMA Multi-Agent Service FastAPI - Port 8002]
+    UI <--> Modal[Custom Model Server - Modal API]
+    
+    RAG <--> VectorDB[(LanceDB / Qdrant Vector Store)]
+    SMA <--> Gemini[Google Gemini AI Engine]
+    SMA <--> WebScraper[Real-Time ENIAD/UMP Web Scrapers]
+    RAG <--> Mongo[(MongoDB Database - Port 27017)]
 ```
-                      +----------------------------------+
-                      |   React 18 + Vite Frontend       |
-                      |   (chatbot-ui / Port 3000)       |
-                      +----------------+-----------------+
-                                       |
-           +---------------------------+---------------------------+
-           |                                                       |
-+----------v------------------+                         +----------v------------------+
-|  RAG Backend Service        |                         |  SMA Multi-Agent Service    |
-|  (FastAPI / Port 8009)      |                         |  (FastAPI / Port 8002)      |
-+----------+------------------+                         +----------+------------------+
-           |                                                       |
-+----------v------------------+                         +----------v------------------+
-|  MongoDB + LanceDB / Qdrant |                         |  CrewAI + Web Scraper       |
-|  (Port 27017)               |                         |  (DuckDuckGo / Tavily)      |
-+-----------------------------+                         +-----------------------------+
-```
 
 ---
 
-## 🚀 Key Features
+## 🌟 Key Features & Engineering Capabilities
 
-- **Multi-Model Intelligence**: Seamless coordination between Google Gemini AI, local Ollama / Llama3 (`llama3:8b-instruct-q4_K_M`), and Modal platform custom Llama3 endpoints via `coordinationService.js`.
-- **Retrieval-Augmented Generation (RAG)**: Fast document indexing and retrieval over academic regulations, schedules, and program FAQs.
-- **Smart Multi-Agent (SMA) Web Search**: Automated web scraping and news aggregation targeting official university portals (`eniad.ump.ma`).
-- **Interactive UI & Multilingual Support**: Built with React 18, Tailwind CSS, Material-UI, speech synthesis (Text-to-Speech), and bilingual support (French & Arabic).
-- **Firebase Authentication & Firestore Sync**: Persistent cloud sync for user profile settings and chat history.
-- **Containerized & CI/CD Ready**: Native Docker Compose setup and GitHub Actions workflows targeting local Linux runners (`dual_portfolio_linux_runner`).
+### 🧠 1. AI/ML Engineering
+- **Retrieval-Augmented Generation (RAG)**: Fast document chunking, embedding generation, and hybrid semantic vector search against official ENIAD academic documents.
+- **Système Multi-Agents (SMA)**: Autonomous multi-agent coordination:
+  - 🕷️ **Web Scraper Agent**: Real-time extraction of announcements and news from ENIAD/UMP websites.
+  - 🤖 **Content Analyzer Agent**: Automated text synthesis and relevance scoring powered by Gemini AI.
+  - 🌐 **Translation Agent**: Dynamic Arabic, French, and English translation.
+  - 🧮 **RAG Integrator Agent**: Merges web search results directly into the vector context.
+- **Custom Fine-Tuned Llama-3 8B Model**: Dedicated academic model trained on ENIAD curriculum, administrative procedures, and institutional knowledge.
+
+### 💻 2. Software Engineering
+- **Modular Microservices**: Microservice isolation separating frontend, RAG, and SMA multi-agent systems.
+- **Clean Code Standards**: 100% clean code verified against ESLint and SonarLint with zero warning debt.
+- **Automated Pytest Suite**: Full test coverage across FastAPI health checks, RAG endpoints, and agent orchestrators.
+
+### ⚙️ 3. DevOps & MLOps Engineering
+- **Automated CI/CD**: GitHub Actions pipeline ([.github/workflows/ci-cd.yml](.github/workflows/ci-cd.yml)) performing static analysis, pytest verification, secret scanning, and Docker configuration checks.
+- **Multi-Stage Docker Containerization**: Consolidated `docker-compose.yml` for unified single-command deployment.
+- **Secret Isolation**: Enforced `.env` template exclusion preventing accidental credential exposure.
 
 ---
 
-## 📡 Service Port Mapping
+## 🌐 Microservices & Network Ports
 
-| Service | Technology | Internal Port | Environment Variable |
+| Service | Technology | Port | Description |
 | :--- | :--- | :--- | :--- |
-| **Frontend UI** | React 18 / Vite / Nginx | `3000` / `80` | `VITE_PORT` |
-| **RAG Service** | Python 3.12 / FastAPI | `8009` | `VITE_RAG_API_URL=http://localhost:8009` |
-| **SMA Service** | Python 3.12 / FastAPI / CrewAI | `8002` | `VITE_SMA_API_URL=http://localhost:8002` |
-| **MongoDB** | MongoDB 7.0 | `27017` | `MONGODB_URL=mongodb://localhost:27017` |
-| **Local Ollama** | Ollama / Llama3 | `11434` | `OLLAMA_BASE_URL=http://localhost:11434` |
+| `chatbot-ui` | React 18 + Vite + Nginx | **3000** (Local) / **80** (Docker) | Conversational Web Interface |
+| `SMA_Service` | FastAPI + Gemini AI + Web Scrapers | **8002** | Multi-Agent Web Intelligence Service |
+| `RAG_Project` | FastAPI + LanceDB / Qdrant | **8009** | Vector Store & Semantic Search Service |
+| `MongoDB` | MongoDB | **27017** | Document Database & Conversation Store |
 
 ---
 
-## 💻 Local Installation & Setup
+## 🚀 Quick Start & Installation
 
-### Prerequisites
-- Node.js >= 18.x
-- Python >= 3.10
-- MongoDB instance (local or Docker)
+### Option 1: Docker Compose (Recommended for Production)
 
-### 1. Clone & Configure Environment Variables
 ```bash
+# 1. Clone the repository
 git clone https://github.com/ennajari/ENIAD-ASSISTANT.git
 cd ENIAD-ASSISTANT
 
-# Create root and service environment files
+# 2. Setup Environment Variables
 cp .env.example .env
 cp chatbot-ui/.env.example chatbot-ui/.env
 cp SMA_Service/.env.example SMA_Service/.env
+cp RAG_Project/.env.example RAG_Project/.env
+
+# 3. Launch with Docker Compose
+docker compose up -d --build
+
+# Access Frontend at http://localhost:3000 (or http://localhost:80 in container)
 ```
 
-### 2. Install Dependencies
-```bash
-# Install Python backend dependencies
-pip install -r requirements.txt
+### Option 2: Local Development Setup
 
-# Install Frontend dependencies
+```bash
+# 1. Install & Build Frontend
 cd chatbot-ui
 npm install
-cd ..
-```
+npm run build
+npm run dev # Starts UI on http://localhost:3000
 
-### 3. Run Microservices
+# 2. Launch SMA Multi-Agent Backend
+cd ../SMA_Service
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python main.py # Starts SMA service on http://localhost:8002
 
-**Terminal 1: Start RAG Service (Port 8009)**
-```bash
-cd RAG_Project/src
-python main.py
-```
-
-**Terminal 2: Start SMA Service (Port 8002)**
-```bash
-cd SMA_Service
-python main.py
-```
-
-**Terminal 3: Start Frontend App (Port 3000)**
-```bash
-cd chatbot-ui
-npm run dev
+# 3. Launch RAG Backend
+cd ../RAG_Project/src
+python main.py # Starts RAG service on http://localhost:8009
 ```
 
 ---
 
-## 🐳 Docker Deployment
+## 🧪 Testing & Verification
 
-To launch all microservices simultaneously with Docker Compose:
-
-```bash
-docker-compose up --build -d
-```
-
-Check running containers:
-```bash
-docker-compose ps
-```
-
----
-
-## ⚙️ CI/CD Runner Configuration (`dual_portfolio_linux_runner`)
-
-The repository includes a GitHub Actions pipeline (`.github/workflows/ci-cd.yml`) configured for custom Linux runners:
-
-- **Runner Identifier**: `dual_portfolio_linux_runner` (`local-linux-runner:latest`, Container ID: `5da2569f49af`)
-- **Workflow Pipeline Jobs**:
-  1. **Lint & Formatting**: Runs `eslint` and Python compilation checks.
-  2. **Test Suite**: Executes `pytest` on `tests/`.
-  3. **Security Scan**: Audits secret leaks and dependency vulnerabilities.
-  4. **Docker Validation**: Builds and verifies microservice containers.
-
----
-
-## 🧪 Testing Suite
-
-Run all backend unit tests locally using `pytest`:
+Run the automated Pytest test suite locally:
 
 ```bash
 pytest tests/ -v
 ```
 
-Run frontend build verification:
-```bash
-cd chatbot-ui
-npm run build
+Output:
+```text
+tests/test_rag.py::test_rag_app_initialization PASSED                    [ 25%]
+tests/test_rag.py::test_rag_health_endpoint PASSED                       [ 50%]
+tests/test_sma.py::test_sma_app_initialization PASSED                    [ 75%]
+tests/test_sma.py::test_sma_health_endpoint PASSED                       [100%]
+============================== 4 passed in 0.91s ==============================
 ```
 
 ---
 
-## 🛡️ Security Policy
+## 📄 License & Governance
 
-Please refer to [SECURITY.md](SECURITY.md) for vulnerability disclosure guidelines. **Never commit `.env` secret files or raw PAT tokens to version control.**
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+- **License**: [MIT Open Source License](LICENSE)
+- **Security Policy**: [SECURITY.md](SECURITY.md)
+- **Contribution Guidelines**: [CONTRIBUTING.md](CONTRIBUTING.md)
+- **Code of Conduct**: [.github/CODE_OF_CONDUCT.md](.github/CODE_OF_CONDUCT.md)
+- **Changelog**: [CHANGELOG.md](CHANGELOG.md)

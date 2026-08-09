@@ -1,67 +1,39 @@
-# Contributing to ENIAD Academic Assistant
+# Contributing to ENIAD-ASSISTANT
 
-Thank you for your interest in contributing to the **ENIAD Academic Assistant** project! This document outlines our development standards, workflow rules, and pull request procedures.
-
----
-
-## 🛠️ Development Setup
-
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/ennajari/ENIAD-ASSISTANT.git
-   cd ENIAD-ASSISTANT
-   ```
-
-2. **Configure Environment Variables**:
-   Copy `.env.example` to `.env` in the root folder and in subfolders (`chatbot-ui/`, `SMA_Service/`):
-   ```bash
-   cp .env.example .env
-   cp chatbot-ui/.env.example chatbot-ui/.env
-   cp SMA_Service/.env.example SMA_Service/.env
-   ```
-
-3. **Install Dependencies**:
-   - **Python Backends**:
-     ```bash
-     pip install -r requirements.txt
-     ```
-   - **Frontend UI**:
-     ```bash
-     cd chatbot-ui
-     npm install
-     ```
+Thank you for your interest in contributing to **ENIAD-ASSISTANT**! This project is maintained by the **ENIAD AI Engineering PFA Team** at **École Nationale d'Intelligence Artificielle et du Digital (ENIAD)**, Université Mohammed Premier (UMP), Oujda, Morocco.
 
 ---
 
-## 🌿 Branching Policy
+## 👥 Core AI Engineering Team
 
-- **`main`**: Production branch. Must always pass CI/CD pipeline tests.
-- **`dev-<author>`**: Feature development branch (e.g. `dev-oussama`).
-- **Feature Branches**: Name feature branches as `feature/<short-description>` or `fix/<bug-description>`.
-
----
-
-## 🧪 Testing & Linting
-
-Before submitting a Pull Request, verify your changes locally:
-
-1. **Frontend Lint & Build**:
-   ```bash
-   cd chatbot-ui
-   npm run lint
-   npm run build
-   ```
-
-2. **Backend Syntax & Unit Tests**:
-   ```bash
-   pytest tests/
-   python -m py_compile SMA_Service/main.py RAG_Project/src/main.py
-   ```
+- **Oussama ENNAJARI** – Lead AI & MLOps Engineer (*Architecture, SMA Multi-Agent, CI/CD Pipeline*)
+- **Ahmed OUKAL** – AI Systems & Fine-Tuning Specialist (*Fine-tuned Llama-3 8B, Model API Server*)
+- **AI Engineering Specialist** – Vector Indexing & RAG Engineer (*LanceDB / Qdrant RAG Pipeline*)
+- **AI Engineering Specialist** – Full-Stack AI Interface Developer (*React 18 + Vite Conversational UI*)
 
 ---
 
-## 🚀 Submitting Pull Requests
+## 🌿 Branching Workflow
 
-1. Fill out the `.github/PULL_REQUEST_TEMPLATE.md`.
-2. Ensure no secret keys or `.env` files are tracked in your commit history.
-3. Link relevant GitHub Issues in your PR description (e.g., `Closes #1`).
+1. **Production Branch**: `main` — Always stable, production-ready, passing all CI/CD pipelines.
+2. **Development Branch**: `dev-oussama` — Active development and integration branch.
+3. **Feature Branches**: `feature/<feature-name>` — Short-lived branches off `dev-oussama`.
+
+---
+
+## 🛠️ Development & Pull Request Rules
+
+1. **Pull Requests**: Submit all PRs against the `dev-oussama` branch.
+2. **Linting & Code Quality**: Enforce 0 warnings in ESLint/SonarLint and Flake8.
+3. **Unit Testing**: Ensure all unit tests pass locally before pushing (`pytest tests/`).
+4. **Secret Protection**: Never commit `.env` files or hardcoded credentials.
+
+---
+
+## 🧪 Running Tests
+
+```bash
+pytest tests/ -v
+```
+
+Thank you for adhering to our engineering standards!
