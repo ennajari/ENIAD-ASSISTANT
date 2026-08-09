@@ -10,7 +10,7 @@ python-dotenv==1.1.0
 
 # AI et LLM
 google-generativeai==0.8.3
-openai==1.54.4
+openai==2.53.0
 cohere==5.11.3
 langchain==0.3.7
 langchain-community==0.3.5
