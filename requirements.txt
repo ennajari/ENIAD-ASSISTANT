@@ -1,101 +1,43 @@
 # ========================================
 # ENIAD Academic Assistant - Requirements
 # ========================================
-#
-# This file contains all Python dependencies for the ENIAD Academic Assistant project.
-# It includes dependencies for the RAG system, data processing, and additional utilities.
-#
-# Installation:
-# pip install -r requirements.txt
-#
-# For development:
-# pip install -r requirements.txt -r requirements-dev.txt
-#
-# ========================================
 
 # Core Web Framework
-fastapi==0.115.12
-uvicorn[standard]==0.34.0
-python-multipart==0.0.20
+fastapi>=0.115.0
+uvicorn[standard]>=0.34.0
+python-multipart>=0.0.20
 
 # Data Processing & Analysis
-pandas==2.2.3
-numpy==2.2.4
-scikit-learn==1.5.1
+pandas>=2.2.0
+numpy>=2.0.0
+scikit-learn>=1.5.0
 
 # Configuration & Environment
-pydantic-settings==2.8.1
-python-dotenv==1.1.0
+pydantic-settings>=2.8.0
+python-dotenv>=1.0.0
 
 # File Handling & Document Processing
-aiofiles==24.1.0
-PyMuPDF==1.25.5
-PyPDF2==3.0.1
-python-docx==1.1.2
-pdfplumber==0.11.4
-Pillow==10.4.0
-pytesseract==0.3.13
-opencv-python==4.10.0.84
-file-saver==2.0.5
+aiofiles>=24.1.0
+PyPDF2>=3.0.1
+python-docx>=1.1.2
+Pillow>=11.1.0
 
 # AI & Language Models
-google-generativeai==0.8.3
-langchain==0.3.23
-langchain-community==0.3.21
-openai==1.78.1
-cohere==5.15.0
-sentence-transformers==3.3.1
-transformers==4.46.3
-torch==2.5.1
+google-generativeai>=0.8.0
+openai>=1.78.0
+requests>=2.32.3
 
 # Database & Storage
-motor==3.7.0
-qdrant-client==1.14.2
-pymongo==4.8.0
-chromadb==0.5.23
-
-# Speech Services (Optional)
-# Uncomment if using speech features
-# azure-cognitiveservices-speech==1.38.0
-# google-cloud-texttospeech==2.16.4
-# elevenlabs==1.8.0
-
-# Utilities
-uuid==1.30
-requests==2.32.3
-python-json-logger==2.0.7
-
-# Development & Testing (Optional)
-# pytest==8.2.2
-# pytest-asyncio==0.23.7
-# black==24.4.2
-# flake8==7.1.0
-
-# Security
-cryptography==42.0.8
-python-jose[cryptography]==3.3.0
+motor>=3.7.0
+pymongo>=4.8.0
 
 # Web Scraping & SMA Dependencies
-beautifulsoup4==4.12.3
-aiohttp==3.10.11
-selenium==4.27.1
-lxml==5.3.0
-urllib3==2.1.0
-chardet==5.2.0
-certifi==2023.11.17
-idna==3.6
+beautifulsoup4>=4.12.3
+aiohttp>=3.11.12
+lxml>=5.3.1
+urllib3>=2.3.0
+certifi>=2024.12.14
 
-# Multi-Agent Framework
-crewai==0.86.0
-
-# Text Processing & NLP
-nltk==3.9.1
-textblob==0.18.0
-python-dateutil==2.9.0
-
-# Additional Utilities
-tqdm==4.66.4
-colorama==0.4.6
-loguru==0.7.2
-schedule==1.2.2
-faiss-cpu==1.9.0
+# Testing & Development
+pytest>=8.0.0
+httpx>=0.28.0
