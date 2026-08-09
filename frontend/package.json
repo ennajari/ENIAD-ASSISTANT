@@ -17,7 +17,7 @@
     "@firebase/firestore": "^4.4.0",
     "@mui/icons-material": "^5.15.15",
     "@mui/material": "^5.15.15",
-    "@tailwindcss/postcss": "^4.1.10",
+    "@tailwindcss/postcss": "^4.3.3",
     "axios": "^1.6.8",
     "file-saver": "^2.0.5",
     "firebase": "^10.12.2",
