@@ -6,111 +6,30 @@ from pydantic import BaseModel
 from typing import List, Dict, Any
 import asyncio
 
-# Créer l'app FastAPI sans lifespan complexe
-app = FastAPI(
-    title="ENIAD RAG System",
-    description="RAG system with MongoDB, Qdrant and Gemini AI",
-    version="1.0.0"
-)
+from contextlib import asynccontextmanager
 
-# Configure CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# Cache pour requêtes RAG fréquentes (LRU cache avec TTL)
+rag_query_cache: Dict[str, Any] = {}
 
-# Variables globales pour l'initialisation
-initialization_status = {
-    "completed": False,
-    "error": None,
-    "mongo": False,
-    "llm_factory": False,
-    "generation_client": False,
-    "embedding_client": False,
-    "vectordb_client": False,
-    "template_parser": False
-}
-
-async def initialize_rag_system():
-    """Initialisation non-bloquante du système RAG"""
-    try:
-        print("🔄 Initialisation du système RAG...")
-        
-        # Import des modules nécessaires
-        from motor.motor_asyncio import AsyncIOMotorClient
-        from helpers.config import get_settings
-        from stores.llm.LLMProviderFactory import LLMProviderFactory
-        from stores.vectordb.VectorDBProviderFactory import VectorDBProviderFactory
-        from stores.llm.templates.template_parser import TemplateParser
-        
-        settings = get_settings()
-        
-        # MongoDB
-        app.mongo_conn = AsyncIOMotorClient(settings.MONGODB_URL)
-        app.db_client = app.mongo_conn[settings.MONGODB_DATABASE]
-        initialization_status["mongo"] = True
-        print("✅ MongoDB connecté")
-
-        # LLM Factory
-        llm_provider_factory = LLMProviderFactory(settings)
-        vectordb_provider_factory = VectorDBProviderFactory(settings)
-        initialization_status["llm_factory"] = True
-        print("✅ Factories créées")
-
-        # Generation client - Use Ollama for local generation
-        app.generation_client = llm_provider_factory.create(provider="OLLAMA")
-        app.generation_client.set_generation_model(model_id="llama3:8b-instruct-q4_K_M")
-        initialization_status["generation_client"] = True
-        print("✅ Client de génération configuré")
-
-        # Embedding client
-        app.embedding_client = llm_provider_factory.create(provider=settings.EMBEDDING_BACKEND)
-        app.embedding_client.set_embedding_model(model_id=settings.EMBEDDING_MODEL_ID,
-                                                 embedding_size=settings.EMBEDDING_MODEL_SIZE)
-        initialization_status["embedding_client"] = True
-        print("✅ Client d'embedding configuré")
-
-        # Vector DB client
-        app.vectordb_client = vectordb_provider_factory.create(
-            provider=settings.VECTOR_DB_BACKEND
-        )
-        app.vectordb_client.connect()
-        initialization_status["vectordb_client"] = True
-        print("✅ Base de données vectorielle connectée")
-
-        # Template parser
-        app.template_parser = TemplateParser(
-            language=settings.PRIMARY_LANG,
-            default_language=settings.DEFAULT_LANG,
-        )
-        initialization_status["template_parser"] = True
-        print("✅ Parser de templates configuré")
-
-        initialization_status["completed"] = True
-        print("🎉 Initialisation RAG complète!")
-        
-    except Exception as e:
-        error_msg = f"Erreur initialisation RAG: {str(e)}"
-        print(f"❌ {error_msg}")
-        initialization_status["error"] = error_msg
-
-@app.on_event("startup")
-async def startup_event():
-    """Démarrage du serveur"""
-    print("🚀 Démarrage serveur RAG...")
-    # Lancer l'initialisation en arrière-plan
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Modern async lifespan manager for FastAPI RAG service"""
+    print("🚀 Initialisation du service RAG (Async Lifespan)...")
     asyncio.create_task(initialize_rag_system())
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Arrêt du serveur"""
+    yield
+    print("🧹 Fermeture du service RAG...")
     if hasattr(app, 'mongo_conn'):
         app.mongo_conn.close()
     if hasattr(app, 'vectordb_client'):
         app.vectordb_client.disconnect()
+
+# Créer l'app FastAPI avec lifespan
+app = FastAPI(
+    title="ENIAD RAG System",
+    description="High-Performance RAG System with Vector DB and AI Search",
+    version="2.0.0",
+    lifespan=lifespan
+)
 
 # Health check endpoint
 @app.get("/status")

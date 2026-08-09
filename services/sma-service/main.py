@@ -20,15 +20,30 @@ import os
 import re
 import time
 
+from contextlib import asynccontextmanager
+from concurrent.futures import ThreadPoolExecutor
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Executor pour scraping parallèle performant
+scrape_executor = ThreadPoolExecutor(max_workers=8)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Modern async lifespan manager for FastAPI SMA service"""
+    logger.info("🚀 Initialisation du service SMA Multi-Agent (Lifespan)...")
+    yield
+    logger.info("🧹 Fermeture du service SMA Multi-Agent...")
+    scrape_executor.shutdown(wait=False)
+
 # Initialize FastAPI app
 app = FastAPI(
     title="ENIAD SMA Service",
-    description="Smart Multi-Agent system for web intelligence and monitoring",
-    version="1.0.0"
+    description="High-Performance Smart Multi-Agent system for web intelligence and monitoring",
+    version="2.0.0",
+    lifespan=lifespan
 )
 
 # Configure CORS - Allow all origins for testing
