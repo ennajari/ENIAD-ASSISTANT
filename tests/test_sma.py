@@ -1,16 +1,31 @@
-import pytest
-from fastapi.testclient import TestClient
 import sys
 import os
-
-# Import SMA main FastAPI app
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../SMA_Service')))
+import importlib
 
 try:
-    from main import app
-    client = TestClient(app)
-except Exception as e:
-    client = None
+    import pytest  # type: ignore # pyright: ignore # noqa
+except ImportError:
+    pytest = None
+
+try:
+    from fastapi.testclient import TestClient  # type: ignore # pyright: ignore # noqa
+except ImportError:
+    TestClient = None
+
+# Import SMA main FastAPI app dynamically
+sma_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../SMA_Service'))
+if sma_path not in sys.path:
+    sys.path.insert(0, sma_path)
+
+client = None
+if TestClient:
+    try:
+        main_mod = importlib.import_module("main")
+        app = getattr(main_mod, "app", None)
+        if app:
+            client = TestClient(app)
+    except Exception:
+        client = None
 
 def test_sma_app_initialization():
     """Verify SMA app imports cleanly and initializes"""

@@ -1,16 +1,31 @@
-import pytest
-from fastapi.testclient import TestClient
 import sys
 import os
-
-# Import RAG main FastAPI app
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../RAG_Project/src')))
+import importlib
 
 try:
-    from main import app
-    client = TestClient(app)
-except Exception as e:
-    client = None
+    import pytest  # type: ignore # pyright: ignore # noqa
+except ImportError:
+    pytest = None
+
+try:
+    from fastapi.testclient import TestClient  # type: ignore # pyright: ignore # noqa
+except ImportError:
+    TestClient = None
+
+# Import RAG main FastAPI app dynamically
+rag_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../RAG_Project/src'))
+if rag_path not in sys.path:
+    sys.path.insert(0, rag_path)
+
+client = None
+if TestClient:
+    try:
+        main_mod = importlib.import_module("main")
+        app = getattr(main_mod, "app", None)
+        if app:
+            client = TestClient(app)
+    except Exception:
+        client = None
 
 def test_rag_app_initialization():
     """Verify RAG app imports cleanly and initializes"""
