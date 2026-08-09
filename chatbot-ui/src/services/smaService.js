@@ -9,7 +9,7 @@ import axios from 'axios';
 class SMAService {
   constructor() {
     // SMA API Configuration
-    this.baseURL = import.meta.env.VITE_SMA_API_BASE_URL || 'http://localhost:8001';
+    this.baseURL = import.meta.env.VITE_SMA_API_BASE_URL || 'http://localhost:8002';
     this.apiKey = import.meta.env.VITE_SMA_API_KEY;
     this.timeout = 60000; // 60 seconds for web scraping
     

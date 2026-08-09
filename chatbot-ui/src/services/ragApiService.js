@@ -15,8 +15,8 @@ class RAGApiService {
     this.projectId = import.meta.env.VITE_RAG_PROJECT_ID || 'eniadassistant';
     this.timeout = 60000; // 60 seconds timeout for model inference
 
-    // RAG System Configuration (for direct monitoring) - CORRECTED TO PORT 8003
-    this.ragSystemURL = import.meta.env.VITE_RAG_SYSTEM_BASE_URL || 'http://localhost:8003';
+    // RAG System Configuration (for direct monitoring) - PORT 8009
+    this.ragSystemURL = import.meta.env.VITE_RAG_SYSTEM_BASE_URL || 'http://localhost:8009';
 
     // Error logging throttling
     this.lastErrorLogged = 0;

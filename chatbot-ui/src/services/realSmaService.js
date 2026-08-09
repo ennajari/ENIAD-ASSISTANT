@@ -8,7 +8,7 @@ import geminiService from './geminiService';
 
 class RealSmaService {
   constructor() {
-    this.smaApiUrl = import.meta.env.VITE_SMA_API_URL || 'http://localhost:8001';
+    this.smaApiUrl = import.meta.env.VITE_SMA_API_URL || 'http://localhost:8002';
     this.isSmaAvailable = false;
     this.agents = {
       webScraper: { status: 'idle', lastRun: null, results: [] },
