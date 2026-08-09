@@ -1,0 +1,26 @@
+{
+  "pythonVersion": "3.12",
+  "pythonPlatform": "Windows",
+  "extraPaths": [
+    "C:\\anaconda3\\Lib\\site-packages",
+    "C:\\Users\\ROG FLOW\\AppData\\Roaming\\Python\\Python312\\site-packages",
+    "./services/rag-service/src",
+    "./services/sma-service"
+  ],
+  "executionEnvironments": [
+    {
+      "root": "./services/rag-service/src",
+      "extraPaths": [
+        "C:\\anaconda3\\Lib\\site-packages",
+        "C:\\Users\\ROG FLOW\\AppData\\Roaming\\Python\\Python312\\site-packages"
+      ]
+    },
+    {
+      "root": "./services/sma-service",
+      "extraPaths": [
+        "C:\\anaconda3\\Lib\\site-packages",
+        "C:\\Users\\ROG FLOW\\AppData\\Roaming\\Python\\Python312\\site-packages"
+      ]
+    }
+  ]
+}

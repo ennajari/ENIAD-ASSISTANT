@@ -23,10 +23,14 @@ initialization_status = {
     "template_parser": True
 }
 
+EMBEDDING_FAILED_MSG = "Embedding generation failed"
+_rag_init_task = None
+
 async def initialize_rag_system():
     """Initialisation non-bloquante du système RAG"""
     try:
         print("🔄 Initialisation du système RAG...")
+        await asyncio.sleep(0.01)
         initialization_status["completed"] = True
         print("🎉 Initialisation RAG complète!")
     except Exception as e:
@@ -37,8 +41,9 @@ async def initialize_rag_system():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Modern async lifespan manager for FastAPI RAG service"""
+    global _rag_init_task
     print("🚀 Initialisation du service RAG (Async Lifespan)...")
-    asyncio.create_task(initialize_rag_system())
+    _rag_init_task = asyncio.create_task(initialize_rag_system())
     yield
     print("🧹 Fermeture du service RAG...")
     if hasattr(app, 'mongo_conn'):
@@ -173,7 +178,13 @@ async def get_real_rag_info(project_id: str):
             "error": str(e)
         }
 
-@app.post("/api/v1/nlp/index/answer/{project_id}")
+@app.post(
+    "/api/v1/nlp/index/answer/{project_id}",
+    responses={
+        503: {"description": "RAG system or components still initializing"},
+        500: {"description": "Embedding generation or RAG processing failed"}
+    }
+)
 async def real_rag_answer(project_id: str, request: SimpleQueryRequest):
     """Real RAG answer endpoint using actual RAG system"""
     try:
@@ -199,7 +210,7 @@ async def real_rag_answer(project_id: str, request: SimpleQueryRequest):
         try:
             query_embedding = app.embedding_client.embed_text(request.query)
             if query_embedding is None:
-                raise Exception("Embedding generation returned None")
+                raise RuntimeError(EMBEDDING_FAILED_MSG)
             print(f"✅ Embedding généré: {len(query_embedding)} dimensions")
         except Exception as e:
             print(f"❌ Erreur embedding: {str(e)}")
@@ -309,7 +320,14 @@ Veuillez fournir une réponse complète et précise en français."""
         from fastapi import HTTPException
         raise HTTPException(status_code=500, detail=f"RAG processing failed: {str(e)}")
 
-@app.post("/api/v1/nlp/index/upload/{project_id}")
+@app.post(
+    "/api/v1/nlp/index/upload/{project_id}",
+    responses={
+        503: {"description": "RAG system initializing"},
+        404: {"description": "DATA folder not found"},
+        500: {"description": "Upload and index processing failed"}
+    }
+)
 async def upload_and_index_documents(project_id: str):
     """Upload and index documents from DATA folder"""
     try:
@@ -359,7 +377,7 @@ async def upload_and_index_documents(project_id: str):
                     # Générer l'embedding
                     embedding = app.embedding_client.embed_text(content)
                     if embedding is None:
-                        raise Exception("Embedding generation failed")
+                        raise RuntimeError(EMBEDDING_FAILED_MSG)
 
                     # Stocker dans la base vectorielle
                     collection_name = f"eniad_project_{project_id}"
@@ -398,7 +416,7 @@ async def upload_and_index_documents(project_id: str):
                     # Générer l'embedding
                     embedding = app.embedding_client.embed_text(content)
                     if embedding is None:
-                        raise Exception("Embedding generation failed")
+                        raise RuntimeError(EMBEDDING_FAILED_MSG)
 
                     # Stocker dans la base vectorielle
                     collection_name = f"eniad_project_{project_id}"
@@ -446,7 +464,7 @@ async def upload_and_index_documents(project_id: str):
                             # Générer l'embedding
                             embedding = app.embedding_client.embed_text(content)
                             if embedding is None:
-                                raise Exception("Embedding generation failed")
+                                raise RuntimeError(EMBEDDING_FAILED_MSG)
 
                             # Stocker dans la base vectorielle
                             collection_name = f"eniad_project_{project_id}"
@@ -526,7 +544,9 @@ async def upload_and_index_documents(project_id: str):
 
 if __name__ == "__main__":
     print("🚀 Démarrage serveur RAG corrigé...")
-    print("📍 URL: http://localhost:8009")
-    uvicorn.run(app, host="0.0.0.0", port=8009)
+    host = os.getenv("HOST", "127.0.0.1")
+    port = int(os.getenv("PORT", "8009"))
+    print(f"📍 URL: http://{host}:{port}")
+    uvicorn.run(app, host=host, port=port)
 
 

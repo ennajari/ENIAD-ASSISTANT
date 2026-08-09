@@ -3,10 +3,18 @@ SMA Service Configuration Settings
 """
 
 from pydantic_settings import BaseSettings
+from pydantic import ConfigDict
 from typing import List, Optional
 import os
 
 class Settings(BaseSettings):
+    model_config = ConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore"
+    )
+
     # Application Settings
     app_name: str = "ENIAD SMA Service"
     app_version: str = "1.0.0"
@@ -61,7 +69,6 @@ class Settings(BaseSettings):
     log_format: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     
     # AI Service Keys
-    
     gemini_api_key: str = os.getenv("GEMINI_API_KEY", "")
     openai_api_key: Optional[str] = None
     anthropic_api_key: Optional[str] = None
@@ -74,12 +81,6 @@ class Settings(BaseSettings):
     
     # Database (if needed for storing results)
     database_url: Optional[str] = None
-    
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        case_sensitive = False
-        extra = "ignore"
 
 # Create global settings instance
 settings = Settings()

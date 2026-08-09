@@ -298,21 +298,11 @@ out/
 # ========================================
 
 # IDE files
-.vscode/
 .idea/
 *.swp
 *.swo
 *~
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+!.vscode/settings.json
 
 # ========================================
 # 📊 Data & Logs
