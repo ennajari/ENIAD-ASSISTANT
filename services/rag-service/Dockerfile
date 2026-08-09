@@ -12,9 +12,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy RAG_Project source code
-COPY RAG_Project/ /app/RAG_Project/
-WORKDIR /app/RAG_Project/src
+# Copy source code
+COPY . /app/
+WORKDIR /app/src
 
 EXPOSE 8009
 

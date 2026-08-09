@@ -4,11 +4,11 @@ FROM node:20-alpine AS build
 WORKDIR /app
 
 # Copy dependency definitions
-COPY frontend/package*.json ./
+COPY package*.json ./
 RUN npm ci
 
 # Copy source code and build
-COPY frontend/ ./
+COPY . ./
 RUN npm run build
 
 # Nginx Production Stage
