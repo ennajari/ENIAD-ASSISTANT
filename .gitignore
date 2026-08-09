@@ -43,6 +43,15 @@ __pycache__/
 *$py.class
 *.so
 
+# Caches & build outputs
+.clerk/
+.next/
+.vite/
+.gradio/
+.pytest_cache/
+*.log
+/package-lock.json
+
 # Distribution / packaging
 .Python
 build/
