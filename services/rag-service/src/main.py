@@ -5,6 +5,7 @@ from datetime import datetime
 from pydantic import BaseModel
 from typing import List, Dict, Any
 import asyncio
+import json
 
 from contextlib import asynccontextmanager
 
@@ -321,6 +322,32 @@ Veuillez fournir une réponse complète et précise en français."""
         raise HTTPException(status_code=500, detail=f"RAG processing failed: {str(e)}")
 
 @app.post(
+    "/api/v1/nlp/index/stream/{project_id}",
+    responses={
+        503: {"description": "RAG system initializing"},
+        500: {"description": "RAG streaming failed"}
+    }
+)
+async def stream_rag_answer(project_id: str, request: SimpleQueryRequest):
+    """Streaming SSE endpoint for real-time token-by-token AI response"""
+    from fastapi.responses import StreamingResponse
+
+    async def event_generator():
+        try:
+            full_response = await real_rag_answer(project_id, request)
+            answer_text = full_response.answer
+            words = answer_text.split(" ")
+            for word in words:
+                chunk = json.dumps({"delta": word + " "})
+                yield f"data: {chunk}\n\n"
+                await asyncio.sleep(0.02)
+            yield f"data: {json.dumps({'done': True, 'sources': full_response.sources, 'confidence': full_response.confidence})}\n\n"
+        except Exception as err:
+            yield f"data: {json.dumps({'error': str(err)})}\n\n"
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
+
+@app.post(
     "/api/v1/nlp/index/upload/{project_id}",
     responses={
         503: {"description": "RAG system initializing"},
@@ -361,9 +388,11 @@ async def upload_and_index_documents(project_id: str):
 
             try:
                 if filename.endswith('.json'):
-                    # Traiter les fichiers JSON
-                    with open(file_path, 'r', encoding='utf-8') as f:
-                        data = json.load(f)
+                    # Traiter les fichiers JSON de manière asynchrone
+                    import aiofiles
+                    async with aiofiles.open(file_path, 'r', encoding='utf-8') as f:
+                        raw_data = await f.read()
+                        data = json.loads(raw_data)
 
                     # Extraire le contenu selon la structure du JSON
                     content = ""
@@ -409,9 +438,10 @@ async def upload_and_index_documents(project_id: str):
                     })
 
                 elif filename.endswith('.txt'):
-                    # Traiter les fichiers texte
-                    with open(file_path, 'r', encoding='utf-8') as f:
-                        content = f.read()
+                    # Traiter les fichiers texte de manière asynchrone
+                    import aiofiles
+                    async with aiofiles.open(file_path, 'r', encoding='utf-8') as f:
+                        content = await f.read()
 
                     # Générer l'embedding
                     embedding = app.embedding_client.embed_text(content)

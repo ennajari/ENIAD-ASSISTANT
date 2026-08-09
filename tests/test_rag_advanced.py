@@ -62,3 +62,13 @@ def test_rag_cors_configuration():
     """Test CORS response on endpoint"""
     response = client.get("/status")
     assert response.status_code == 200
+
+def test_rag_streaming_endpoint():
+    """Test RAG SSE streaming endpoint"""
+    response = client.post(
+        "/api/v1/nlp/index/stream/1",
+        json={"query": "Informations sur l'ENIAD", "language": "fr"}
+    )
+    assert response.status_code == 200
+    assert "text/event-stream" in response.headers.get("content-type", "")
+
