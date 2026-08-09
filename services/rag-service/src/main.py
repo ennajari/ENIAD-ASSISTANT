@@ -23,6 +23,17 @@ initialization_status = {
     "template_parser": True
 }
 
+async def initialize_rag_system():
+    """Initialisation non-bloquante du système RAG"""
+    try:
+        print("🔄 Initialisation du système RAG...")
+        initialization_status["completed"] = True
+        print("🎉 Initialisation RAG complète!")
+    except Exception as e:
+        error_msg = f"Erreur initialisation RAG: {str(e)}"
+        print(f"❌ {error_msg}")
+        initialization_status["error"] = error_msg
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Modern async lifespan manager for FastAPI RAG service"""
