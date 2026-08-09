@@ -72,3 +72,32 @@ def test_rag_streaming_endpoint():
     assert response.status_code == 200
     assert "text/event-stream" in response.headers.get("content-type", "")
 
+def test_hybrid_search_rrf():
+    """Test Hybrid Vector & BM25 Reciprocal Rank Fusion (RRF) search algorithm"""
+    class MockDoc:
+        def __init__(self, text, score):
+            self.text = text
+            self.score = score
+
+    docs = [
+        MockDoc("Cycle ingénieur filière IA et Big Data à l'ENIAD", 0.95),
+        MockDoc("Informations administratives et bourses de l'UMP", 0.70)
+    ]
+    hybrid = rag_module.perform_hybrid_search("filière IA", docs, limit=2)
+    assert len(hybrid) == 2
+    assert "IA" in hybrid[0].text
+
+@pytest.mark.anyio
+async def test_jwt_verification_dependency():
+    """Test JWT token verification dependency"""
+    res_anon = await rag_module.verify_jwt_token(None)
+    assert res_anon["authenticated"] is False
+
+    class MockCreds:
+        credentials = "bearer_sample_token_xyz"
+
+    res_auth = await rag_module.verify_jwt_token(MockCreds())
+    assert res_auth["authenticated"] is True
+    assert "user" in res_auth
+
+
