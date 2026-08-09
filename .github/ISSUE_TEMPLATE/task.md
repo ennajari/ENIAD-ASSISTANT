@@ -1,14 +1,13 @@
+---
 name: Task
-description: Technical task, refactoring, or maintenance item
+about: Technical task, refactoring, or maintenance item
 title: '[TASK] '
-labels: ['task']
+labels: task
 assignees: ''
+---
 
-body:
-  - type: textarea
-    id: task-description
-    attributes:
-      label: Task Summary
-      description: Detailed breakdown of the technical task or maintenance required.
-    validations:
-      required: true
+# Technical Task
+
+## Task Summary
+
+Detailed breakdown of the technical task, refactoring, or maintenance required.
