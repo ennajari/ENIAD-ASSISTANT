@@ -9,7 +9,7 @@ import time
 from pathlib import Path
 
 # Configuration
-RAG_API_BASE = "http://localhost:8004/api/v1"
+RAG_API_BASE = "http://localhost:8009/api/v1"
 PROJECT_ID = "1"
 DATA_PATH = "./data"  # Chemin vers vos documents ENIAD
 
