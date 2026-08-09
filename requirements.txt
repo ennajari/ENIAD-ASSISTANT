@@ -16,7 +16,7 @@
 # Core Web Framework
 fastapi==0.115.12
 uvicorn[standard]==0.34.0
-python-multipart==0.0.20
+python-multipart==0.0.31
 
 # Data Processing & Analysis
 pandas==2.2.3
@@ -25,7 +25,7 @@ scikit-learn==1.5.1
 
 # Configuration & Environment
 pydantic-settings==2.8.1
-python-dotenv==1.1.0
+python-dotenv==1.2.2
 
 # File Handling & Document Processing
 aiofiles==24.1.0
@@ -33,20 +33,20 @@ PyMuPDF==1.25.5
 PyPDF2==3.0.1
 python-docx==1.1.2
 pdfplumber==0.11.4
-Pillow==10.4.0
+Pillow==12.3.0
 pytesseract==0.3.13
 opencv-python==4.10.0.84
 file-saver==2.0.5
 
 # AI & Language Models
 google-generativeai==0.8.3
-langchain==0.3.23
-langchain-community==0.3.21
+langchain==1.3.9
+langchain-community==0.3.27
 openai==1.78.1
 cohere==5.15.0
 sentence-transformers==3.3.1
-transformers==4.46.3
-torch==2.5.1
+transformers==5.5.0
+torch==2.13.0
 
 # Database & Storage
 motor==3.7.0
@@ -62,7 +62,7 @@ chromadb==0.5.23
 
 # Utilities
 uuid==1.30
-requests==2.32.3
+requests==2.33.0
 python-json-logger==2.0.7
 
 # Development & Testing (Optional)
@@ -72,24 +72,24 @@ python-json-logger==2.0.7
 # flake8==7.1.0
 
 # Security
-cryptography==42.0.8
-python-jose[cryptography]==3.3.0
+cryptography==50.0.0
+python-jose[cryptography]==3.4.0
 
 # Web Scraping & SMA Dependencies
 beautifulsoup4==4.12.3
-aiohttp==3.10.11
+aiohttp==3.14.3
 selenium==4.27.1
-lxml==5.3.0
-urllib3==2.1.0
+lxml==6.1.0
+urllib3==2.7.0
 chardet==5.2.0
 certifi==2023.11.17
-idna==3.6
+idna==3.15
 
 # Multi-Agent Framework
 crewai==0.86.0
 
 # Text Processing & NLP
-nltk==3.9.1
+nltk==3.10.0
 textblob==0.18.0
 python-dateutil==2.9.0
 
