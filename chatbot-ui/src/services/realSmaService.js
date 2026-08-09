@@ -289,8 +289,12 @@ Fournissez une analyse structurée en format JSON:
           let analysis;
 
           try {
-            const jsonMatch = analysisText.match(/\{[\s\S]*\}/);
-            analysis = jsonMatch ? JSON.parse(jsonMatch[0]) : this.fallbackAnalysis(analysisText);
+            const firstBrace = analysisText.indexOf('{');
+            const lastBrace = analysisText.lastIndexOf('}');
+            const jsonString = (firstBrace !== -1 && lastBrace > firstBrace)
+              ? analysisText.slice(firstBrace, lastBrace + 1)
+              : null;
+            analysis = jsonString ? JSON.parse(jsonString) : this.fallbackAnalysis(analysisText);
           } catch (e) {
             console.warn('Analysis text parsing error:', e?.message);
             analysis = this.fallbackAnalysis(analysisText);
@@ -368,8 +372,12 @@ Format JSON:
 
         try {
           const translationText = await geminiService.generateContent(prompt);
-          const jsonMatch = translationText.match(/\{[\s\S]*\}/);
-          const translation = jsonMatch ? JSON.parse(jsonMatch[0]) : {
+          const firstBrace = translationText.indexOf('{');
+          const lastBrace = translationText.lastIndexOf('}');
+          const jsonString = (firstBrace !== -1 && lastBrace > firstBrace)
+            ? translationText.slice(firstBrace, lastBrace + 1)
+            : null;
+          const translation = jsonString ? JSON.parse(jsonString) : {
             translatedTitle: item.title,
             translatedSummary: item.analysis.summary
           };

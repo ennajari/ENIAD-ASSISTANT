@@ -331,10 +331,12 @@ class RAGApiService {
     // Parse JSON response if the content contains structured data
     let parsedContent = null;
     try {
-      // Try to extract JSON from the response content safely (non-greedy)
-      const jsonMatch = messageData.content.match(/\{[\s\S]*?\}/);
-      if (jsonMatch) {
-        parsedContent = JSON.parse(jsonMatch[0]);
+      // Try to extract JSON from the response content safely (without regex backtracking)
+      const firstBrace = messageData.content.indexOf('{');
+      const lastBrace = messageData.content.lastIndexOf('}');
+      if (firstBrace !== -1 && lastBrace > firstBrace) {
+        const jsonString = messageData.content.slice(firstBrace, lastBrace + 1);
+        parsedContent = JSON.parse(jsonString);
       }
     } catch (err) {
       console.log('📝 Response is not structured JSON, treating as plain text:', err?.message);
@@ -414,11 +416,19 @@ class RAGApiService {
   }
 
   /**
-   * Generate a unique chat ID
+   * Generate a unique chat ID using cryptographically secure random values
    * @returns {string} Chat ID
    */
   generateChatId() {
-    return `chat_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+    const randomBytes = new Uint32Array(2);
+    if (typeof window !== 'undefined' && window.crypto?.getRandomValues) {
+      window.crypto.getRandomValues(randomBytes);
+    } else {
+      randomBytes[0] = Math.floor(Math.random() * 4294967295);
+      randomBytes[1] = Math.floor(Math.random() * 4294967295);
+    }
+    const randStr = randomBytes[0].toString(36) + randomBytes[1].toString(36);
+    return `chat_${Date.now()}_${randStr.substring(0, 9)}`;
   }
 
   /**
