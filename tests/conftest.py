@@ -8,8 +8,8 @@ except ImportError:
 
 # Add project subdirectories to sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../RAG_Project/src')))
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../SMA_Service')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../services/rag-service/src')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../services/sma-service')))
 
 if pytest:
     @pytest.fixture

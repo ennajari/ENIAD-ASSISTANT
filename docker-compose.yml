@@ -3,7 +3,7 @@ version: '3.8'
 services:
   frontend:
     build:
-      context: .
+      context: ./frontend
       dockerfile: Dockerfile
     container_name: eniad_frontend
     ports:
@@ -18,8 +18,8 @@ services:
 
   rag-service:
     build:
-      context: .
-      dockerfile: RAG_Project/Dockerfile
+      context: ./services/rag-service
+      dockerfile: Dockerfile
     container_name: eniad_rag_service
     ports:
       - "8009:8009"
@@ -33,8 +33,8 @@ services:
 
   sma-service:
     build:
-      context: .
-      dockerfile: SMA_Service/Dockerfile
+      context: ./services/sma-service
+      dockerfile: Dockerfile
     container_name: eniad_sma_service
     ports:
       - "8002:8002"

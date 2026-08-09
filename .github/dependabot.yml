@@ -1,23 +1,23 @@
 # Dependabot configuration for ENIAD-ASSISTANT
 version: 2
 updates:
-  # npm dependencies for Chatbot UI
+  # npm dependencies for Frontend UI
   - package-ecosystem: "npm"
-    directory: "/chatbot-ui"
+    directory: "/frontend"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
 
   # Python dependencies for RAG Microservice
   - package-ecosystem: "pip"
-    directory: "/RAG_Project"
+    directory: "/services/rag-service"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
 
   # Python dependencies for SMA Multi-Agent Microservice
   - package-ecosystem: "pip"
-    directory: "/SMA_Service"
+    directory: "/services/sma-service"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5

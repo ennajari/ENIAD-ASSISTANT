@@ -29,7 +29,7 @@ This platform was developed as part of the **Projet de Fin d'Année (PFA)** by a
 
 ```mermaid
 graph TD
-    User([Student / Professor]) <--> UI[Chatbot UI - React 18 / Vite<br/>Port: 3000 (Local) / 80 (Docker)]
+    User([Student / Professor]) <--> UI[Frontend Web App - React 18 / Vite<br/>Port: 3000 (Local) / 80 (Docker)]
     UI <--> RAG[RAG Service - FastAPI<br/>Port: 8009]
     UI <--> SMA[SMA Multi-Agent Service - FastAPI<br/>Port: 8002]
     UI <--> Modal[Custom Model Server - Modal API<br/>Llama-3 8B Fine-tuned]
@@ -41,12 +41,12 @@ graph TD
 
 ### Microservice Port Map
 
-| Component | Technology | Port | API Endpoint Base |
-| :--- | :--- | :--- | :--- |
-| **Chatbot UI** | React 18 + Vite + MUI | **3000** | `http://localhost:3000` |
-| `SMA_Service` | FastAPI + CrewAI + Gemini | **8002** | `http://localhost:8002/sma/intelligent-query` |
-| `RAG_Project` | FastAPI + LanceDB / Qdrant | **8009** | `http://localhost:8009/search/eniadassistant` |
-| `MongoDB` | Database | **27017** | `mongodb://localhost:27017` |
+| Component | Technology | Port | API Endpoint Base | Directory Location |
+| :--- | :--- | :--- | :--- | :--- |
+| **Frontend UI** | React 18 + Vite + MUI | **3000** | `http://localhost:3000` | [`frontend/`](file:///c:/Users/ROG%20FLOW/Desktop/ENIAD/Semestre/Semestre_8/Atelier%20Des%20Activites%20Pratiques%20Et%20Projets-%20PFA/PFA%20-%20code/ENIAD-ASSISTANT/frontend) |
+| **SMA Service** | FastAPI + CrewAI + Gemini | **8002** | `http://localhost:8002/sma/intelligent-query` | [`services/sma-service/`](file:///c:/Users/ROG%20FLOW/Desktop/ENIAD/Semestre/Semestre_8/Atelier%20Des%20Activites%20Pratiques%20Et%20Projets-%20PFA/PFA%20-%20code/ENIAD-ASSISTANT/services/sma-service) |
+| **RAG Service** | FastAPI + LanceDB / Qdrant | **8009** | `http://localhost:8009/search/eniadassistant` | [`services/rag-service/`](file:///c:/Users/ROG%20FLOW/Desktop/ENIAD/Semestre/Semestre_8/Atelier%20Des%20Activites%20Pratiques%20Et%20Projets-%20PFA/PFA%20-%20code/ENIAD-ASSISTANT/services/rag-service) |
+| **MongoDB** | Database | **27017** | `mongodb://localhost:27017` | Standard Container |
 
 ---
 
@@ -57,18 +57,22 @@ ENIAD-ASSISTANT/
 ├── .github/                      # CI/CD Workflows, Dependabot, Issue & PR Templates
 │   ├── workflows/ci-cd.yml       # GitHub Actions CI/CD Pipeline
 │   └── dependabot.yml            # Security scanner configuration
-├── chatbot-ui/                   # React 18 + Vite Conversational Frontend (Port 3000)
+├── frontend/                     # React 18 + Vite Conversational Web UI (Port 3000)
 │   ├── src/                      # UI Components, State Contexts & API Services
 │   └── Dockerfile                # Nginx multi-stage build container
-├── RAG_Project/                  # RAG Vector Search Microservice (Port 8009)
-│   ├── src/                      # FastAPI Routes, LanceDB/Qdrant Vector DB Stores
-│   └── data/                     # ENIAD Academic PDF & Text Documents
-├── SMA_Service/                  # Multi-Agent Web Intelligence Service (Port 8002)
-│   ├── agents/                   # Autonomous Agents (WebScraper, ContentAnalyzer, RAG)
-│   └── crew/                     # CrewAI Multi-Agent Task Orchestrations
-├── deploy_code/                  # Custom Fine-Tuned Llama-3 8B Deployment Scripts
-│   └── app.py                    # Modal Serverless Serving script
-├── docs/wiki/                    # Official Project Technical Wiki Documentation
+├── services/                     # Microservice Backend Applications
+│   ├── rag-service/              # RAG Vector Search Microservice (Port 8009)
+│   │   ├── src/                  # FastAPI Routes, LanceDB/Qdrant Vector DB Stores
+│   │   └── data/                 # ENIAD Academic PDF & Text Documents
+│   └── sma-service/              # Multi-Agent Web Intelligence Service (Port 8002)
+│       ├── agents/               # Autonomous Agents (WebScraper, ContentAnalyzer, RAG)
+│       └── crew/                 # CrewAI Multi-Agent Task Orchestrations
+├── deployments/                  # Cloud & Infrastructure Deployments
+│   └── modal/                    # Custom Fine-Tuned Llama-3 8B Serving Scripts
+├── notebooks/                    # AI Research, Fine-Tuning & Deployment Notebooks
+├── docs/                         # Project Documentation & Reports
+│   ├── wiki/                     # Official Project Technical Wiki Documentation
+│   └── reports/                  # Academic PFA Reports & Integration Results
 ├── tests/                        # Automated Pytest Suite
 └── docker-compose.yml            # Multi-Container Production Deployer
 ```
@@ -88,23 +92,23 @@ Access the application at `http://localhost:3000`.
 
 ### 2. Manual Development Setup
 
-#### Frontend (`chatbot-ui`):
+#### Frontend (`frontend`):
 ```bash
-cd chatbot-ui
+cd frontend
 npm install
 npm run dev
 ```
 
-#### RAG Microservice (`RAG_Project`):
+#### RAG Microservice (`services/rag-service`):
 ```bash
-cd RAG_Project
+cd services/rag-service
 pip install -r src/requirements.txt
 python src/main.py
 ```
 
-#### SMA Microservice (`SMA_Service`):
+#### SMA Microservice (`services/sma-service`):
 ```bash
-cd SMA_Service
+cd services/sma-service
 pip install -r requirements.txt
 python main.py
 ```

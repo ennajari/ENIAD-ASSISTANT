@@ -32,11 +32,11 @@ jobs:
 
       - name: Python Syntax & Compilation Verification
         run: |
-          python -m py_compile SMA_Service/main.py RAG_Project/src/main.py
+          python -m py_compile services/sma-service/main.py services/rag-service/src/main.py
 
       - name: Frontend Dependencies & Build
         run: |
-          cd chatbot-ui
+          cd frontend
           npm install
           npm run build
 

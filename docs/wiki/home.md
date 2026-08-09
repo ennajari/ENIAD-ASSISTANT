@@ -8,15 +8,15 @@ Welcome to the official technical wiki for **ENIAD-ASSISTANT**, the enterprise c
 
 | Section | Content & Focus Area | Link |
 | :--- | :--- | :--- |
-| **🏠 Home & Overview** | Platform mission, architecture overview, AI Engineering team roster | [Home](home.md) |
-| **🏗️ System Architecture** | Topology, microservices interaction, sequence diagrams, port map | [System Architecture](architecture.md) |
-| **💻 Frontend Application** | React 18 + Vite components, state management, API services, UI themes | [Frontend Guide](frontend-ui.md) |
-| **🧮 RAG Microservice** | Vector DB (LanceDB/Qdrant), document processing, FastAPI endpoints (8009) | [RAG Service](rag-service.md) |
-| **🤖 SMA Multi-Agent System** | Autonomous web scrapers, Gemini AI analysis, crew orchestration (8002) | [SMA Service](sma-service.md) |
-| **🧠 Model Deployment** | Fine-tuned Llama-3 8B model (`ahmed-ouka`), Modal platform vLLM serving | [Model Deployment](model-deployment.md) |
-| **⚙️ DevOps & CI/CD** | GitHub Actions pipeline, multi-stage Docker Compose, environment secrets | [DevOps & CI/CD](devops-cicd.md) |
-| **🧪 Testing & Quality** | Pytest test suite, ESLint & SonarLint code quality, security controls | [Testing & Quality](testing-quality.md) |
-| **❓ Troubleshooting & FAQ** | Port conflict resolution, startup diagnostics, error fixes | [FAQ & Troubleshooting](faq.md) |
+| **🏠 Home & Overview** | Platform mission, architecture overview, AI Engineering team roster | [Home](Home) |
+| **🏗️ System Architecture** | Topology, microservices interaction, sequence diagrams, port map | [System Architecture](Architecture) |
+| **💻 Frontend Application** | React 18 + Vite components, state management, API services, UI themes | [Frontend Guide](Frontend-UI) |
+| **🧮 RAG Microservice** | Vector DB (LanceDB/Qdrant), document processing, FastAPI endpoints (8009) | [RAG Service](RAG-Service) |
+| **🤖 SMA Multi-Agent System** | Autonomous web scrapers, Gemini AI analysis, crew orchestration (8002) | [SMA Service](SMA-Service) |
+| **🧠 Model Deployment** | Fine-tuned Llama-3 8B model (`ahmed-ouka`), Modal platform vLLM serving | [Model Deployment](Model-Deployment) |
+| **⚙️ DevOps & CI/CD** | GitHub Actions pipeline, multi-stage Docker Compose, environment secrets | [DevOps & CI/CD](DevOps-CICD) |
+| **🧪 Testing & Quality** | Pytest test suite, ESLint & SonarLint code quality, security controls | [Testing & Quality](Testing-Quality) |
+| **❓ Troubleshooting & FAQ** | Port conflict resolution, startup diagnostics, error fixes | [FAQ & Troubleshooting](FAQ) |
 
 ---
 
@@ -52,9 +52,9 @@ graph TD
 
 ## 🌐 Network Ports & Microservices Summary
 
-| Service | Technology Stack | Network Port | Service Purpose |
-| :--- | :--- | :--- | :--- |
-| `eniad-assistant-ui` | React 18 + Vite + Nginx | **3000** (Local) / **80** (Docker) | Conversational Web Interface |
-| `SMA_Service` | FastAPI + Gemini AI + Scrapers | **8002** | Multi-Agent Web Intelligence API |
-| `RAG_Project` | FastAPI + LanceDB / Qdrant | **8009** | Vector Search & Document Ingestion API |
-| `MongoDB` | MongoDB | **27017** | Chat History & Session Storage |
+| Service | Technology Stack | Network Port | Service Purpose | Directory Location |
+| :--- | :--- | :--- | :--- | :--- |
+| `frontend` | React 18 + Vite + Nginx | **3000** (Local) / **80** (Docker) | Conversational Web Interface | `frontend/` |
+| `sma-service` | FastAPI + Gemini AI + Scrapers | **8002** | Multi-Agent Web Intelligence API | `services/sma-service/` |
+| `rag-service` | FastAPI + LanceDB / Qdrant | **8009** | Vector Search & Document Ingestion API | `services/rag-service/` |
+| `MongoDB` | MongoDB | **27017** | Chat History & Session Storage | Standard Container |

@@ -13,7 +13,7 @@ except ImportError:
     TestClient = None
 
 # Import RAG main FastAPI app dynamically
-rag_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../RAG_Project/src'))
+rag_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../services/rag-service/src'))
 if rag_path not in sys.path:
     sys.path.insert(0, rag_path)
 

@@ -13,7 +13,7 @@ except ImportError:
     TestClient = None
 
 # Import SMA main FastAPI app dynamically
-sma_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../SMA_Service'))
+sma_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../services/sma-service'))
 if sma_path not in sys.path:
     sys.path.insert(0, sma_path)
 
