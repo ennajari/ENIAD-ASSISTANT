@@ -13,7 +13,7 @@ google-generativeai==0.8.3
 openai==1.54.4
 cohere==5.11.3
 langchain==0.3.7
-langchain-community==0.3.5
+langchain-community==0.4.2
 
 # Base de données
 motor==3.6.0
