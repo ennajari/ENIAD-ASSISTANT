@@ -29,7 +29,7 @@ pdfplumber==0.11.4
 # Image Processing & OCR
 Pillow==10.4.0
 pytesseract==0.3.13
-opencv-python==4.10.0.84
+opencv-python==5.0.0.93
 
 # Vector Database & Embeddings
 chromadb==0.5.23
