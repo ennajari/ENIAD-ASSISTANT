@@ -23,7 +23,7 @@ chromadb>=0.5.23
 
 # Traitement de documents
 PyPDF2>=3.0.1
-python-docx>=1.1.2
+python-docx>=1.2.0
 pdfplumber>=0.11.4
 Pillow>=11.1.0
 pytesseract>=0.3.13
