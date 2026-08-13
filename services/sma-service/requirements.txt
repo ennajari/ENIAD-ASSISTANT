@@ -11,7 +11,7 @@ python-multipart>=0.0.20
 # Web Scraping
 beautifulsoup4>=4.12.3
 requests>=2.32.3
-aiohttp>=3.11.12
+aiohttp>=3.14.3
 selenium>=4.27.1
 
 # AI Integration
