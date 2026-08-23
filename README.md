@@ -1,6 +1,7 @@
 # 🎓 ENIAD-ASSISTANT: Enterprise AI Academic Platform
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI/CD Pipeline](https://github.com/ennajari/ENIAD-ASSISTANT/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/ennajari/ENIAD-ASSISTANT/actions/workflows/ci-cd.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![React 18](https://img.shields.io/badge/React-18-61DAFB.svg?logo=react&logoColor=black)](https://react.dev/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110.0-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
@@ -43,9 +44,9 @@ graph TD
 
 | Component | Technology | Port | API Endpoint Base | Directory Location |
 | :--- | :--- | :--- | :--- | :--- |
-| **Frontend UI** | React 18 + Vite + MUI | **3000** | `http://localhost:3000` | [`frontend/`](file:///c:/Users/ROG%20FLOW/Desktop/ENIAD/Semestre/Semestre_8/Atelier%20Des%20Activites%20Pratiques%20Et%20Projets-%20PFA/PFA%20-%20code/ENIAD-ASSISTANT/frontend) |
-| **SMA Service** | FastAPI + CrewAI + Gemini | **8002** | `http://localhost:8002/sma/intelligent-query` | [`services/sma-service/`](file:///c:/Users/ROG%20FLOW/Desktop/ENIAD/Semestre/Semestre_8/Atelier%20Des%20Activites%20Pratiques%20Et%20Projets-%20PFA/PFA%20-%20code/ENIAD-ASSISTANT/services/sma-service) |
-| **RAG Service** | FastAPI + LanceDB / Qdrant | **8009** | `http://localhost:8009/search/eniadassistant` | [`services/rag-service/`](file:///c:/Users/ROG%20FLOW/Desktop/ENIAD/Semestre/Semestre_8/Atelier%20Des%20Activites%20Pratiques%20Et%20Projets-%20PFA/PFA%20-%20code/ENIAD-ASSISTANT/services/rag-service) |
+| **Frontend UI** | React 18 + Vite + MUI | **3000** | `http://localhost:3000` | [`frontend/`](frontend/) |
+| **SMA Service** | FastAPI + CrewAI + Gemini | **8002** | `http://localhost:8002/sma/intelligent-query` | [`services/sma-service/`](services/sma-service/) |
+| **RAG Service** | FastAPI + LanceDB / Qdrant | **8009** | `http://localhost:8009/search/eniadassistant` | [`services/rag-service/`](services/rag-service/) |
 | **MongoDB** | Database | **27017** | `mongodb://localhost:27017` | Standard Container |
 
 ---
@@ -120,7 +121,44 @@ pytest tests/ -v
 
 ---
 
+## ✅ Testing & CI/CD
+
+- **Unit & integration tests**: `pytest` suite under [`tests/`](tests/) covering the RAG and SMA backend endpoints (`pytest tests/ -v`).
+- **Continuous Integration**: [`.github/workflows/ci-cd.yml`](.github/workflows/ci-cd.yml) runs on every push/PR to `main` — Python syntax checks, frontend build, the pytest suite, a `.env`-leak guard, and a `docker compose config` validation. See the live status via the badge at the top of this README.
+- **Dependency updates**: automated via [`.github/dependabot.yml`](.github/dependabot.yml) (npm for `frontend/`, pip for both microservices).
+
+---
+
 ## 📖 Complete Documentation & Wiki
 
 For in-depth architecture diagrams, API contracts, deployment guides, and troubleshooting:
-👉 **[Visit the Official ENIAD-ASSISTANT GitHub Wiki](https://github.com/ennajari/ENIAD-ASSISTANT/wiki)**
+👉 **[Visit the Official ENIAD-ASSISTANT GitHub Wiki](https://github.com/ennajari/ENIAD-ASSISTANT/wiki)** (mirrored under [`docs/wiki/`](docs/wiki/) in this repo)
+👉 **[System Architecture Guide](ARCHITECTURE.md)** — microservice topology, data pipelines, and multi-agent workflow internals.
+
+---
+
+## 🤝 Contributing
+
+Contributions, bug reports, and feature requests are welcome — see [`CONTRIBUTING.md`](CONTRIBUTING.md) for the workflow and coding standards, and [`CODE_OF_CONDUCT.md`](.github/CODE_OF_CONDUCT.md) for community guidelines.
+
+## 🔐 Security
+
+To report a vulnerability, please follow the responsible-disclosure process described in [`SECURITY.md`](SECURITY.md) rather than opening a public issue.
+
+## 📝 Changelog
+
+Notable changes to this project are tracked in [`CHANGELOG.md`](CHANGELOG.md), following [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and [Semantic Versioning](https://semver.org/).
+
+## 📄 License
+
+This project is licensed under the **MIT License** — see [`LICENSE`](LICENSE) for the full text.
+
+## 👤 Authors & Contributors
+
+The "AI Engineering Team" table above lists the academic PFA project roles. Actual repository commit history (`git log`) additionally reflects:
+
+- **Abdellah Ennajari** ([@ennajari](https://github.com/ennajari)) — repository owner
+- **Oussama EL-HADJI** ([@Bosaj](https://github.com/Bosaj)) — frontend, SMA multi-agent service
+- **Abdelilah Ourti** — RAG vector DB pipeline
+
+Ahmed Oukacha's fine-tuning work (`ahmed-ouka/llama3-8b-eniad-merged-32bit`) was carried out outside this repository (Colab/Hugging Face) and is referenced but not committed here.
