@@ -1,19 +1,10 @@
 /**
- * Evaluation harness for CommonJS Node.js environment
+ * Evaluation harness for ENIAD-ASSISTANT (CommonJS)
  */
-let getHealthStatus;
-try {
-  getHealthStatus = require('../monitoring/health.js').getHealthStatus;
-} catch (e) {
-  try {
-    getHealthStatus = require('../monitoring/health').getHealthStatus;
-  } catch (err) {
-    getHealthStatus = () => ({ status: 'UP' });
-  }
-}
+const { getHealthStatus } = require('../monitoring/health.js');
 
 function runEvaluation() {
-  console.log("Running Node.js CommonJS evaluation harness...");
+  console.log("Running Node.js CommonJS evaluation harness for ENIAD-ASSISTANT...");
   let isHealthy = true;
   try {
     const health = getHealthStatus();
