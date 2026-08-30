@@ -162,3 +162,13 @@ The "AI Engineering Team" table above lists the academic PFA project roles. Actu
 - **Abdelilah Ourti** — RAG vector DB pipeline
 
 Ahmed Oukacha's fine-tuning work (`ahmed-ouka/llama3-8b-eniad-merged-32bit`) was carried out outside this repository (Colab/Hugging Face) and is referenced but not committed here.
+
+
+## 📊 Monitoring, Controlling, Evaluation & QA
+
+This project includes a standardized 4-Pillar Observability and QA framework:
+- **Logs & Prometheus/Grafana Monitoring**: Configured in `monitoring/` with Prometheus scraper configs and Grafana dashboards.
+- **Health Controlling & Evaluation**: Liveness/readiness controllers in `monitoring/health.py` and evaluation harness in `scripts/eval_harness.py`.
+- **QA & Testing**: Automated Pytest/Vitest integration and CI workflows via `.github/workflows/ci_qa_monitoring.yml`.
+
+For complete instructions, architecture details, and commands, see [docs/MONITORING_AND_QA.md](file:///C:\Users\ROG FLOW\Desktop\Projects\Github_Projects\ENIAD-ASSISTANT\docs\MONITORING_AND_QA.md).
