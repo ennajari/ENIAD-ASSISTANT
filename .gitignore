@@ -479,3 +479,12 @@ eniad_assistant.log
 !SECURITY.md
 !LICENSE
 node_modules
+
+
+# Local Environment & Staging Security
+*.env
+.wiki-staging
+temp_*
+
+# Environment & Security Exclusions
+.env.*.local

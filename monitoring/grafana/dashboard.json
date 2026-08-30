@@ -1,0 +1,51 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "id": 1,
+      "title": "ENIAD-ASSISTANT - Request Rate",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(app_requests_total[5m])",
+          "legendFormat": "{{endpoint}}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "ENIAD-ASSISTANT - Request Duration (p95)",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(app_request_duration_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p95 duration"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "ENIAD-ASSISTANT - Health & Evaluation Index",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "model_evaluation_score{metric_name='quality_index'}",
+          "legendFormat": "Quality Index"
+        }
+      ]
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 38,
+  "title": "ENIAD-ASSISTANT Observability Dashboard",
+  "uid": "eniad_assistant_obs",
+  "version": 1
+}
