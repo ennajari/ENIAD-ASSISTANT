@@ -34,7 +34,7 @@ motor==3.7.0
 qdrant-client==1.14.2
 
 # Security
-cryptography==42.0.8
+cryptography==50.0.0
 
 # Utilities
 requests==2.32.3
