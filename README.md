@@ -41,6 +41,22 @@ This platform was developed as part of the **Projet de Fin d'Année (PFA)** by a
 
 ---
 
+## 🏛️ The Complete ENIAD Model Family & Checkpoint Hub
+
+The **ENIAD Assistant ecosystem** consists of multiple collaborative checkpoints, quantization profiles, and architectural variants engineered during our PFA research milestone:
+
+| Model & Checkpoint | Base Architecture | Precision / Format | Target Environment & Use-Case | Verified Repository Link |
+| :--- | :--- | :--- | :--- | :--- |
+| **LLaMA-3.1-8B Assistant LoRA** | `meta-llama/Llama-3.1-8B` | 16-Bit PEFT LoRA (Rank 16, Alpha 32) | Primary institutional conversational assistant (Bilingual FR/EN) | [bosaj/eniad-llama3.1-8b-assistant-lora](https://huggingface.co/bosaj/eniad-llama3.1-8b-assistant-lora) |
+| **LLaMA-3-8B Merged 32-Bit** | `meta-llama/Meta-Llama-3-8B` | Full Float32 Merged Weights | Standalone backend inference server without runtime adapter loading | [ahmed-ouka/llama3-8b-eniad-merged-32bit](https://huggingface.co/ahmed-ouka/llama3-8b-eniad-merged-32bit) |
+| **LLaMA-3.1-8B Team Milestone** | `meta-llama/Llama-3.1-8B` | PEFT LoRA Sharded Safetensors | Original PFA milestone model checkpoint (May 2025 team release) | [ahmed-ouka/my-llama3.1-8B-with-lora-Eniad-Assistant](https://huggingface.co/ahmed-ouka/my-llama3.1-8B-with-lora-Eniad-Assistant) |
+| **Eniad LLaMA 8-Bit Quantized** | `meta-llama/Meta-Llama-3-8B` | 8-Bit `bitsandbytes` NF4/INT8 | High-efficiency local inference on edge GPUs (< 6GB VRAM) | [ahmed-ouka/Eniad-model-llama-Assistant](https://huggingface.co/ahmed-ouka/Eniad-model-llama-Assistant) |
+| **LLaMA-Factory 3.1 LoRA Adapter** | `meta-llama/Llama-3.1-8B` | Modular PEFT Adapter (~50MB) | Exported modular weights from the LLaMA-Factory training pipeline | [ahmed-ouka/llama-lora-adapter-eniad](https://huggingface.co/ahmed-ouka/llama-lora-adapter-eniad) |
+| **Qwen-2.5-1.5B LoRA Experiment** | `Qwen/Qwen2.5-1.5B-Instruct` | 16-Bit PEFT LoRA (Compact) | Ultra-fast lightweight edge reasoning model benchmark (< 2GB VRAM) | [ahmed-ouka/lora-qwen-eniad](https://huggingface.co/ahmed-ouka/lora-qwen-eniad) |
+| **Estimation_du_prix PEFT Model** | Domain Regression Adapter | Safetensors LoRA Adapter | Specialized real estate and asset valuation predictive model | [ahmed-ouka/Estimation_du_prix](https://huggingface.co/ahmed-ouka/Estimation_du_prix) |
+
+---
+
 ## 🏛️ System Architecture & Service Network Matrix
 
 ```mermaid
