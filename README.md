@@ -41,9 +41,9 @@ This platform was developed as part of the **Projet de Fin d'Année (PFA)** by a
 
 ---
 
-## 🏛️ The Complete ENIAD LLaMA Chatbot Model Family
+## 🏛️ The Complete ENIAD Chatbot Model Family (LLaMA & Qwen)
 
-The **ENIAD Chatbot ecosystem** consists of collaborative LLaMA checkpoints, quantization profiles, and LoRA adapters engineered for our institutional assistant:
+The **ENIAD Chatbot ecosystem** consists of collaborative LLaMA & Qwen checkpoints, quantization profiles, and LoRA adapters engineered for our institutional assistant:
 
 | Model & Checkpoint | Base Architecture | Precision / Format | Target Environment & Use-Case | Verified Repository Link |
 | :--- | :--- | :--- | :--- | :--- |
@@ -52,6 +52,7 @@ The **ENIAD Chatbot ecosystem** consists of collaborative LLaMA checkpoints, qua
 | **LLaMA-3.1-8B Team Milestone** | `meta-llama/Llama-3.1-8B` | PEFT LoRA Sharded Safetensors | Original PFA milestone model checkpoint (May 2025 team release) | [ahmed-ouka/my-llama3.1-8B-with-lora-Eniad-Assistant](https://huggingface.co/ahmed-ouka/my-llama3.1-8B-with-lora-Eniad-Assistant) |
 | **Eniad LLaMA 8-Bit Quantized** | `meta-llama/Meta-Llama-3-8B` | 8-Bit `bitsandbytes` NF4/INT8 | High-efficiency local inference on edge GPUs (< 6GB VRAM) | [ahmed-ouka/Eniad-model-llama-Assistant](https://huggingface.co/ahmed-ouka/Eniad-model-llama-Assistant) |
 | **LLaMA-Factory 3.1 LoRA Adapter** | `meta-llama/Llama-3.1-8B` | Modular PEFT Adapter (~50MB) | Exported modular weights from the LLaMA-Factory training pipeline | [ahmed-ouka/llama-lora-adapter-eniad](https://huggingface.co/ahmed-ouka/llama-lora-adapter-eniad) |
+| **Qwen-2.5-1.5B ENIAD LoRA** | `Qwen/Qwen2.5-1.5B-Instruct` | 16-Bit PEFT LoRA (Compact) | Ultra-fast lightweight assistant for low-latency & edge devices (< 2GB VRAM) | [ahmed-ouka/lora-qwen-eniad](https://huggingface.co/ahmed-ouka/lora-qwen-eniad) |
 
 ---
 
