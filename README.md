@@ -32,12 +32,12 @@ The system combines **Hybrid Vector RAG Search**, an autonomous **Multi-Agent We
 
 This platform was developed as part of the **Projet de Fin d'Année (PFA)** by a team of **4 AI Engineers**:
 
-| AI Engineer | Official Role | Domain & Core Contributions |
-| :--- | :--- | :--- |
-| **Abdellah ENNAJARI** | **Lead AI & MLOps Engineer** | Microservice System Architecture, CI/CD Pipeline Automation, Multi-stage Docker Containerization, System Integration & Service Port Harmonization |
-| **Ahmed OUKACHA** | **AI Systems & Fine-Tuning Specialist** | Custom Fine-Tuned Llama-3 8B Academic Model (`ahmed-ouka/llama3-8b-eniad-merged-32bit`), Model Server & Modal Platform API Integration |
-| **Oussama ELHADJI** | **Full-Stack AI UI & SMA Multi-Agent Engineer** | React 18 + Vite Conversational Frontend UI, Real-Time Agent Streaming, SMA Multi-Agent Web Intelligence Service & Web Scrapers |
-| **Abdelilah OURTI** | **Vector DB & RAG Pipeline Engineer** | LanceDB / Qdrant Vector Store Indexing, Academic Document Embedding Pipelines, RAG Query Optimizations & Fast Search Backend |
+| AI Engineer | Official Role | Domain & Core Contributions | Verified Profiles |
+| :--- | :--- | :--- | :--- |
+| **Abdellah ENNAJARI** | **Lead AI & MLOps Engineer** | Microservice System Architecture, CI/CD Pipeline Automation, Multi-stage Docker Containerization, System Integration & Service Port Harmonization | [@abdennajari](https://huggingface.co/abdennajari) • [GitHub @ennajari](https://github.com/ennajari) |
+| **Ahmed OUKACHA** | **AI Systems & Fine-Tuning Specialist** | Custom Fine-Tuned Llama-3 8B Academic Model (`ahmed-ouka/llama3-8b-eniad-merged-32bit`), Model Server & Modal Platform API Integration | [@ahmed-ouka](https://huggingface.co/ahmed-ouka) |
+| **Oussama ELHADJI** | **Full-Stack AI UI & SMA Multi-Agent Engineer** | React 18 + Vite Conversational Frontend UI, Real-Time Agent Streaming, SMA Multi-Agent Web Intelligence Service & Web Scrapers | [HF @bosaj](https://huggingface.co/bosaj) • [GitHub @Bosaj](https://github.com/Bosaj) |
+| **Abdelilah OURTI** | **Vector DB & RAG Pipeline Engineer** | LanceDB / Qdrant Vector Store Indexing, Academic Document Embedding Pipelines, RAG Query Optimizations & Fast Search Backend | [@abdelilahou](https://huggingface.co/abdelilahou) |
 
 ---
 
