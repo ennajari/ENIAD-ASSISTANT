@@ -1,3 +1,9 @@
+<p align="center">
+  <a href="https://huggingface.co/spaces/bosaj/chat_model" target="_blank"><img src="https://img.shields.io/badge/🤗%20Hugging%20Face-Live%20Chat%20Space-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black" alt="Live Chat Space" /></a>
+  <a href="https://huggingface.co/bosaj/eniad-llama3.1-8b-assistant-lora" target="_blank"><img src="https://img.shields.io/badge/🤗%20Model%20Card-Llama%203.1%20LoRA-FF9D00?style=for-the-badge&logo=huggingface&logoColor=black" alt="LoRA Model Card" /></a>
+  <a href="https://huggingface.co/datasets/bosaj/eniad-assistant-instruct-dataset" target="_blank"><img src="https://img.shields.io/badge/🤗%20Dataset-Eniad%20Instruct-00D9FF?style=for-the-badge&logo=huggingface&logoColor=black" alt="Dataset" /></a>
+</p>
+
 # ENIAD-ASSISTANT
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/ennajari/ENIAD-ASSISTANT) [![GitHub release](https://img.shields.io/github/v/release/ennajari/ENIAD-ASSISTANT?color=blue&label=release)](https://github.com/ennajari/ENIAD-ASSISTANT/releases) [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
