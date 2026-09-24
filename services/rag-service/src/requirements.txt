@@ -6,7 +6,7 @@ python-multipart>=0.0.20
 # Pydantic et configuration
 pydantic>=2.10.4
 pydantic-settings>=2.6.1
-python-dotenv>=1.1.0
+python-dotenv>=1.2.3
 
 # AI et LLM
 google-generativeai>=0.8.3
